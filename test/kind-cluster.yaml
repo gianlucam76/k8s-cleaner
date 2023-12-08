@@ -1,0 +1,26 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  podSubnet: "10.110.0.0/16"
+  serviceSubnet: "10.115.0.0/16"
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        v: "10"
+  image: kindest/node:K8S_VERSION
+  extraMounts:
+    - hostPath: /var/run/docker.sock
+      containerPath: /var/run/docker.sock
+    - hostPath: /usr/share/zoneinfo
+      containerPath: /usr/share/zoneinfo
+- role: worker
+  image: kindest/node:K8S_VERSION
+  extraMounts:
+    - hostPath: /var/run/docker.sock
+      containerPath: /var/run/docker.sock
+    - hostPath: /usr/share/zoneinfo
+      containerPath: /usr/share/zoneinfo

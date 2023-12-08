@@ -1,0 +1,203 @@
+linters-settings:
+  depguard:
+    list-type: blacklist
+    packages:
+      # Following logging implementations are allowed:
+      #   k8s.io/klog
+      #   go.uber.org/zap
+      #   go-logr/logr
+      #
+      # note that the following list will grow.
+      - github.com/google/glog
+      - log
+      - github.com/sirupsen/logrus
+      - github.com/wojas/genericr
+      - logfmt
+    packages-with-error-message:
+      - github.com/google/glog: "Use klog, zap, or logr for logging."
+      - log: "Use klog, zap, or logr for logging."
+      - github.com/sirupsen/logrus: "Use klog, zap, or logr for logging."
+      - github.com/wojas/genericr: "Use klog, zap, or logr for logging."
+      - logfmt: "Use klog, zap, or logr for logging."
+  dupl:
+    threshold: 200
+  errorlint:
+    # Use '%w' to format errors.
+    errorf: true
+  exhaustive:
+    # Ignore auto-generated code.
+    check-generated: false
+    default-signifies-exhaustive: false
+  forbidigo:
+    forbid:
+      # Forbid 'fmt.Print[|f|ln]() in shipping code.
+      - 'fmt\.Print.*'
+  funlen:
+    lines: 100
+    statements: 50
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+    disabled-checks:
+      - dupImport # https://github.com/go-critic/go-critic/issues/845
+      - ifElseChain
+      - octalLiteral
+      - whyNoLint # conflicts with nolintlint config providing superset functionality
+      - wrapperFunc
+  gocyclo:
+    min-complexity: 20
+  goimports:
+    local-prefixes: github.com/projectsveltos
+  gomnd:
+    settings:
+      mnd:
+        # don't include the "operation" and "assign"
+        checks: argument,case,condition,return
+  gomodguard:
+    # Although this is almost empty, we will evolve the list below with the
+    # modules we shouldn't use for technical and/or security reasons.
+    blocked:
+      modules:
+      - k8s.io/kubernetes:
+          reason: "There is no good, avoidable reason to use this package and often leads to issues such as https://bit.ly/3dlKScY. However, if you disagree please include @ravchama in code review highlighting the reason."
+      versions:
+      # Don't merge replace directives using local path.
+      local_replace_directives: true
+  govet:
+    check-shadowing: true
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  grouper:
+    const-require-grouping: true
+    import-require-single-import: true
+    import-require-grouping: true
+    var-require-grouping: true
+  lll:
+    line-length: 160
+  maintidx:
+    # check https://bit.ly/3tlJX3n for maintainability index.
+    ##
+    # starting with 25 to begin with, with the plan to bump it to 40 eventuallly.
+    ##
+    under: 25
+  misspell:
+    locale: US
+  nolintlint:
+    allow-unused: false # report any unused nolint directives
+    require-explanation: true # require an explanation for nolint directives
+    require-specific: true # require nolint directives to be specific about which linter is being skipped
+  revive:
+    ignore-generated-header: true
+    # this is a new linter, so let's start with Warning instead of errors to
+    # begin with.
+    severity: warning
+  whitespace:
+    multi-if: true
+    multi-func: true
+
+linters:
+  # please, do not use `enable-all`: it's deprecated and will be removed soon.
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  fast: false
+  enable:
+    - bidichk
+    - containedctx
+    - bodyclose
+    - depguard
+    - dogsled
+    - dupl
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forbidigo
+    - funlen
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - grouper
+    - ineffassign
+    - lll
+    - misspell
+    - maintidx
+    - nakedret
+    - noctx
+    - nolintlint
+    - nosprintfhostport
+    - predeclared
+    - revive
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+
+  # don't enable:
+  # - asciicheck
+  # - exhaustivestruct # applicable to special cases.
+  # - gochecknoglobals
+  # - gocognit
+  # - godot
+  # - godox
+  # - goerr113
+  # - golint # deprecated
+  # - interfacer # deprecated
+  # - maligned #deprecated
+  # - nestif
+  # - prealloc
+  # - scopelint # deprecated
+  # - testpackage
+  # - wsl
+
+issues:
+  # Excluding configuration per path, per linter, per text and per-source
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gomnd
+        - grouper
+        - maintidx
+
+    # https://github.com/go-critic/go-critic/issues/926
+    - linters:
+        - gocritic
+      text: "unnecessaryDefer:"
+  # Maximum issues count per one linter.
+  # Set to 0 to disable.
+  max-issues-per-linter: 0
+  # Maximum count of issues with the same text.
+  # Set to 0 to disable.
+  max-same-issues: 0
+
+run:
+  # Allow multiple parallel golangci-lint instances running.
+  allow-parallel-runners: true
+  # Timeout for analysis
+  timeout: 5m
+  # files to skip: they will be analyzed, but issues from them won't be reported.
+  skip-dirs:
+    - cmd/example/gen

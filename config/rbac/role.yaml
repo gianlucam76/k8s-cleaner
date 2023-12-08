@@ -1,0 +1,38 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: controller-role
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - pruners
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - pruners/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - pruners/status
+  verbs:
+  - get
+  - patch
+  - update

@@ -1,0 +1,12 @@
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Pruner
+metadata:
+  labels:
+    app.kubernetes.io/name: pruner
+    app.kubernetes.io/instance: pruner-sample
+    app.kubernetes.io/part-of: k8s-pruner
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: k8s-pruner
+  name: pruner-sample
+spec:
+  # TODO(user): Add fields here
