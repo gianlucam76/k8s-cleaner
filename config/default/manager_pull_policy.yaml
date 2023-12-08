@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller
+  namespace: projectsveltos
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        imagePullPolicy: 
