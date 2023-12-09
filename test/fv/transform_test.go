@@ -19,7 +19,7 @@ package fv_test
 import (
 	"context"
 	"fmt"
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"time"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -51,7 +51,7 @@ var (
         end`
 )
 
-var _ = Describe("PrunerClient", func() {
+var _ = Describe("CleanerClient", func() {
 	const namePrefix = "transform-"
 	It("Transform Action updates matching resources", Label("FV"), func() {
 		ns := namePrefix + randomString()
@@ -110,13 +110,18 @@ var _ = Describe("PrunerClient", func() {
 		By(fmt.Sprintf("creating service %s", service2.Name))
 		Expect(k8sClient.Create(context.TODO(), service2)).To(Succeed())
 
-		// This Pruner matches Service1 but does not match Service2
-		pruner := &appsv1alpha1.Pruner{
+		minute := time.Now().Minute() + 1
+		if minute == 60 {
+			minute = 0
+		}
+
+		// This Cleaner matches Service1 but does not match Service2
+		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: randomString(),
 			},
-			Spec: appsv1alpha1.PrunerSpec{
-				StaleResources: []appsv1alpha1.Resources{
+			Spec: appsv1alpha1.CleanerSpec{
+				MatchingResources: []appsv1alpha1.Resources{
 					{
 						Kind:      "Service",
 						Group:     "",
@@ -127,14 +132,14 @@ var _ = Describe("PrunerClient", func() {
 						Action:    appsv1alpha1.ActionTransform,
 					},
 				},
-				Schedule: fmt.Sprintf("%d * * * *", time.Now().Minute()+1),
+				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}
 
-		By(fmt.Sprintf("creating pruner %s", pruner.Name))
-		Expect(k8sClient.Create(context.TODO(), pruner)).To(Succeed())
+		By(fmt.Sprintf("creating cleaner %s", cleaner.Name))
+		Expect(k8sClient.Create(context.TODO(), cleaner)).To(Succeed())
 
-		// Pruner matches Service1. This is then updated
+		// Cleaner matches Service1. This is then updated
 		Eventually(func() bool {
 			currentService := &corev1.Service{}
 			err := k8sClient.Get(context.TODO(),
@@ -148,7 +153,7 @@ var _ = Describe("PrunerClient", func() {
 			return currentService.Spec.Selector[key] == newValue
 		}, timeout, pollingInterval).Should(BeTrue())
 
-		// Pruner does not match ServiceAccount2. So this is *not* updated
+		// Cleaner does not match ServiceAccount2. So this is *not* updated
 		currentService := &corev1.Service{}
 		Expect(k8sClient.Get(context.TODO(),
 			types.NamespacedName{Namespace: ns, Name: service2.Name}, currentService)).To(Succeed())
@@ -156,6 +161,6 @@ var _ = Describe("PrunerClient", func() {
 		_, ok := currentService.Spec.Selector[key]
 		Expect(ok).To(BeFalse())
 
-		deletePruner(pruner.Name)
+		deleteCleaner(cleaner.Name)
 	})
 })

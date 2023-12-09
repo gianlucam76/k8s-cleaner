@@ -29,7 +29,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
 var (
@@ -45,7 +45,7 @@ var (
         end`
 )
 
-var _ = Describe("PrunerClient", func() {
+var _ = Describe("CleanerClient", func() {
 	const namePrefix = "delete-"
 	It("Delete Action removes matching resources", Label("FV"), func() {
 		ns := namePrefix + randomString()
@@ -85,13 +85,18 @@ var _ = Describe("PrunerClient", func() {
 		By(fmt.Sprintf("creating serviceAccount %s", serviceAccount2.Name))
 		Expect(k8sClient.Create(context.TODO(), serviceAccount2)).To(Succeed())
 
-		// This Pruner matches ServiceAccount1 but does not match ServiceAccount2
-		pruner := &appsv1alpha1.Pruner{
+		minute := time.Now().Minute() + 1
+		if minute == 60 {
+			minute = 0
+		}
+
+		// This Cleaner matches ServiceAccount1 but does not match ServiceAccount2
+		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: randomString(),
 			},
-			Spec: appsv1alpha1.PrunerSpec{
-				StaleResources: []appsv1alpha1.Resources{
+			Spec: appsv1alpha1.CleanerSpec{
+				MatchingResources: []appsv1alpha1.Resources{
 					{
 						Kind:      "ServiceAccount",
 						Group:     "",
@@ -101,14 +106,14 @@ var _ = Describe("PrunerClient", func() {
 						Action:    appsv1alpha1.ActionDelete,
 					},
 				},
-				Schedule: fmt.Sprintf("%d * * * *", time.Now().Minute()+1),
+				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}
 
-		By(fmt.Sprintf("creating pruner %s", pruner.Name))
-		Expect(k8sClient.Create(context.TODO(), pruner)).To(Succeed())
+		By(fmt.Sprintf("creating cleaner %s", cleaner.Name))
+		Expect(k8sClient.Create(context.TODO(), cleaner)).To(Succeed())
 
-		// Pruner matches ServiceAccount1. This is then deleted
+		// Cleaner matches ServiceAccount1. This is then deleted
 		Eventually(func() bool {
 			currentServiceAccount := &corev1.ServiceAccount{}
 			err := k8sClient.Get(context.TODO(),
@@ -119,12 +124,12 @@ var _ = Describe("PrunerClient", func() {
 			return apierrors.IsNotFound(err)
 		}, timeout, pollingInterval).Should(BeTrue())
 
-		// Pruner does not match ServiceAccount2. So this is *not* deleted
+		// Cleaner does not match ServiceAccount2. So this is *not* deleted
 		currentServiceAccount := &corev1.ServiceAccount{}
 		Expect(k8sClient.Get(context.TODO(),
 			types.NamespacedName{Namespace: ns, Name: serviceAccount2.Name},
 			currentServiceAccount)).To(Succeed())
 
-		deletePruner(pruner.Name)
+		deleteCleaner(cleaner.Name)
 	})
 })

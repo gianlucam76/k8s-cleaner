@@ -32,48 +32,48 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
-	"gianlucam76/k8s-pruner/internal/controller/executor"
-	"gianlucam76/k8s-pruner/pkg/scope"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
+	"gianlucam76/k8s-cleaner/internal/controller/executor"
+	"gianlucam76/k8s-cleaner/pkg/scope"
 
 	"github.com/go-logr/logr"
 )
 
-// PrunerReconciler reconciles a Pruner object
-type PrunerReconciler struct {
+// CleanerReconciler reconciles a Cleaner object
+type CleanerReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 }
 
-//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=pruners,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=pruners/status,verbs=get;update;patch
-//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=pruners/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/finalizers,verbs=update
 //+kubebuilder:rbac:groups="*",resources="*",verbs="*"
 
-func (r *PrunerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
+func (r *CleanerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
 	logger := ctrl.LoggerFrom(ctx)
 	logger.Info("Reconciling")
 
-	// Fecth the Pruner instance
-	pruner := &appsv1alpha1.Pruner{}
-	err := r.Get(ctx, req.NamespacedName, pruner)
+	// Fecth the Cleaner instance
+	cleaner := &appsv1alpha1.Cleaner{}
+	err := r.Get(ctx, req.NamespacedName, cleaner)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return reconcile.Result{}, nil
 		}
-		logger.Error(err, "Failed to fetch Pruner")
+		logger.Error(err, "Failed to fetch Cleaner")
 		return reconcile.Result{}, errors.Wrapf(
 			err,
-			"Failed to fetch Pruner %s",
+			"Failed to fetch Cleaner %s",
 			req.NamespacedName,
 		)
 	}
 
-	prunerScope, err := scope.NewPrunerScope(scope.PrunerScopeParams{
+	cleanerScope, err := scope.NewCleanerScope(scope.CleanerScopeParams{
 		Client:         r.Client,
 		Logger:         logger,
-		Pruner:         pruner,
-		ControllerName: "pruner",
+		Cleaner:        cleaner,
+		ControllerName: "cleaner",
 	})
 	if err != nil {
 		logger.Error(err, "Failed to create profileScope")
@@ -85,61 +85,61 @@ func (r *PrunerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ c
 	}
 
 	// Always close the scope when exiting this function so we can persist any
-	// Pruner changes.
+	// Cleaner changes.
 	defer func() {
-		if err := prunerScope.Close(ctx); err != nil {
+		if err := cleanerScope.Close(ctx); err != nil {
 			reterr = err
 		}
 	}()
 
-	logger = logger.WithValues("pruner", pruner.Name)
+	logger = logger.WithValues("cleaner", cleaner.Name)
 
-	if !pruner.DeletionTimestamp.IsZero() {
-		r.reconcileDelete(prunerScope, logger)
+	if !cleaner.DeletionTimestamp.IsZero() {
+		r.reconcileDelete(cleanerScope, logger)
 		return ctrl.Result{}, nil
 	}
 
-	return r.reconcileNormal(ctx, prunerScope, logger)
+	return r.reconcileNormal(ctx, cleanerScope, logger)
 }
 
-func (r *PrunerReconciler) reconcileDelete(prunerScope *scope.PrunerScope, logger logr.Logger) {
+func (r *CleanerReconciler) reconcileDelete(cleanerScope *scope.CleanerScope, logger logr.Logger) {
 	logger.Info("reconcileDelete")
 
-	removeQueuedJobs(prunerScope)
+	removeQueuedJobs(cleanerScope)
 
-	if controllerutil.ContainsFinalizer(prunerScope.Pruner, appsv1alpha1.PrunerFinalizer) {
-		controllerutil.RemoveFinalizer(prunerScope.Pruner, appsv1alpha1.PrunerFinalizer)
+	if controllerutil.ContainsFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer) {
+		controllerutil.RemoveFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer)
 	}
 
 	logger.Info("reconcileDelete succeeded")
 }
 
-func (r *PrunerReconciler) reconcileNormal(ctx context.Context, prunerScope *scope.PrunerScope,
+func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *scope.CleanerScope,
 	logger logr.Logger) (reconcile.Result, error) {
 
 	logger.Info("reconcileSnapshotNormal")
-	if err := r.addFinalizer(ctx, prunerScope.Pruner, appsv1alpha1.PrunerFinalizer); err != nil {
+	if err := r.addFinalizer(ctx, cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer); err != nil {
 		logger.Info(fmt.Sprintf("failed to add finalizer: %s", err))
 		return reconcile.Result{}, err
 	}
 
 	executorClient := executor.GetClient()
-	result := executorClient.GetResult(prunerScope.Pruner.Name)
+	result := executorClient.GetResult(cleanerScope.Cleaner.Name)
 	if result.ResultStatus != executor.Unavailable {
 		if result.Err != nil {
 			msg := result.Err.Error()
-			prunerScope.SetFailureMessage(&msg)
+			cleanerScope.SetFailureMessage(&msg)
 		} else {
-			prunerScope.SetFailureMessage(nil)
+			cleanerScope.SetFailureMessage(nil)
 		}
 	}
 
 	now := time.Now()
-	nextRun, err := schedule(ctx, prunerScope, logger)
+	nextRun, err := schedule(ctx, cleanerScope, logger)
 	if err != nil {
 		logger.Info("failed to get next run. Err: %v", err)
 		msg := err.Error()
-		prunerScope.SetFailureMessage(&msg)
+		cleanerScope.SetFailureMessage(&msg)
 		return ctrl.Result{}, err
 	}
 
@@ -149,77 +149,77 @@ func (r *PrunerReconciler) reconcileNormal(ctx context.Context, prunerScope *sco
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *PrunerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager,
+func (r *CleanerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager,
 	numOfWorker int, logger logr.Logger) error {
 
 	executor.InitializeClient(ctx, logger, mgr.GetConfig(), mgr.GetClient(), numOfWorker)
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&appsv1alpha1.Pruner{}).
+		For(&appsv1alpha1.Cleaner{}).
 		Complete(r)
 }
 
-func (r *PrunerReconciler) addFinalizer(ctx context.Context, pruner *appsv1alpha1.Pruner, finalizer string) error {
-	if controllerutil.ContainsFinalizer(pruner, finalizer) {
+func (r *CleanerReconciler) addFinalizer(ctx context.Context, cleaner *appsv1alpha1.Cleaner, finalizer string) error {
+	if controllerutil.ContainsFinalizer(cleaner, finalizer) {
 		return nil
 	}
 
-	controllerutil.AddFinalizer(pruner, finalizer)
+	controllerutil.AddFinalizer(cleaner, finalizer)
 
-	if err := r.Client.Update(ctx, pruner); err != nil {
+	if err := r.Client.Update(ctx, cleaner); err != nil {
 		return err
 	}
-	return r.Get(ctx, types.NamespacedName{Name: pruner.Name}, pruner)
+	return r.Get(ctx, types.NamespacedName{Name: cleaner.Name}, cleaner)
 }
 
-func schedule(ctx context.Context, prunerScope *scope.PrunerScope, logger logr.Logger) (*time.Time, error) {
-	newLastRunTime := prunerScope.Pruner.Status.LastRunTime
+func schedule(ctx context.Context, cleanerScope *scope.CleanerScope, logger logr.Logger) (*time.Time, error) {
+	newLastRunTime := cleanerScope.Cleaner.Status.LastRunTime
 
 	now := time.Now()
-	nextRun, err := getNextScheduleTime(prunerScope.Pruner, now)
+	nextRun, err := getNextScheduleTime(cleanerScope.Cleaner, now)
 	if err != nil {
 		logger.Info("failed to get next run. Err: %v", err)
 		return nil, err
 	}
 
 	var newNextScheduleTime *metav1.Time
-	if prunerScope.Pruner.Status.NextScheduleTime == nil {
+	if cleanerScope.Cleaner.Status.NextScheduleTime == nil {
 		logger.Info("set NextScheduleTime")
 		newNextScheduleTime = &metav1.Time{Time: *nextRun}
 	} else {
-		if shouldSchedule(prunerScope.Pruner, logger) {
+		if shouldSchedule(cleanerScope.Cleaner, logger) {
 			logger.Info("queuing job")
 			executorClient := executor.GetClient()
-			executorClient.Process(ctx, prunerScope.Pruner.Name)
+			executorClient.Process(ctx, cleanerScope.Cleaner.Name)
 			newLastRunTime = &metav1.Time{Time: now}
 		}
 
 		newNextScheduleTime = &metav1.Time{Time: *nextRun}
 	}
 
-	prunerScope.SetLastRunTime(newLastRunTime)
-	prunerScope.SetNextScheduleTime(newNextScheduleTime)
+	cleanerScope.SetLastRunTime(newLastRunTime)
+	cleanerScope.SetNextScheduleTime(newNextScheduleTime)
 
 	return nextRun, nil
 }
 
 // getNextScheduleTime gets the time of next schedule after last scheduled and before now
-func getNextScheduleTime(pruner *appsv1alpha1.Pruner, now time.Time) (*time.Time, error) {
-	sched, err := cron.ParseStandard(pruner.Spec.Schedule)
+func getNextScheduleTime(cleaner *appsv1alpha1.Cleaner, now time.Time) (*time.Time, error) {
+	sched, err := cron.ParseStandard(cleaner.Spec.Schedule)
 	if err != nil {
-		return nil, fmt.Errorf("unparseable schedule %q: %w", pruner.Spec.Schedule, err)
+		return nil, fmt.Errorf("unparseable schedule %q: %w", cleaner.Spec.Schedule, err)
 	}
 
 	var earliestTime time.Time
-	if pruner.Status.LastRunTime != nil {
-		earliestTime = pruner.Status.LastRunTime.Time
+	if cleaner.Status.LastRunTime != nil {
+		earliestTime = cleaner.Status.LastRunTime.Time
 	} else {
 		// If none found, then this is a recently created snapshot
-		earliestTime = pruner.CreationTimestamp.Time
+		earliestTime = cleaner.CreationTimestamp.Time
 	}
-	if pruner.Spec.StartingDeadlineSeconds != nil {
+	if cleaner.Spec.StartingDeadlineSeconds != nil {
 		// controller is not going to schedule anything below this point
-		schedulingDeadline := now.Add(-time.Second * time.Duration(*pruner.Spec.StartingDeadlineSeconds))
+		schedulingDeadline := now.Add(-time.Second * time.Duration(*cleaner.Spec.StartingDeadlineSeconds))
 
 		if schedulingDeadline.After(earliestTime) {
 			earliestTime = schedulingDeadline
@@ -241,21 +241,21 @@ func getNextScheduleTime(pruner *appsv1alpha1.Pruner, now time.Time) (*time.Time
 	return &next, nil
 }
 
-func shouldSchedule(pruner *appsv1alpha1.Pruner, logger logr.Logger) bool {
+func shouldSchedule(cleaner *appsv1alpha1.Cleaner, logger logr.Logger) bool {
 	now := time.Now()
-	logger.Info(fmt.Sprintf("currently next schedule is %s", pruner.Status.NextScheduleTime.Time))
+	logger.Info(fmt.Sprintf("currently next schedule is %s", cleaner.Status.NextScheduleTime.Time))
 
-	if now.Before(pruner.Status.NextScheduleTime.Time) {
+	if now.Before(cleaner.Status.NextScheduleTime.Time) {
 		logger.Info("do not schedule yet")
 		return false
 	}
 
 	// if last processed request was within 30 seconds, ignore it.
 	// Avoid reprocessing spuriors back-to-back reconciliations
-	if pruner.Status.LastRunTime != nil {
-		logger.Info(fmt.Sprintf("last run was requested at %s", pruner.Status.LastRunTime))
+	if cleaner.Status.LastRunTime != nil {
+		logger.Info(fmt.Sprintf("last run was requested at %s", cleaner.Status.LastRunTime))
 		const ignoreTimeInSecond = 30
-		diff := now.Sub(pruner.Status.LastRunTime.Time)
+		diff := now.Sub(cleaner.Status.LastRunTime.Time)
 		logger.Info(fmt.Sprintf("Elapsed time since last run in minutes %f",
 			diff.Minutes()))
 		return diff.Seconds() >= ignoreTimeInSecond
@@ -264,7 +264,7 @@ func shouldSchedule(pruner *appsv1alpha1.Pruner, logger logr.Logger) bool {
 	return true
 }
 
-func removeQueuedJobs(prunerScope *scope.PrunerScope) {
+func removeQueuedJobs(cleanerScope *scope.CleanerScope) {
 	executorClient := executor.GetClient()
-	executorClient.RemoveEntries(prunerScope.Pruner.Name)
+	executorClient.RemoveEntries(cleanerScope.Cleaner.Name)
 }

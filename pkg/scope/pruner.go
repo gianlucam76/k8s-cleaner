@@ -25,73 +25,73 @@ import (
 	"sigs.k8s.io/cluster-api/util/patch"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
-// PrunerScopeParams defines the input parameters used to create a new Pruner Scope.
-type PrunerScopeParams struct {
+// CleanerScopeParams defines the input parameters used to create a new Cleaner Scope.
+type CleanerScopeParams struct {
 	Client         client.Client
 	Logger         logr.Logger
-	Pruner         *appsv1alpha1.Pruner
+	Cleaner        *appsv1alpha1.Cleaner
 	ControllerName string
 }
 
-// NewPrunerScope creates a new Pruner Scope from the supplied parameters.
+// NewCleanerScope creates a new Cleaner Scope from the supplied parameters.
 // This is meant to be called for each reconcile iteration.
-func NewPrunerScope(params PrunerScopeParams) (*PrunerScope, error) {
+func NewCleanerScope(params CleanerScopeParams) (*CleanerScope, error) {
 	if params.Client == nil {
-		return nil, errors.New("client is required when creating a PrunerScope")
+		return nil, errors.New("client is required when creating a CleanerScope")
 	}
-	if params.Pruner == nil {
-		return nil, errors.New("failed to generate new scope from nil Pruner")
+	if params.Cleaner == nil {
+		return nil, errors.New("failed to generate new scope from nil Cleaner")
 	}
 
-	helper, err := patch.NewHelper(params.Pruner, params.Client)
+	helper, err := patch.NewHelper(params.Cleaner, params.Client)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to init patch helper")
 	}
-	return &PrunerScope{
+	return &CleanerScope{
 		Logger:         params.Logger,
 		client:         params.Client,
-		Pruner:         params.Pruner,
+		Cleaner:        params.Cleaner,
 		patchHelper:    helper,
 		controllerName: params.ControllerName,
 	}, nil
 }
 
-// PrunerScope defines the basic context for an actuator to operate upon.
-type PrunerScope struct {
+// CleanerScope defines the basic context for an actuator to operate upon.
+type CleanerScope struct {
 	logr.Logger
 	client         client.Client
 	patchHelper    *patch.Helper
-	Pruner         *appsv1alpha1.Pruner
+	Cleaner        *appsv1alpha1.Cleaner
 	controllerName string
 }
 
 // PatchObject persists the feature configuration and status.
-func (s *PrunerScope) PatchObject(ctx context.Context) error {
+func (s *CleanerScope) PatchObject(ctx context.Context) error {
 	return s.patchHelper.Patch(
 		ctx,
-		s.Pruner,
+		s.Cleaner,
 	)
 }
 
-// Close closes the current scope persisting the Pruner configuration and status.
-func (s *PrunerScope) Close(ctx context.Context) error {
+// Close closes the current scope persisting the Cleaner configuration and status.
+func (s *CleanerScope) Close(ctx context.Context) error {
 	return s.PatchObject(ctx)
 }
 
 // SetLastRunTime set LastRunTime field
-func (s *PrunerScope) SetLastRunTime(lastRunTime *metav1.Time) {
-	s.Pruner.Status.LastRunTime = lastRunTime
+func (s *CleanerScope) SetLastRunTime(lastRunTime *metav1.Time) {
+	s.Cleaner.Status.LastRunTime = lastRunTime
 }
 
 // SetNextScheduleTime sets NextScheduleTime field
-func (s *PrunerScope) SetNextScheduleTime(lastRunTime *metav1.Time) {
-	s.Pruner.Status.NextScheduleTime = lastRunTime
+func (s *CleanerScope) SetNextScheduleTime(lastRunTime *metav1.Time) {
+	s.Cleaner.Status.NextScheduleTime = lastRunTime
 }
 
 // SetFailureMessage sets FasilureMessage field
-func (s *PrunerScope) SetFailureMessage(failureMessage *string) {
-	s.Pruner.Status.FailureMessage = failureMessage
+func (s *CleanerScope) SetFailureMessage(failureMessage *string) {
+	s.Cleaner.Status.FailureMessage = failureMessage
 }

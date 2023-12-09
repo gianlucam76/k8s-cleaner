@@ -28,8 +28,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
-	"gianlucam76/k8s-pruner/internal/controller/executor"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
+	"gianlucam76/k8s-cleaner/internal/controller/executor"
 
 	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
 )
@@ -65,13 +65,13 @@ var _ = Describe("Worker", func() {
 		}
 
 		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
-		staleResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.Resources{
 			Kind:    "Secret",
 			Group:   "",
 			Version: "v1",
 		}
 
-		list, err := executor.FetchResources(context.TODO(), staleResources)
+		list, err := executor.FetchResources(context.TODO(), matchingResources)
 		Expect(err).To(BeNil())
 		Expect(len(list.Items)).To(Equal(1))
 	})
@@ -101,7 +101,7 @@ var _ = Describe("Worker", func() {
 		}
 
 		Expect(k8sClient.Create(context.TODO(), secret2)).To(Succeed())
-		staleResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.Resources{
 			Kind:    "Secret",
 			Group:   "",
 			Version: "v1",
@@ -114,13 +114,13 @@ var _ = Describe("Worker", func() {
 			},
 		}
 
-		list, err := executor.FetchResources(context.TODO(), staleResources)
+		list, err := executor.FetchResources(context.TODO(), matchingResources)
 		Expect(err).To(BeNil())
 		Expect(len(list.Items)).To(Equal(1))
 		Expect(list.Items[0].GetName()).To(Equal(secret2.Name))
 	})
 
-	It("getStaleResources gets stale resources", func() {
+	It("getMatchingResources gets stale resources", func() {
 		value := randomString()
 		secret := &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
@@ -161,7 +161,7 @@ var _ = Describe("Worker", func() {
    end
    `
 
-		staleResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.Resources{
 			Kind:     "Secret",
 			Group:    "",
 			Version:  "v1",
@@ -169,7 +169,7 @@ var _ = Describe("Worker", func() {
 		}
 		logger, err := zap.NewDevelopment()
 		Expect(err).To(BeNil())
-		resources, err := executor.GetStaleResources(context.TODO(), staleResources, false,
+		resources, err := executor.GetMatchingResources(context.TODO(), matchingResources, false,
 			zapr.NewLogger(logger))
 		Expect(err).To(BeNil())
 		Expect(resources).ToNot(BeNil())

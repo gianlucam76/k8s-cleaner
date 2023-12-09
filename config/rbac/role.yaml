@@ -13,7 +13,7 @@ rules:
 - apiGroups:
   - apps.projectsveltos.io
   resources:
-  - pruners
+  - cleaners
   verbs:
   - create
   - delete
@@ -25,13 +25,13 @@ rules:
 - apiGroups:
   - apps.projectsveltos.io
   resources:
-  - pruners/finalizers
+  - cleaners/finalizers
   verbs:
   - update
 - apiGroups:
   - apps.projectsveltos.io
   resources:
-  - pruners/status
+  - cleaners/status
   verbs:
   - get
   - patch

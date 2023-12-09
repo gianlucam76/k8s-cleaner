@@ -35,7 +35,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
 var (
@@ -96,11 +96,11 @@ func randomString() string {
 	return util.RandomString(length)
 }
 
-func deletePruner(prunerName string) {
-	currentPruner := &appsv1alpha1.Pruner{}
+func deleteCleaner(cleanerName string) {
+	currentCleaner := &appsv1alpha1.Cleaner{}
 
 	Expect(k8sClient.Get(context.TODO(),
-		types.NamespacedName{Name: prunerName}, currentPruner)).To(Succeed())
+		types.NamespacedName{Name: cleanerName}, currentCleaner)).To(Succeed())
 
-	Expect(k8sClient.Delete(context.TODO(), currentPruner)).To(Succeed())
+	Expect(k8sClient.Delete(context.TODO(), currentCleaner)).To(Succeed())
 }
