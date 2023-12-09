@@ -8,21 +8,21 @@ The Kubernetes controller __Cleaner__ proactively identifies, removes, or update
 
 ## Flexibility and Customization:
 
-- **Schedule**: Specify the frequency at which the Cleaner should scan the cluster and identify stale resources. Utilize the Cron syntax to define recurring schedules.
+1️⃣ **Schedule**: Specify the frequency at which the Cleaner should scan the cluster and identify stale resources. Utilize the Cron syntax to define recurring schedules.
 
-- **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied.
+2️⃣ **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied.
 
-- **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
+3️⃣ **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
-- **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
+4️⃣ **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
 ## Maintaining a Clean and Efficient Cluster:
 
-- **Resource Removal**: Efficiently remove stale resources from your cluster, reclaiming unused resources and improving resource utilization.
+💪 **Resource Removal**: Efficiently remove stale resources from your cluster, reclaiming unused resources and improving resource utilization.
 
-- **Resource Updates**: Update outdated resources to ensure they align with the latest configurations and maintain consistent functionality.
+💪 **Resource Updates**: Update outdated resources to ensure they align with the latest configurations and maintain consistent functionality.
 
-- **Reduced Resource Bloat**: Minimize resource bloat and maintain a clean and organized cluster, improving overall performance and stability.
+💪 **Reduced Resource Bloat**: Minimize resource bloat and maintain a clean and organized cluster, improving overall performance and stability.
 
 By combining the flexibility of scheduling, the accuracy of label filtering, the power of Lua-based criteria, and the ability to remove or update stale resources, Cleaner empowers users to effectively manage their Kubernetes environments and optimize resource usage.
 
