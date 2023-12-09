@@ -26,6 +26,13 @@ The Kubernetes controller __Cleaner__ proactively identifies, removes, or update
 
 By combining the flexibility of scheduling, the accuracy of label filtering, the power of Lua-based criteria, and the ability to remove or update stale resources, Cleaner empowers users to effectively manage their Kubernetes environments and optimize resource usage.
 
+## Deploying the K8s Cleaner
+To deploy the __k8s-cleaner__ to your Kubernetes cluster, run the following command:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/manifest/manifest.yaml
+```
+
 ## Removing Unwanted Secrets
 
 To remove all Secrets from the test namespace every day at 1 AM, use the following YAML configuration:
