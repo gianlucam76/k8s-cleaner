@@ -40,8 +40,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
-	"gianlucam76/k8s-pruner/internal/controller"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
+	"gianlucam76/k8s-cleaner/internal/controller"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -103,11 +103,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&controller.PrunerReconciler{
+	if err = (&controller.CleanerReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(ctx, mgr, workers, ctrl.Log.WithName("worker")); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Pruner")
+		setupLog.Error(err, "unable to create controller", "controller", "Cleaner")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
@@ -137,7 +137,7 @@ func initFlags(fs *pflag.FlagSet) {
 
 	const defaultWorkers = 5
 	fs.IntVar(&workers, "worker-number", defaultWorkers,
-		"Number of worker. Workers are used to process pruner instances in backgroun")
+		"Number of worker. Workers are used to process cleaner instances in backgroun")
 
 	const defautlRestConfigQPS = 40
 	fs.Float32Var(&restConfigQPS, "kube-api-qps", defautlRestConfigQPS,

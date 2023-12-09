@@ -35,9 +35,9 @@ const (
 )
 
 const (
-	// PrunerFinalizer allows Reconciler to clean up resources associated with
-	// Pruner instance before removing it from the apiserver.
-	PrunerFinalizer = "prunerfinalizer.projectsveltos.io"
+	// CleanerFinalizer allows Reconciler to clean up resources associated with
+	// Cleaner instance before removing it from the apiserver.
+	CleanerFinalizer = "cleanerfinalizer.projectsveltos.io"
 )
 
 type Resources struct {
@@ -82,9 +82,9 @@ type Resources struct {
 	Transform string `json:"transform,omitempty"`
 }
 
-// PrunerSpec defines the desired state of Pruner
-type PrunerSpec struct {
-	StaleResources []Resources `json:"staleResources"`
+// CleanerSpec defines the desired state of Cleaner
+type CleanerSpec struct {
+	MatchingResources []Resources `json:"matchingResources"`
 
 	// Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 	Schedule string `json:"schedule"`
@@ -101,8 +101,8 @@ type PrunerSpec struct {
 	DryRun bool `json:"dryRune,omitempty"`
 }
 
-// PrunerStatus defines the observed state of Pruner
-type PrunerStatus struct {
+// CleanerStatus defines the observed state of Cleaner
+type CleanerStatus struct {
 	// Information when next snapshot is scheduled
 	// +optional
 	NextScheduleTime *metav1.Time `json:"nextScheduleTime,omitempty"`
@@ -117,27 +117,27 @@ type PrunerStatus struct {
 }
 
 //+kubebuilder:object:root=true
-//+kubebuilder:resource:path=pruners,scope=Cluster
+//+kubebuilder:resource:path=cleaners,scope=Cluster
 //+kubebuilder:subresource:status
 
-// Pruner is the Schema for the pruners API
-type Pruner struct {
+// Cleaner is the Schema for the cleaners API
+type Cleaner struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   PrunerSpec   `json:"spec,omitempty"`
-	Status PrunerStatus `json:"status,omitempty"`
+	Spec   CleanerSpec   `json:"spec,omitempty"`
+	Status CleanerStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
 
-// PrunerList contains a list of Pruner
-type PrunerList struct {
+// CleanerList contains a list of Cleaner
+type CleanerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Pruner `json:"items"`
+	Items           []Cleaner `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&Pruner{}, &PrunerList{})
+	SchemeBuilder.Register(&Cleaner{}, &CleanerList{})
 }

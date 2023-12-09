@@ -75,18 +75,18 @@ type Manager struct {
 
 	mu *sync.Mutex
 
-	// A request represents a request to process a Pruner instance
+	// A request represents a request to process a Cleaner instance
 
-	// dirty contains all requests (pruner names) which are currently waiting to be served.
+	// dirty contains all requests (cleaner names) which are currently waiting to be served.
 	dirty []string
 
-	// inProgress contains all requests (pruner names) that are currently being served.
+	// inProgress contains all requests (cleaner names) that are currently being served.
 	inProgress []string
 
-	// jobQueue contains all requests (pruner names) that needs to be served.
+	// jobQueue contains all requests (cleaner names) that needs to be served.
 	jobQueue []string
 
-	// results contains results for processed requests (pruner names)
+	// results contains results for processed requests (cleaner names)
 	results map[string]error
 }
 
@@ -137,12 +137,12 @@ func GetClient() *Manager {
 	return managerInstance
 }
 
-func (m *Manager) Process(ctx context.Context, prunerName string) {
+func (m *Manager) Process(ctx context.Context, cleanerName string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	l := m.log.WithValues("pruner", prunerName)
-	key := prunerName
+	l := m.log.WithValues("cleaner", cleanerName)
+	key := cleanerName
 
 	// Search if request is in dirty. Drop it if already there
 	for i := range m.dirty {
@@ -168,11 +168,11 @@ func (m *Manager) Process(ctx context.Context, prunerName string) {
 	}
 
 	m.log.V(logs.LogDebug).Info("request added to jobQueue")
-	m.jobQueue = append(m.jobQueue, prunerName)
+	m.jobQueue = append(m.jobQueue, cleanerName)
 }
 
-func (m *Manager) GetResult(prunerName string) Result {
-	responseParam, err := getRequestStatus(prunerName)
+func (m *Manager) GetResult(cleanerName string) Result {
+	responseParam, err := getRequestStatus(cleanerName)
 	if err != nil {
 		return Result{
 			ResultStatus: Unavailable,
@@ -199,11 +199,11 @@ func (m *Manager) GetResult(prunerName string) Result {
 	}
 }
 
-func (m *Manager) RemoveEntries(prunerName string) {
+func (m *Manager) RemoveEntries(cleanerName string) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	key := prunerName
+	key := cleanerName
 
 	for i := range m.inProgress {
 		if m.inProgress[i] == key {

@@ -20,7 +20,7 @@ SHELL = /usr/bin/env bash -o pipefail
 
 # Define Docker related variables.
 REGISTRY ?= projectsveltos
-IMAGE_NAME ?= k8s-pruner
+IMAGE_NAME ?= k8s-cleaner
 ARCH ?= amd64
 OS ?= $(shell uname -s | tr A-Z a-z)
 K8S_LATEST_VER ?= $(shell curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
@@ -155,7 +155,7 @@ K8S_VERSION := v1.28.0
 endif
 
 KIND_CONFIG ?= kind-cluster.yaml
-CONTROL_CLUSTER_NAME ?= pruner-management
+CONTROL_CLUSTER_NAME ?= cleaner-management
 TIMEOUT ?= 10m
 NUM_NODES ?= 6
 
@@ -167,15 +167,15 @@ test: | check-manifests generate fmt vet $(SETUP_ENVTEST) ## Run uts.
 kind-test: test create-cluster fv ## Build docker image; start kind cluster; load docker image; install all cluster api components and run fv
 
 .PHONY: fv
-fv: $(KUBECTL) $(GINKGO) ## Run Pruner Controller tests using existing cluster
+fv: $(KUBECTL) $(GINKGO) ## Run Cleaner Controller tests using existing cluster
 	cd test/fv; $(GINKGO) -nodes $(NUM_NODES) --label-filter='FV' --v --trace --randomize-all
 
 .PHONY: create-cluster
 create-cluster: $(KIND) $(KUBECTL) $(ENVSUBST) ## Create a new kind cluster designed for development
 	$(MAKE) create-control-cluster
 
-	@echo "Start pruner"
-	$(MAKE) deploy-pruner
+	@echo "Start cleaner"
+	$(MAKE) deploy-cleaner
 
 .PHONY: delete-cluster
 delete-cluster: $(KIND) ## Deletes the kind cluster $(CONTROL_CLUSTER_NAME)
@@ -187,17 +187,17 @@ create-control-cluster: $(KIND) $(CLUSTERCTL) $(KUBECTL)
 	sed -e "s/K8S_VERSION/$(K8S_VERSION)/g"  test/$(KIND_CONFIG) > test/$(KIND_CONFIG).tmp
 	$(KIND) create cluster --name=$(CONTROL_CLUSTER_NAME) --config test/$(KIND_CONFIG).tmp
 
-deploy-pruner: $(KUSTOMIZE)
-	# Load pruner image into cluster
-	@echo 'Load pruner image into cluster'
+deploy-cleaner: $(KUSTOMIZE)
+	# Load cleaner image into cluster
+	@echo 'Load cleaner image into cluster'
 	$(MAKE) load-image
-	# Install k8s-pruner components
-	@echo 'Install k8s-pruner components'
+	# Install k8s-cleaner components
+	@echo 'Install k8s-cleaner components'
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | $(ENVSUBST) | $(KUBECTL) apply -f-
 
-	@echo "Waiting for k8s-pruner to be available..."
-	$(KUBECTL) wait --for=condition=Available deployment/k8s-pruner-controller -n projectsveltos --timeout=$(TIMEOUT)
+	@echo "Waiting for k8s-cleaner to be available..."
+	$(KUBECTL) wait --for=condition=Available deployment/k8s-cleaner-controller -n projectsveltos --timeout=$(TIMEOUT)
 
 set-manifest-image:
 	$(info Updating kustomize image patch file for manager resource)
@@ -247,10 +247,10 @@ uninstall: manifests $(KUSTOMIZE) ## Uninstall CRDs from the K8s cluster specifi
 	$(KUSTOMIZE) build config/crd | kubectl delete --ignore-not-found=$(ignore-not-found) -f -
 
 .PHONY: deploy
-deploy: manifests $(KUSTOMIZE) ## Deploy controller to the K8s cluster specified in ~/.kube/config.
+deploy: manifests load-image $(KUSTOMIZE) $(KUBECTL) $(ENVSUBST) ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | $(ENVSUBST) | $(KUBECTL)  apply -f -
 
 .PHONY: undeploy
-undeploy: s $(KUSTOMIZE) ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
+undeploy: $(KUSTOMIZE) ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Call with ignore-not-found=true to ignore resource not found errors during deletion.
 	$(KUSTOMIZE) build config/default | kubectl delete --ignore-not-found=$(ignore-not-found) -f -

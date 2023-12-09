@@ -5,8 +5,8 @@
 domain: projectsveltos.io
 layout:
 - go.kubebuilder.io/v4
-projectName: k8s-pruner
-repo: gianlucam76/k8s-pruner
+projectName: k8s-cleaner
+repo: gianlucam76/k8s-cleaner
 resources:
 - api:
     crdVersion: v1
@@ -14,7 +14,7 @@ resources:
   controller: true
   domain: projectsveltos.io
   group: apps
-  kind: Pruner
-  path: gianlucam76/k8s-pruner/api/v1alpha1
+  kind: Cleaner
+  path: gianlucam76/k8s-cleaner/api/v1alpha1
   version: v1alpha1
 version: "3"

@@ -18,7 +18,7 @@ package executor_test
 
 import (
 	"context"
-	"gianlucam76/k8s-pruner/internal/controller/executor"
+	"gianlucam76/k8s-cleaner/internal/controller/executor"
 	"path/filepath"
 	"testing"
 	"time"

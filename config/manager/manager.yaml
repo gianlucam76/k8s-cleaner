@@ -9,24 +9,24 @@ metadata:
   name: controller
   namespace: projectsveltos
   labels:
-    control-plane: k8s-pruner
+    control-plane: k8s-cleaner
     app.kubernetes.io/name: deployment
     app.kubernetes.io/instance: controller-manager
     app.kubernetes.io/component: manager
-    app.kubernetes.io/created-by: k8s-pruner
-    app.kubernetes.io/part-of: k8s-pruner
+    app.kubernetes.io/created-by: k8s-cleaner
+    app.kubernetes.io/part-of: k8s-cleaner
     app.kubernetes.io/managed-by: kustomize
 spec:
   selector:
     matchLabels:
-      control-plane: k8s-pruner
+      control-plane: k8s-cleaner
   replicas: 1
   template:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: controller
       labels:
-        control-plane: k8s-pruner
+        control-plane: k8s-cleaner
     spec:
       # TODO(user): Uncomment the following code to configure the nodeAffinity expression
       # according to the platforms which are supported by your solution.

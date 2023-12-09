@@ -23,132 +23,132 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"gianlucam76/k8s-pruner/internal/controller/executor"
+	"gianlucam76/k8s-cleaner/internal/controller/executor"
 )
 
-var _ = Describe("PrunerClient", func() {
+var _ = Describe("CleanerClient", func() {
 	It("GetResult returns result when available", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		r := map[string]error{prunerName: nil}
+		r := map[string]error{cleanerName: nil}
 		d.SetResults(r)
 		Expect(len(d.GetResults())).To(Equal(1))
 
-		result := d.GetResult(prunerName)
+		result := d.GetResult(cleanerName)
 		Expect(result.Err).To(BeNil())
 		Expect(result.ResultStatus).To(Equal(executor.Processed))
 	})
 
 	It("GetResult returns result when available with error", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		r := map[string]error{prunerName: fmt.Errorf("failed to deploy")}
+		r := map[string]error{cleanerName: fmt.Errorf("failed to deploy")}
 		d.SetResults(r)
 		Expect(len(d.GetResults())).To(Equal(1))
 
-		result := d.GetResult(prunerName)
+		result := d.GetResult(cleanerName)
 		Expect(result.Err).ToNot(BeNil())
 		Expect(result.ResultStatus).To(Equal(executor.Failed))
 	})
 
 	It("GetResult returns InProgress when request is still queued (currently in progress)", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		d.SetInProgress([]string{prunerName})
+		d.SetInProgress([]string{cleanerName})
 		Expect(len(d.GetInProgress())).To(Equal(1))
 
-		result := d.GetResult(prunerName)
+		result := d.GetResult(cleanerName)
 		Expect(result.Err).To(BeNil())
 		Expect(result.ResultStatus).To(Equal(executor.InProgress))
 	})
 
 	It("GetResult returns InProgress when request is still queued (currently queued)", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		d.SetJobQueue(prunerName)
+		d.SetJobQueue(cleanerName)
 		Expect(len(d.GetJobQueue())).To(Equal(1))
 
-		result := d.GetResult(prunerName)
+		result := d.GetResult(cleanerName)
 		Expect(result.Err).To(BeNil())
 		Expect(result.ResultStatus).To(Equal(executor.InProgress))
 	})
 
 	It("GetResult returns Unavailable when request is not queued/in progress and result not available", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		result := d.GetResult(prunerName)
+		result := d.GetResult(cleanerName)
 		Expect(result.Err).To(BeNil())
 		Expect(result.ResultStatus).To(Equal(executor.Unavailable))
 	})
 
 	It("Process does nothing if already in the dirty set", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		d.SetDirty([]string{prunerName})
+		d.SetDirty([]string{cleanerName})
 		Expect(len(d.GetDirty())).To(Equal(1))
 
-		d.Process(context.TODO(), prunerName)
+		d.Process(context.TODO(), cleanerName)
 		Expect(len(d.GetDirty())).To(Equal(1))
 		Expect(len(d.GetInProgress())).To(Equal(0))
 		Expect(len(d.GetJobQueue())).To(Equal(0))
 	})
 
 	It("Process adds to inProgress", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		d.Process(context.TODO(), prunerName)
+		d.Process(context.TODO(), cleanerName)
 		Expect(len(d.GetDirty())).To(Equal(1))
 		Expect(len(d.GetInProgress())).To(Equal(0))
 		Expect(len(d.GetJobQueue())).To(Equal(1))
 	})
 
 	It("Process if already in progress, does not add to jobQueue", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		d.SetInProgress([]string{prunerName})
+		d.SetInProgress([]string{cleanerName})
 		Expect(len(d.GetInProgress())).To(Equal(1))
 
-		d.Process(context.TODO(), prunerName)
+		d.Process(context.TODO(), cleanerName)
 		Expect(len(d.GetDirty())).To(Equal(1))
 		Expect(len(d.GetInProgress())).To(Equal(1))
 		Expect(len(d.GetJobQueue())).To(Equal(0))
 	})
 
 	It("Process removes existing result", func() {
-		prunerName := randomString()
+		cleanerName := randomString()
 
 		d := executor.GetClient()
 		defer d.ClearInternalStruct()
 
-		r := map[string]error{prunerName: nil}
+		r := map[string]error{cleanerName: nil}
 		d.SetResults(r)
 		Expect(len(d.GetResults())).To(Equal(1))
 
-		d.Process(context.TODO(), prunerName)
+		d.Process(context.TODO(), cleanerName)
 		Expect(len(d.GetDirty())).To(Equal(1))
 		Expect(len(d.GetInProgress())).To(Equal(0))
 		Expect(len(d.GetJobQueue())).To(Equal(1))

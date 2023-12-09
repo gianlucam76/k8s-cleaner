@@ -1,4 +1,4 @@
 ## Append samples of your project ##
 resources:
-- apps_v1alpha1_pruner.yaml
+- apps_v1alpha1_cleaner.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

@@ -36,13 +36,13 @@ import (
 	"k8s.io/client-go/restmapper"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 
 	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
 	logs "github.com/projectsveltos/libsveltos/lib/logsettings"
 )
 
-// A "request" represents a Pruner instance that needs to be processed.
+// A "request" represents a Cleaner instance that needs to be processed.
 //
 // The flow is following:
 // - when a request arrives, it is first added to the dirty set or dropped if it already
@@ -62,8 +62,8 @@ import (
 // If the same request is also present in the dirty set, it is added back to the back of the jobQueue.
 
 type responseParams struct {
-	prunerName string
-	err        error
+	cleanerName string
+	err         error
 }
 
 var (
@@ -88,32 +88,32 @@ type transformStatus struct {
 
 func processRequests(ctx context.Context, i int, logger logr.Logger) {
 	id := i
-	var prunerName *string
+	var cleanerName *string
 
 	logger.V(logs.LogDebug).Info(fmt.Sprintf("started worker %d", id))
 
 	for {
-		if prunerName != nil {
-			l := logger.WithValues("pruner", prunerName)
+		if cleanerName != nil {
+			l := logger.WithValues("cleaner", cleanerName)
 			// Get error only from getIsCleanupFromKey as same key is always used
 			l.Info(fmt.Sprintf("worker: %d processing request", id))
-			err := processPrunerInstance(ctx, *prunerName, l)
-			storeResult(*prunerName, err, l)
+			err := processCleanerInstance(ctx, *cleanerName, l)
+			storeResult(*cleanerName, err, l)
 			l.Info(fmt.Sprintf("worker: %d request processed", id))
 		}
-		prunerName = nil
+		cleanerName = nil
 		select {
 		case <-time.After(1 * time.Second):
 			managerInstance.mu.Lock()
 			if len(managerInstance.jobQueue) > 0 {
 				// take a request from queue and remove it from queue
-				prunerName = &managerInstance.jobQueue[0]
+				cleanerName = &managerInstance.jobQueue[0]
 				managerInstance.jobQueue = managerInstance.jobQueue[1:]
-				l := logger.WithValues("pruner", prunerName)
+				l := logger.WithValues("cleaner", cleanerName)
 				l.V(logs.LogDebug).Info("take from jobQueue")
 				// Add to inProgress
 				l.V(logs.LogDebug).Info("add to inProgress")
-				key := *prunerName
+				key := *cleanerName
 				managerInstance.inProgress = append(managerInstance.inProgress, key)
 				// If present remove from dirty
 				for i := range managerInstance.dirty {
@@ -132,37 +132,37 @@ func processRequests(ctx context.Context, i int, logger logr.Logger) {
 	}
 }
 
-func processPrunerInstance(ctx context.Context, prunerName string, logger logr.Logger) error {
-	pruner, err := getPrunerInstance(ctx, prunerName)
+func processCleanerInstance(ctx context.Context, cleanerName string, logger logr.Logger) error {
+	cleaner, err := getCleanerInstance(ctx, cleanerName)
 	if err != nil {
-		logger.Info(fmt.Sprintf("failed to get pruner instance: %v", err))
+		logger.Info(fmt.Sprintf("failed to get cleaner instance: %v", err))
 		return err
 	}
-	if pruner == nil {
-		logger.V(logs.LogDebug).Info("pruner instance not found")
+	if cleaner == nil {
+		logger.V(logs.LogDebug).Info("cleaner instance not found")
 		return nil
 	}
 
-	for i := range pruner.Spec.StaleResources {
-		sr := &pruner.Spec.StaleResources[i]
+	for i := range cleaner.Spec.MatchingResources {
+		sr := &cleaner.Spec.MatchingResources[i]
 		var resources []*unstructured.Unstructured
-		resources, err = getStaleResources(ctx, sr, pruner.Spec.DryRun, logger)
+		resources, err = getMatchingResources(ctx, sr, cleaner.Spec.DryRun, logger)
 		if err != nil {
 			logger.Info(fmt.Sprintf("failed to fetch resource (gvk: %s): %v",
 				fmt.Sprintf("%s:%s:%s", sr.Group, sr.Version, sr.Kind), err))
 			return err
 		}
 		if sr.Action == appsv1alpha1.ActionDelete {
-			return deleteStaleResources(ctx, resources, logger)
+			return deleteMatchingResources(ctx, resources, logger)
 		} else {
-			return updateStaleResources(ctx, resources, sr.Transform, logger)
+			return updateMatchingResources(ctx, resources, sr.Transform, logger)
 		}
 	}
 
 	return nil
 }
 
-func getStaleResources(ctx context.Context, sr *appsv1alpha1.Resources, dryRun bool, logger logr.Logger,
+func getMatchingResources(ctx context.Context, sr *appsv1alpha1.Resources, dryRun bool, logger logr.Logger,
 ) ([]*unstructured.Unstructured, error) {
 
 	resources, err := fetchResources(ctx, sr)
@@ -190,7 +190,7 @@ func getStaleResources(ctx context.Context, sr *appsv1alpha1.Resources, dryRun b
 			return nil, err
 		}
 		if isMatch {
-			l.Info("resource is a match for pruner")
+			l.Info("resource is a match for cleaner")
 			results = append(results, resource)
 		}
 	}
@@ -198,7 +198,7 @@ func getStaleResources(ctx context.Context, sr *appsv1alpha1.Resources, dryRun b
 	return results, nil
 }
 
-func deleteStaleResources(ctx context.Context, resources []*unstructured.Unstructured,
+func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
 	logger logr.Logger) error {
 
 	for i := range resources {
@@ -215,7 +215,7 @@ func deleteStaleResources(ctx context.Context, resources []*unstructured.Unstruc
 	return nil
 }
 
-func updateStaleResources(ctx context.Context, resources []*unstructured.Unstructured,
+func updateMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
 	transform string, logger logr.Logger) error {
 
 	for i := range resources {
@@ -410,26 +410,26 @@ func Transform(resource *unstructured.Unstructured, script string, logger logr.L
 	return result.Resource, nil
 }
 
-func getPrunerInstance(ctx context.Context, prunerName string) (*appsv1alpha1.Pruner, error) {
-	pruner := &appsv1alpha1.Pruner{}
-	err := k8sClient.Get(ctx, types.NamespacedName{Name: prunerName}, pruner)
+func getCleanerInstance(ctx context.Context, cleanerName string) (*appsv1alpha1.Cleaner, error) {
+	cleaner := &appsv1alpha1.Cleaner{}
+	err := k8sClient.Get(ctx, types.NamespacedName{Name: cleanerName}, cleaner)
 
 	if apierrors.IsNotFound(err) {
 		err = nil
 	}
 
-	return pruner, err
+	return cleaner, err
 }
 
 // storeResult does following:
 // - set results for further in time lookup
 // - remove request from inProgress
 // - if request is in dirty, remove it from there and add it to the back of the jobQueue
-func storeResult(prunerName string, err error, logger logr.Logger) {
+func storeResult(cleanerName string, err error, logger logr.Logger) {
 	managerInstance.mu.Lock()
 	defer managerInstance.mu.Unlock()
 
-	key := prunerName
+	key := cleanerName
 
 	// Remove from inProgress
 	for i := range managerInstance.inProgress {
@@ -467,12 +467,12 @@ func storeResult(prunerName string, err error, logger logr.Logger) {
 // If result is available it returns the result.
 // If request is still queued, responseParams is nil and an error is nil.
 // If result is not available and request is neither queued nor already processed, it returns an error to indicate that.
-func getRequestStatus(prunerName string) (*responseParams, error) {
-	logger := managerInstance.log.WithValues("pruner", prunerName)
+func getRequestStatus(cleanerName string) (*responseParams, error) {
+	logger := managerInstance.log.WithValues("cleaner", cleanerName)
 	managerInstance.mu.Lock()
 	defer managerInstance.mu.Unlock()
 
-	key := prunerName
+	key := cleanerName
 
 	logger.V(logs.LogDebug).Info("searching result")
 	if _, ok := managerInstance.results[key]; ok {
@@ -481,8 +481,8 @@ func getRequestStatus(prunerName string) (*responseParams, error) {
 			logger.V(logs.LogDebug).Info("returning a response with an error")
 		}
 		resp := responseParams{
-			prunerName: key,
-			err:        managerInstance.results[key],
+			cleanerName: key,
+			err:         managerInstance.results[key],
 		}
 		logger.V(logs.LogDebug).Info("removing result")
 		delete(managerInstance.results, key)

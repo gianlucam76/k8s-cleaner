@@ -1,4 +1,4 @@
-module gianlucam76/k8s-pruner
+module gianlucam76/k8s-cleaner
 
 go 1.20
 

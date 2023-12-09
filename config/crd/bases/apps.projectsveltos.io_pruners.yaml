@@ -4,20 +4,20 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.13.0
-  name: pruners.apps.projectsveltos.io
+  name: cleaners.apps.projectsveltos.io
 spec:
   group: apps.projectsveltos.io
   names:
-    kind: Pruner
-    listKind: PrunerList
-    plural: pruners
-    singular: pruner
+    kind: Cleaner
+    listKind: CleanerList
+    plural: cleaners
+    singular: cleaner
   scope: Cluster
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Pruner is the Schema for the pruners API
+        description: Cleaner is the Schema for the cleaners API
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -32,7 +32,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: PrunerSpec defines the desired state of Pruner
+            description: CleanerSpec defines the desired state of Cleaner
             properties:
               dryRune:
                 default: false
@@ -42,7 +42,7 @@ spec:
               schedule:
                 description: Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
                 type: string
-              staleResources:
+              matchingResources:
                 items:
                   properties:
                     action:
@@ -117,10 +117,10 @@ spec:
                 type: integer
             required:
             - schedule
-            - staleResources
+            - matchingResources
             type: object
           status:
-            description: PrunerStatus defines the observed state of Pruner
+            description: CleanerStatus defines the observed state of Cleaner
             properties:
               failureMessage:
                 description: FailureMessage provides more information about the error,

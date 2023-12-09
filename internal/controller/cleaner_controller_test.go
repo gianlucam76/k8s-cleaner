@@ -30,18 +30,18 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
-	"gianlucam76/k8s-pruner/internal/controller"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
+	"gianlucam76/k8s-cleaner/internal/controller"
 )
 
-var _ = Describe("PrunerClient", func() {
+var _ = Describe("CleanerClient", func() {
 	AfterEach(func() {
-		pruners := &appsv1alpha1.PrunerList{}
-		Expect(k8sClient.List(context.TODO(), pruners)).To(Succeed())
+		cleaners := &appsv1alpha1.CleanerList{}
+		Expect(k8sClient.List(context.TODO(), cleaners)).To(Succeed())
 
-		for i := range pruners.Items {
-			pruner := pruners.Items[i]
-			Expect(k8sClient.Delete(context.TODO(), &pruner)).To(Succeed())
+		for i := range cleaners.Items {
+			cleaner := cleaners.Items[i]
+			Expect(k8sClient.Delete(context.TODO(), &cleaner)).To(Succeed())
 		}
 	})
 
@@ -49,11 +49,11 @@ var _ = Describe("PrunerClient", func() {
 		now := time.Now()
 		before := now.Add(-time.Second * 30)
 
-		pruner := &appsv1alpha1.Pruner{
+		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: randomString(),
 			},
-			Status: appsv1alpha1.PrunerStatus{
+			Status: appsv1alpha1.CleanerStatus{
 				NextScheduleTime: &metav1.Time{Time: before},
 			},
 		}
@@ -62,39 +62,39 @@ var _ = Describe("PrunerClient", func() {
 		logger, err := zap.NewDevelopment()
 		Expect(err).To(BeNil())
 
-		Expect(controller.ShouldSchedule(pruner, zapr.NewLogger(logger))).To(BeTrue())
+		Expect(controller.ShouldSchedule(cleaner, zapr.NewLogger(logger))).To(BeTrue())
 
 		after := now.Add(time.Second * 30)
-		pruner.Status.NextScheduleTime = &metav1.Time{Time: after}
+		cleaner.Status.NextScheduleTime = &metav1.Time{Time: after}
 
-		Expect(controller.ShouldSchedule(pruner, zapr.NewLogger(logger))).To(BeFalse())
+		Expect(controller.ShouldSchedule(cleaner, zapr.NewLogger(logger))).To(BeFalse())
 	})
 
-	It("getNextScheduleTime returns the next time pruner should be scheduled", func() {
+	It("getNextScheduleTime returns the next time cleaner should be scheduled", func() {
 		now := time.Now()
 
-		pruner := &appsv1alpha1.Pruner{
+		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:              randomString(),
 				CreationTimestamp: metav1.Time{Time: now},
 			},
-			Spec: appsv1alpha1.PrunerSpec{
+			Spec: appsv1alpha1.CleanerSpec{
 				Schedule: fmt.Sprintf("%d * * * *", now.Minute()+1),
 			},
 		}
 
-		nextSchedule, err := controller.GetNextScheduleTime(pruner, now)
+		nextSchedule, err := controller.GetNextScheduleTime(cleaner, now)
 		Expect(err).To(BeNil())
 		Expect(nextSchedule.Minute()).To(Equal(now.Minute() + 1))
 	})
 
 	It("addFinalizer adds finalizer", func() {
-		pruner := &appsv1alpha1.Pruner{
+		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: randomString(),
 			},
-			Spec: appsv1alpha1.PrunerSpec{
-				StaleResources: []appsv1alpha1.Resources{
+			Spec: appsv1alpha1.CleanerSpec{
+				MatchingResources: []appsv1alpha1.Resources{
 					{
 						Kind:      randomString(),
 						Group:     randomString(),
@@ -105,18 +105,18 @@ var _ = Describe("PrunerClient", func() {
 			},
 		}
 
-		Expect(k8sClient.Create(context.TODO(), pruner)).To(Succeed())
+		Expect(k8sClient.Create(context.TODO(), cleaner)).To(Succeed())
 
-		reconciler := &controller.PrunerReconciler{
+		reconciler := &controller.CleanerReconciler{
 			Client: k8sClient,
 			Scheme: testEnv.Scheme,
 		}
 
-		Expect(controller.AddFinalizer(reconciler, context.TODO(), pruner, appsv1alpha1.PrunerFinalizer)).To(Succeed())
+		Expect(controller.AddFinalizer(reconciler, context.TODO(), cleaner, appsv1alpha1.CleanerFinalizer)).To(Succeed())
 
-		currentPruner := &appsv1alpha1.Pruner{}
-		Expect(k8sClient.Get(context.TODO(), types.NamespacedName{Name: pruner.Name}, currentPruner)).To(Succeed())
+		currentCleaner := &appsv1alpha1.Cleaner{}
+		Expect(k8sClient.Get(context.TODO(), types.NamespacedName{Name: cleaner.Name}, currentCleaner)).To(Succeed())
 
-		Expect(controllerutil.ContainsFinalizer(currentPruner, appsv1alpha1.PrunerFinalizer)).To(BeTrue())
+		Expect(controllerutil.ContainsFinalizer(currentCleaner, appsv1alpha1.CleanerFinalizer)).To(BeTrue())
 	})
 })
