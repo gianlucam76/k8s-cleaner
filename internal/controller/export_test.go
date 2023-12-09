@@ -20,5 +20,5 @@ var (
 	ShouldSchedule      = shouldSchedule
 	GetNextScheduleTime = getNextScheduleTime
 
-	AddFinalizer = (*PrunerReconciler).addFinalizer
+	AddFinalizer = (*CleanerReconciler).addFinalizer
 )

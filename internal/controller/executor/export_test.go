@@ -17,9 +17,9 @@ limitations under the License.
 package executor
 
 var (
-	FetchResources       = fetchResources
-	GetStaleResources    = getStaleResources
-	DeleteStaleResources = deleteStaleResources
+	FetchResources          = fetchResources
+	GetMatchingResources    = getMatchingResources
+	DeleteMatchingResources = deleteMatchingResources
 )
 
 func (m *Manager) ClearInternalStruct() {
@@ -45,8 +45,8 @@ func (m *Manager) GetDirty() []string {
 	return m.dirty
 }
 
-func (m *Manager) SetJobQueue(prunerName string) {
-	m.jobQueue = []string{prunerName}
+func (m *Manager) SetJobQueue(cleanerName string) {
+	m.jobQueue = []string{cleanerName}
 }
 
 func (m *Manager) GetJobQueue() []string {

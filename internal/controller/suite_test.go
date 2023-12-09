@@ -31,7 +31,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	appsv1alpha1 "gianlucam76/k8s-pruner/api/v1alpha1"
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 
