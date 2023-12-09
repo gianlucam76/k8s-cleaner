@@ -112,6 +112,7 @@ spec:
         end
         return hs
         end
+    action: Transform
     transform: |
       function transform()
         hs = {}
@@ -119,5 +120,4 @@ spec:
         hs.resource = obj
         return hs
         end
-    action: Transform
 ```
