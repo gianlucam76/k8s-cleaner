@@ -121,6 +121,32 @@ spec:
 
 By leveraging Lua scripts, Cleaner empowers users to define complex and dynamic selection criteria, catering to specific resource management needs. This flexibility enables accurate and targeted identification of stale resources, ensuring effective resource utilization and maintenance of a clean Kubernetes environment.
 
+Here is another example removing Pods in __failed__ state:
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-failed-pods-lua
+spec:
+  schedule: "* 0 * * *"
+  matchingResources:
+  - namespace: all
+    kind: Pod
+    group: ""
+    version: v1
+  evaluate: |
+    function evaluate()
+      hs = {}
+      hs.matching = false
+      if obj.status.phase == "Failed" then
+        hs.matching = true
+      end
+      return hs
+    end
+  action: Delete
+```
+
 ## Updating Resources
 
 Beyond removing stale resources, __Cleaner__ also facilitates the dynamic updating of existing resource configurations. This capability allows you to modify resource specifications based on specific criteria, ensuring alignment with evolving requirements and maintaining resource consistency.
