@@ -72,6 +72,10 @@ var _ = Describe("CleanerClient", func() {
 
 	It("getNextScheduleTime returns the next time cleaner should be scheduled", func() {
 		now := time.Now()
+		minute := now.Minute() + 1
+		if minute == 60 {
+			minute = 0
+		}
 
 		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
@@ -79,13 +83,13 @@ var _ = Describe("CleanerClient", func() {
 				CreationTimestamp: metav1.Time{Time: now},
 			},
 			Spec: appsv1alpha1.CleanerSpec{
-				Schedule: fmt.Sprintf("%d * * * *", now.Minute()+1),
+				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}
 
 		nextSchedule, err := controller.GetNextScheduleTime(cleaner, now)
 		Expect(err).To(BeNil())
-		Expect(nextSchedule.Minute()).To(Equal(now.Minute() + 1))
+		Expect(nextSchedule.Minute()).To(Equal(minute))
 	})
 
 	It("addFinalizer adds finalizer", func() {

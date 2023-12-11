@@ -1,24 +1,40 @@
+[![CI](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/main.yaml/badge.svg)](https://github.com/gianlucam76/k8s-cleaner/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gianlucam76/k8s-cleaner)](https://goreportcard.com/report/github.com/gianlucam76/k8s-cleaner)
+[![Slack](https://img.shields.io/badge/join%20slack-%23projectsveltos-brighteen)](https://join.slack.com/t/projectsveltos/shared_invite/zt-1hraownbr-W8NTs6LTimxLPB8Erj8Q6Q)
+[![License](https://img.shields.io/badge/license-Apache-blue.svg)](LICENSE)
+[![Twitter Follow](https://img.shields.io/twitter/follow/projectsveltos?style=social)](https://twitter.com/projectsveltos)
+
 The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale resources to maintain a clean and efficient Kubernetes environment. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
+
+- 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
+- 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
 
 ## Flexibility and Customization:
 
-- **Schedule**: Specify the frequency at which the Cleaner should scan the cluster and identify stale resources. Utilize the Cron syntax to define recurring schedules.
+1️⃣ **Schedule**: Specify the frequency at which the Cleaner should scan the cluster and identify stale resources. Utilize the Cron syntax to define recurring schedules.
 
-- **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied.
+2️⃣ **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied.
 
-- **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
+3️⃣ **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
-- **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
+4️⃣ **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
 ## Maintaining a Clean and Efficient Cluster:
 
-- **Resource Removal**: Efficiently remove stale resources from your cluster, reclaiming unused resources and improving resource utilization.
+💪 **Resource Removal**: Efficiently remove stale resources from your cluster, reclaiming unused resources and improving resource utilization.
 
-- **Resource Updates**: Update outdated resources to ensure they align with the latest configurations and maintain consistent functionality.
+💪 **Resource Updates**: Update outdated resources to ensure they align with the latest configurations and maintain consistent functionality.
 
-- **Reduced Resource Bloat**: Minimize resource bloat and maintain a clean and organized cluster, improving overall performance and stability.
+💪 **Reduced Resource Bloat**: Minimize resource bloat and maintain a clean and organized cluster, improving overall performance and stability.
 
 By combining the flexibility of scheduling, the accuracy of label filtering, the power of Lua-based criteria, and the ability to remove or update stale resources, Cleaner empowers users to effectively manage their Kubernetes environments and optimize resource usage.
+
+## Deploying the K8s Cleaner
+To deploy the __k8s-cleaner__ to your Kubernetes cluster, run the following command:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/manifest/manifest.yaml
+```
 
 ## Removing Unwanted Secrets
 
@@ -104,6 +120,32 @@ spec:
 ```
 
 By leveraging Lua scripts, Cleaner empowers users to define complex and dynamic selection criteria, catering to specific resource management needs. This flexibility enables accurate and targeted identification of stale resources, ensuring effective resource utilization and maintenance of a clean Kubernetes environment.
+
+Here is another example removing Pods in __failed__ state:
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-failed-pods-lua
+spec:
+  schedule: "* 0 * * *"
+  matchingResources:
+  - namespace: all
+    kind: Pod
+    group: ""
+    version: v1
+  evaluate: |
+    function evaluate()
+      hs = {}
+      hs.matching = false
+      if obj.status.phase == "Failed" then
+        hs.matching = true
+      end
+      return hs
+    end
+  action: Delete
+```
 
 ## Updating Resources
 

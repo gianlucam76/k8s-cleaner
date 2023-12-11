@@ -39,9 +39,6 @@ spec:
                 description: DryRun if set to true, will have controller delete no
                   resource. All matching resources will be listed in status section
                 type: boolean
-              schedule:
-                description: Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
-                type: string
               matchingResources:
                 items:
                   properties:
@@ -109,6 +106,9 @@ spec:
                   - version
                   type: object
                 type: array
+              schedule:
+                description: Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                type: string
               startingDeadlineSeconds:
                 description: Optional deadline in seconds for starting the job if
                   it misses scheduled time for any reason.  Missed jobs executions
@@ -116,8 +116,8 @@ spec:
                 format: int64
                 type: integer
             required:
-            - schedule
             - matchingResources
+            - schedule
             type: object
           status:
             description: CleanerStatus defines the observed state of Cleaner

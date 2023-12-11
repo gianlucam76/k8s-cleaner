@@ -110,6 +110,11 @@ var _ = Describe("CleanerClient", func() {
 		By(fmt.Sprintf("creating service %s", service2.Name))
 		Expect(k8sClient.Create(context.TODO(), service2)).To(Succeed())
 
+		minute := time.Now().Minute() + 1
+		if minute == 60 {
+			minute = 0
+		}
+
 		// This Cleaner matches Service1 but does not match Service2
 		cleaner := &appsv1alpha1.Cleaner{
 			ObjectMeta: metav1.ObjectMeta{
@@ -127,7 +132,7 @@ var _ = Describe("CleanerClient", func() {
 						Action:    appsv1alpha1.ActionTransform,
 					},
 				},
-				Schedule: fmt.Sprintf("%d * * * *", time.Now().Minute()+1),
+				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}
 
