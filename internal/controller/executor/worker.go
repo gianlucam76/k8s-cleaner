@@ -152,7 +152,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 		selector := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 		var tmpResources []*unstructured.Unstructured
-		tmpResources, err = getMatchingResources(ctx, selector, cleaner.Spec.DryRun, logger)
+		tmpResources, err = getMatchingResources(ctx, selector, logger)
 		if err != nil {
 			logger.Info(fmt.Sprintf("failed to fetch resource (gvk: %s): %v",
 				fmt.Sprintf("%s:%s:%s", selector.Group, selector.Version, selector.Kind), err))
@@ -170,13 +170,17 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		}
 	}
 
+	if cleaner.Spec.DryRun {
+		return nil
+	}
+
 	if cleaner.Spec.ResourcePolicySet.Action == appsv1alpha1.ActionDelete {
 		return deleteMatchingResources(ctx, resources, logger)
 	}
 	return updateMatchingResources(ctx, resources, cleaner.Spec.ResourcePolicySet.Transform, logger)
 }
 
-func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, dryRun bool, logger logr.Logger,
+func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,
 ) ([]*unstructured.Unstructured, error) {
 
 	resources, err := fetchResources(ctx, sr)
@@ -484,6 +488,12 @@ func aggregatedSelection(luaScript string, resources []*unstructured.Unstructure
 
 	if result.Message != "" {
 		logger.V(logs.LogInfo).Info(fmt.Sprintf("message: %s", result.Message))
+	}
+
+	for i := range result.Resources {
+		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
+			result.Resources[i].GetKind(), result.Resources[i].GetNamespace(), result.Resources[i].GetName()))
+		l.Info("resource is a match for cleaner")
 	}
 
 	return result.Resources, nil

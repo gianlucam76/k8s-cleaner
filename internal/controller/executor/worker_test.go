@@ -169,7 +169,7 @@ var _ = Describe("Worker", func() {
 		}
 		logger, err := zap.NewDevelopment()
 		Expect(err).To(BeNil())
-		resources, err := executor.GetMatchingResources(context.TODO(), matchingResources, false,
+		resources, err := executor.GetMatchingResources(context.TODO(), matchingResources,
 			zapr.NewLogger(logger))
 		Expect(err).To(BeNil())
 		Expect(resources).ToNot(BeNil())
