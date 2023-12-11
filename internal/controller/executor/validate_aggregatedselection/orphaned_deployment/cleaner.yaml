@@ -1,0 +1,110 @@
+# Selects Deployment, Pod, and Service resources, and then filters the results to 
+# identify deployments that have no pods or services associated with them.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: orphaned-deployments
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Deployment
+      group: ""
+      version: v1
+    - namespace: foo
+      kind: Pod
+      group: ""
+      version: v1      
+    - namespace: foo
+      kind: Service
+      group: ""
+      version: v1      
+    action: Delete # Delete matching resources
+    aggregatedSelection: |
+      function table_equal(t1, t2)
+        local metatable = {}
+        metatable.__eq = function(t1, t2)
+          if type(t1) ~= "table" or type(t2) ~= "table" then
+            return false
+          end
+
+          local keys = {}
+          for k in pairs(t1) do
+            keys[k] = true
+          end
+
+          for k in pairs(t2) do
+            if not keys[k] then
+              return false
+            end
+          end
+
+          for k, v in pairs(t1) do
+            if t2[k] ~= v then
+              return false
+            end
+          end
+
+          return true
+        end
+
+        setmetatable(t1, metatable)
+        setmetatable(t2, metatable)
+
+        return t1 == t2
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        local deployments = {}
+        local pods = {}
+        local services = {}
+        local orphanedDeployments = {}
+
+        -- Separate deployments, pods, and services from the resources
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Deployment" then
+            table.insert(deployments, resource)
+          elseif kind == "Pod" then
+            table.insert(pods, resource)
+          elseif kind == "Service" then
+            table.insert(services, resource)
+          end
+        end
+
+        -- Identify deployments that have no pods or services associated with them
+        for _, deployment in ipairs(deployments) do
+          local deploymentName = deployment.metadata.name
+          local hasPod = false
+          local hasService = false
+
+          for _, pod in ipairs(pods) do
+             for _, owner in ipairs(pod.metadata.ownerReferences) do
+               if owner.name == deploymentName then
+                 hasPod = true
+                 break
+               end  
+             end
+          end
+
+          for _, service in ipairs(services) do
+            if table_equal(service.spec.selector, deployment.metadata.labels) then
+              hasService = true
+              break
+            end
+          end
+
+          if not hasPod and not hasService then
+            table.insert(orphanedDeployments, deployment)
+            break
+          end
+        end
+
+        hs.resources = orphanedDeployments
+        return hs
+      end

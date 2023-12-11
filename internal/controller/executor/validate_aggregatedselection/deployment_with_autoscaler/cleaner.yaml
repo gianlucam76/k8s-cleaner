@@ -1,0 +1,59 @@
+# Find all Deployments not backed up by an Autoscaler. Those are a match.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-sample3
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Deployment
+      group: ""
+      version: v1
+    - namespace: foo
+      kind: HorizontalPodAutoscaler
+      group: "autoscaling"
+      version: v2beta1
+    action: Delete # Delete matching resources
+    aggregatedSelection: |
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        local deployments = {}
+        local autoscalers = {}
+        local deploymentWithNoAutoscaler = {}
+
+        -- Separate deployments and services from the resources
+        for _, resource in ipairs(resources) do
+            local kind = resource.kind
+                if kind == "Deployment" then
+                    table.insert(deployments, resource)
+                elseif kind == "HorizontalPodAutoscaler" then
+                    table.insert(autoscalers, resource)
+                end
+        end
+
+        -- Check for each deployment if there is a matching HorizontalPodAutoscaler
+        for _, deployment in ipairs(deployments) do
+            local deploymentName = deployment.metadata.name
+            local matchingAutoscaler = false
+
+            for _, autoscaler in ipairs(autoscalers) do
+                if autoscaler.spec.scaleTargetRef.name == deployment.metadata.name then
+                    matchingAutoscaler = true
+                    break
+                end
+            end
+
+            if not matchingAutoscaler then
+                table.insert(deploymentWithNoAutoscaler, deployment)
+                break
+            end
+        end
+
+        hs.resources = deploymentWithNoAutoscaler
+        return hs
+      end

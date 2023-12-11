@@ -27,6 +27,7 @@ import (
 
 	"github.com/TwiN/go-color"
 	ginkgotypes "github.com/onsi/ginkgo/v2/types"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -103,4 +104,13 @@ func deleteCleaner(cleanerName string) {
 		types.NamespacedName{Name: cleanerName}, currentCleaner)).To(Succeed())
 
 	Expect(k8sClient.Delete(context.TODO(), currentCleaner)).To(Succeed())
+}
+
+func deleteNamespace(name string) {
+	currentNamespace := &corev1.Namespace{}
+
+	Expect(k8sClient.Get(context.TODO(),
+		types.NamespacedName{Name: name}, currentNamespace)).To(Succeed())
+
+	Expect(k8sClient.Delete(context.TODO(), currentNamespace)).To(Succeed())
 }

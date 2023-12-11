@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orphaned-deployment
+  labels:
+    app: orphaned
+spec:
+  replicas: 3 # Number of replicas
+  selector:
+    matchLabels:
+      app: orphaned
+  template:
+    metadata:
+      labels:
+        app: orphaned
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80

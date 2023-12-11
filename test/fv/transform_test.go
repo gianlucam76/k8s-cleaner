@@ -121,16 +121,18 @@ var _ = Describe("CleanerClient", func() {
 				Name: randomString(),
 			},
 			Spec: appsv1alpha1.CleanerSpec{
-				MatchingResources: []appsv1alpha1.Resources{
-					{
-						Kind:      "Service",
-						Group:     "",
-						Version:   "v1",
-						Namespace: ns,
-						Evaluate:  fmt.Sprintf(evaluateService, key, value),
-						Transform: fmt.Sprintf(tranformService, key, newValue),
-						Action:    appsv1alpha1.ActionTransform,
+				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
+					ResourceSelectors: []appsv1alpha1.ResourceSelector{
+						{
+							Kind:      "Service",
+							Group:     "",
+							Version:   "v1",
+							Namespace: ns,
+							Evaluate:  fmt.Sprintf(evaluateService, key, value),
+						},
 					},
+					Transform: fmt.Sprintf(tranformService, key, newValue),
+					Action:    appsv1alpha1.ActionTransform,
 				},
 				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
@@ -162,5 +164,7 @@ var _ = Describe("CleanerClient", func() {
 		Expect(ok).To(BeFalse())
 
 		deleteCleaner(cleaner.Name)
+
+		deleteNamespace(ns)
 	})
 })
