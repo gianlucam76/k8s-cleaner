@@ -133,20 +133,21 @@ metadata:
   name: cleaner-failed-pods-lua
 spec:
   schedule: "* 0 * * *"
-  matchingResources:
-  - namespace: all
-    kind: Pod
-    group: ""
-    version: v1
-  evaluate: |
-    function evaluate()
-      hs = {}
-      hs.matching = false
-      if obj.status.phase == "Failed" then
-        hs.matching = true
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: all
+      kind: Pod
+      group: ""
+      version: v1
+    evaluate: |
+      function evaluate()
+        hs = {}
+        hs.matching = false
+        if obj.status.phase == "Failed" then
+          hs.matching = true
+        end
+        return hs
       end
-      return hs
-    end
   action: Delete
 ```
 
