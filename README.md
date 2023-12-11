@@ -135,8 +135,7 @@ spec:
   schedule: "* 0 * * *"
   resourcePolicySet:
     resourceSelectors:
-    - namespace: all
-      kind: Pod
+    - kind: Pod
       group: ""
       version: v1
     evaluate: |
