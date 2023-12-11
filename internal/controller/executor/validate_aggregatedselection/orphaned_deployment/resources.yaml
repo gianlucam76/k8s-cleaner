@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+  ownerReferences:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: nginx-deployment
+    controller: true
+spec:
+  containers:
+  - image: nginx:latest
+    imagePullPolicy: IfNotPresent
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3 # Number of replicas
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80 # Port for HTTP traffic
+    targetPort: 80 # Port on the pods
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orphaned-deployment
+  labels:
+    app: orphaned
+spec:
+  replicas: 3 # Number of replicas
+  selector:
+    matchLabels:
+      app: orphaned
+  template:
+    metadata:
+      labels:
+        app: orphaned
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80

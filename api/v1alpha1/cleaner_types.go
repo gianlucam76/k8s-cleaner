@@ -40,7 +40,7 @@ const (
 	CleanerFinalizer = "cleanerfinalizer.projectsveltos.io"
 )
 
-type Resources struct {
+type ResourceSelector struct {
 	// Namespace of the resource deployed in the  Cluster.
 	// Empty for resources scoped at cluster level.
 	// +optional
@@ -66,6 +66,23 @@ type Resources struct {
 	// representing whether object is a match.
 	// +optional
 	Evaluate string `json:"evaluate,omitempty"`
+}
+
+type ResourcePolicySet struct {
+	// ResourceSelectors identifies what resources to select
+	ResourceSelectors []ResourceSelector `json:"resourceSelectors"`
+
+	// This field is optional and can be used to specify a Lua function
+	// that will be used to further select a subset of the resources that
+	// have already been selected using the ResourceSelector field.
+	// The function will receive the array of resources selected by ResourceSelectors.
+	// If this field is not specified, all resources selected by the ResourceSelector
+	// field will be considered.
+	// This field allows to perform more complex filtering or selection operations
+	// on the resources, looking at all resources together.
+	// This can be useful for more sophisticated tasks, such as identifying resources
+	// that are related to each other or that have similar properties.
+	AggregatedSelection string `json:"aggregatedSelection,omitempty"`
 
 	// Action indicates the action to take. Default action
 	// is to delete object. If set to transform, the transform function
@@ -84,7 +101,9 @@ type Resources struct {
 
 // CleanerSpec defines the desired state of Cleaner
 type CleanerSpec struct {
-	MatchingResources []Resources `json:"matchingResources"`
+	// ResourcePolicySet identifies a group of resources and the action
+	// to take on those.
+	ResourcePolicySet ResourcePolicySet `json:"resourcePolicySet"`
 
 	// Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 	Schedule string `json:"schedule"`
@@ -98,7 +117,7 @@ type CleanerSpec struct {
 	// All matching resources will be listed in status section
 	// +kubebuilder:default:=false
 	// +optional
-	DryRun bool `json:"dryRune,omitempty"`
+	DryRun bool `json:"dryRun,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner

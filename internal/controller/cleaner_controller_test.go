@@ -98,12 +98,14 @@ var _ = Describe("CleanerClient", func() {
 				Name: randomString(),
 			},
 			Spec: appsv1alpha1.CleanerSpec{
-				MatchingResources: []appsv1alpha1.Resources{
-					{
-						Kind:      randomString(),
-						Group:     randomString(),
-						Version:   randomString(),
-						Namespace: randomString(),
+				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
+					ResourceSelectors: []appsv1alpha1.ResourceSelector{
+						{
+							Kind:      randomString(),
+							Group:     randomString(),
+							Version:   randomString(),
+							Namespace: randomString(),
+						},
 					},
 				},
 			},

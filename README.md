@@ -47,11 +47,12 @@ metadata:
   name: cleaner-sample
 spec:
   schedule: "* 1 * * *" # Runs every day at 1 AM
-  matchingResources:
-  - namespace: test
-    kind: Secret
-    group: ""
-    version: v1
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Secret
+      group: ""
+      version: v1
     action: Delete # Deletes matching Secrets
 ```
 
@@ -68,18 +69,19 @@ metadata:
   name: cleaner-sample1
 spec:
   schedule: "* 0 * * *" # Executes every day at midnight
-  matchingResources:
-  - namespace: test
-    kind: Deployment
-    group: "apps"
-    version: v1
-    labelFilters:
-    - key: serving
-      operation: Equal
-      value: api # Identifies Deployments with "serving" label set to "api"
-    - key: environment
-      operation: Different
-      value: prouction # Identifies Deployments with "environment" label different from "production"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+      labelFilters:
+      - key: serving
+        operation: Equal
+        value: api # Identifies Deployments with "serving" label set to "api"
+      - key: environment
+        operation: Different
+        value: prouction # Identifies Deployments with "environment" label different from "production"
     action: Delete # Deletes matching Deployments
 ```
 
@@ -98,24 +100,25 @@ metadata:
   name: cleaner-sample2
 spec:
   schedule: "* 0 * * *"
-  matchingResources:
-  - namespace: foo
-    kind: Service
-    group: ""
-    version: v1
-    evaluate: |
-      function evaluate()
-        hs = {}
-        hs.matching = false -- Initialize matching flag
-        if obj.spec.ports ~= nil then
-          for _,p in pairs(obj.spec.ports) do -- Iterate through the ports
-            if p.port == 443 or p.port == 8443 then -- Check if port is 443 or 8443
-              hs.matching = true -- Set matching flag to true
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Service
+      group: ""
+      version: v1
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false -- Initialize matching flag
+          if obj.spec.ports ~= nil then
+            for _,p in pairs(obj.spec.ports) do -- Iterate through the ports
+              if p.port == 443 or p.port == 8443 then -- Check if port is 443 or 8443
+                hs.matching = true -- Set matching flag to true
+              end
             end
           end
+          return hs
         end
-        return hs
-      end
     action: Delete
 ```
 
@@ -163,23 +166,24 @@ metadata:
   name: cleaner-sample3
 spec:
   schedule: "* 0 * * *"
-  matchingResources:
-  - namespace: foo
-    kind: Service
-    group: ""
-    version: v1
-    evaluate: |
-      -- Define how resources will be selected 
-      function evaluate()
-        hs = {}
-        hs.matching = false
-        if obj.spec.selector ~= nil then
-          if obj.spec.selector["app"] == "version1" then
-            hs.matching = true
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Service
+      group: ""
+      version: v1
+      evaluate: |
+        -- Define how resources will be selected 
+        function evaluate()
+          hs = {}
+          hs.matching = false
+          if obj.spec.selector ~= nil then
+            if obj.spec.selector["app"] == "version1" then
+              hs.matching = true
+            end
           end
-        end
-        return hs
-        end
+          return hs
+          end
     action: Transform # Update matching resources
     transform: |
       -- Define how resources will be updated
@@ -189,6 +193,76 @@ spec:
         hs.resource = obj
         return hs
         end
+```
+
+## Considering resources of different types together
+
+Occasionally, it's necessary to examine resources of distinct types simultaneously. Imagine wanting to eliminate all Deployment instances that aren't backed by an Autoscaler instance. Cleaner allows you to do this. By employing __resourceSelector__, you can select all Deployment and Autoscaler instances.
+
+Next, define __aggregatedSelection__. AggregatedSelection will be given all instances collected by Cleaner using resourceSelector, in this situation, all Deployment and Autoscaler instances in the foo namespace.
+
+ aggregatedSelection will then refine this set further. The filtered resources will then be subjected to Cleaner's action.
+
+```yaml
+# Find all Deployments not backed up by an Autoscaler. Those are a match.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-sample3
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Deployment
+      group: ""
+      version: v1
+    - namespace: foo
+      kind: HorizontalPodAutoscaler
+      group: "autoscaling"
+      version: v2beta1
+    action: Delete # Delete matching resources
+    aggregatedSelection: |
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        local deployments = {}
+        local autoscalers = {}
+        local deploymentWithNoAutoscaler = {}
+
+        -- Separate deployments and services from the resources
+        for _, resource in ipairs(resources) do
+            local kind = resource.kind
+                if kind == "Deployment" then
+                    table.insert(deployments, resource)
+                elseif kind == "HorizontalPodAutoscaler" then
+                    table.insert(autoscalers, resource)
+                end
+        end
+
+        -- Check for each deployment if there is a matching HorizontalPodAutoscaler
+        for _, deployment in ipairs(deployments) do
+            local deploymentName = deployment.metadata.name
+            local matchingAutoscaler = false
+
+            for _, autoscaler in ipairs(autoscalers) do
+                if autoscaler.spec.scaleTargetRef.name == deployment.metadata.name then
+                    matchingAutoscaler = true
+                    break
+                end
+            end
+
+            if not matchingAutoscaler then
+                table.insert(deploymentWithNoAutoscaler, deployment)
+                break
+            end
+        end
+
+        hs.resources = deploymentWithNoAutoscaler
+        return hs
+      end
 ```
 
 ## DryRun 
@@ -203,18 +277,19 @@ metadata:
 spec:
   schedule: "* 0 * * *" # Runs every day at midnight
   dryRun: true  # Set to true to preview matching resources
-  matchingResources:
-  - namespace: test
-    kind: Deployment
-    group: "apps"
-    version: v1
-    labelFilters:
-    - key: serving
-      operation: Equal
-      value: api # Match deployments with the "serving" label set to "api"
-    - key: environment
-      operation: Different
-      value: prouction # Match deployments with the "environment" label different from "production"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+      labelFilters:
+      - key: serving
+        operation: Equal
+        value: api # Match deployments with the "serving" label set to "api"
+      - key: environment
+        operation: Different
+        value: prouction # Match deployments with the "environment" label different from "production"
     action: Delete
 ```
 

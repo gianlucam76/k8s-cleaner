@@ -65,7 +65,7 @@ var _ = Describe("Worker", func() {
 		}
 
 		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
-		matchingResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.ResourceSelector{
 			Kind:    "Secret",
 			Group:   "",
 			Version: "v1",
@@ -101,7 +101,7 @@ var _ = Describe("Worker", func() {
 		}
 
 		Expect(k8sClient.Create(context.TODO(), secret2)).To(Succeed())
-		matchingResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.ResourceSelector{
 			Kind:    "Secret",
 			Group:   "",
 			Version: "v1",
@@ -161,7 +161,7 @@ var _ = Describe("Worker", func() {
    end
    `
 
-		matchingResources := &appsv1alpha1.Resources{
+		matchingResources := &appsv1alpha1.ResourceSelector{
 			Kind:     "Secret",
 			Group:    "",
 			Version:  "v1",

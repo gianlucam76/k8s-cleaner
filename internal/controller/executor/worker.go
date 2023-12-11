@@ -86,6 +86,11 @@ type transformStatus struct {
 	Message  string                     `json:"message"`
 }
 
+type aggregatedStatus struct {
+	Resources []*unstructured.Unstructured `json:"resources"`
+	Message   string                       `json:"message"`
+}
+
 func processRequests(ctx context.Context, i int, logger logr.Logger) {
 	id := i
 	var cleanerName *string
@@ -143,26 +148,35 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		return nil
 	}
 
-	for i := range cleaner.Spec.MatchingResources {
-		sr := &cleaner.Spec.MatchingResources[i]
-		var resources []*unstructured.Unstructured
-		resources, err = getMatchingResources(ctx, sr, cleaner.Spec.DryRun, logger)
+	resources := make([]*unstructured.Unstructured, 0)
+	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+		selector := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
+		var tmpResources []*unstructured.Unstructured
+		tmpResources, err = getMatchingResources(ctx, selector, cleaner.Spec.DryRun, logger)
 		if err != nil {
 			logger.Info(fmt.Sprintf("failed to fetch resource (gvk: %s): %v",
-				fmt.Sprintf("%s:%s:%s", sr.Group, sr.Version, sr.Kind), err))
+				fmt.Sprintf("%s:%s:%s", selector.Group, selector.Version, selector.Kind), err))
 			return err
 		}
-		if sr.Action == appsv1alpha1.ActionDelete {
-			return deleteMatchingResources(ctx, resources, logger)
-		} else {
-			return updateMatchingResources(ctx, resources, sr.Transform, logger)
+		resources = append(resources, tmpResources...)
+	}
+
+	if cleaner.Spec.ResourcePolicySet.AggregatedSelection != "" {
+		resources, err = aggregatedSelection(cleaner.Spec.ResourcePolicySet.AggregatedSelection, resources,
+			logger)
+		if err != nil {
+			logger.Info(fmt.Sprintf("failed to filter aggregated resources: %v", err))
+			return err
 		}
 	}
 
-	return nil
+	if cleaner.Spec.ResourcePolicySet.Action == appsv1alpha1.ActionDelete {
+		return deleteMatchingResources(ctx, resources, logger)
+	}
+	return updateMatchingResources(ctx, resources, cleaner.Spec.ResourcePolicySet.Transform, logger)
 }
 
-func getMatchingResources(ctx context.Context, sr *appsv1alpha1.Resources, dryRun bool, logger logr.Logger,
+func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, dryRun bool, logger logr.Logger,
 ) ([]*unstructured.Unstructured, error) {
 
 	resources, err := fetchResources(ctx, sr)
@@ -216,14 +230,14 @@ func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unst
 }
 
 func updateMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
-	transform string, logger logr.Logger) error {
+	transformFunction string, logger logr.Logger) error {
 
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
 			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
 		l.Info("updating resource")
-		newResource, err := Transform(resource, transform, l)
+		newResource, err := transform(resource, transformFunction, l)
 		if err != nil {
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
 			return err
@@ -237,11 +251,13 @@ func updateMatchingResources(ctx context.Context, resources []*unstructured.Unst
 	return nil
 }
 
-func fetchResources(ctx context.Context, sr *appsv1alpha1.Resources) (*unstructured.UnstructuredList, error) {
+func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.ResourceSelector,
+) (*unstructured.UnstructuredList, error) {
+
 	gvk := schema.GroupVersionKind{
-		Group:   sr.Group,
-		Version: sr.Version,
-		Kind:    sr.Kind,
+		Group:   resourceSelector.Group,
+		Version: resourceSelector.Version,
+		Kind:    resourceSelector.Kind,
 	}
 
 	dc := discovery.NewDiscoveryClientForConfigOrDie(config)
@@ -267,13 +283,13 @@ func fetchResources(ctx context.Context, sr *appsv1alpha1.Resources) (*unstructu
 
 	options := metav1.ListOptions{}
 
-	if len(sr.LabelFilters) > 0 {
+	if len(resourceSelector.LabelFilters) > 0 {
 		labelFilter := ""
-		for i := range sr.LabelFilters {
+		for i := range resourceSelector.LabelFilters {
 			if labelFilter != "" {
 				labelFilter += ","
 			}
-			f := sr.LabelFilters[i]
+			f := resourceSelector.LabelFilters[i]
 			if f.Operation == libsveltosv1alpha1.OperationEqual {
 				labelFilter += fmt.Sprintf("%s=%s", f.Key, f.Value)
 			} else {
@@ -284,8 +300,8 @@ func fetchResources(ctx context.Context, sr *appsv1alpha1.Resources) (*unstructu
 		options.LabelSelector = labelFilter
 	}
 
-	if sr.Namespace != "" {
-		options.FieldSelector += fmt.Sprintf("metadata.namespace=%s", sr.Namespace)
+	if resourceSelector.Namespace != "" {
+		options.FieldSelector += fmt.Sprintf("metadata.namespace=%s", resourceSelector.Namespace)
 	}
 
 	d := dynamic.NewForConfigOrDie(config)
@@ -354,7 +370,7 @@ func isMatch(resource *unstructured.Unstructured, script string, logger logr.Log
 	return result.Matching, nil
 }
 
-func Transform(resource *unstructured.Unstructured, script string, logger logr.Logger,
+func transform(resource *unstructured.Unstructured, script string, logger logr.Logger,
 ) (*unstructured.Unstructured, error) {
 
 	if script == "" {
@@ -408,6 +424,69 @@ func Transform(resource *unstructured.Unstructured, script string, logger logr.L
 	}
 
 	return result.Resource, nil
+}
+
+func aggregatedSelection(luaScript string, resources []*unstructured.Unstructured,
+	logger logr.Logger) ([]*unstructured.Unstructured, error) {
+
+	if luaScript == "" {
+		return resources, nil
+	}
+
+	// Create a new Lua state
+	l := lua.NewState()
+	defer l.Close()
+
+	// Load the Lua script
+	if err := l.DoString(luaScript); err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("doString failed: %v", err))
+		return nil, err
+	}
+
+	// Create an argument table
+	argTable := l.NewTable()
+	for _, resource := range resources {
+		obj := mapToTable(resource.UnstructuredContent())
+		argTable.Append(obj)
+	}
+
+	l.SetGlobal("resources", argTable)
+
+	if err := l.CallByParam(lua.P{
+		Fn:      l.GetGlobal("evaluate"), // name of Lua function
+		NRet:    1,                       // number of returned values
+		Protect: true,                    // return err or panic
+	}, argTable); err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to call evaluate function: %s", err.Error()))
+		return nil, err
+	}
+
+	lv := l.Get(-1)
+	tbl, ok := lv.(*lua.LTable)
+	if !ok {
+		logger.V(logs.LogInfo).Info(luaTableError)
+		return nil, fmt.Errorf("%s", luaTableError)
+	}
+
+	goResult := toGoValue(tbl)
+	resultJson, err := json.Marshal(goResult)
+	if err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal result: %v", err))
+		return nil, err
+	}
+
+	var result aggregatedStatus
+	err = json.Unmarshal(resultJson, &result)
+	if err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal result: %v", err))
+		return nil, err
+	}
+
+	if result.Message != "" {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("message: %s", result.Message))
+	}
+
+	return result.Resources, nil
 }
 
 func getCleanerInstance(ctx context.Context, cleanerName string) (*appsv1alpha1.Cleaner, error) {

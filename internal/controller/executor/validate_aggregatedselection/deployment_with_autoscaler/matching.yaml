@@ -1,0 +1,24 @@
+# The file matching_resources contains all resources defined in resources.yaml
+# which are a match for aggregatedSelection
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: not-backed-by-autoscaler
+  namespace: default
+spec:
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      containers:
+        - name: php-apache
+          image: php:8.0-apache
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi

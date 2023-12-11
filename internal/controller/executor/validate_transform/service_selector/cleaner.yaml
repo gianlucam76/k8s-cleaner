@@ -1,0 +1,34 @@
+# Find all Services with selector app: version1 and update it to app: version1
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-sample3
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: foo
+      kind: Service
+      group: ""
+      version: v1
+      evaluate: |
+        -- Define how resources will be selected 
+        function evaluate()
+          hs = {}
+          hs.matching = false
+          if obj.spec.selector ~= nil then
+            if obj.spec.selector["app"] == "version1" then
+              hs.matching = true
+            end
+          end
+          return hs
+          end
+    action: Transform # Update matching resources
+    transform: |
+      -- Define how resources will be updated
+      function transform()
+        hs = {}
+        obj.spec.selector["app"] = "version2"
+        hs.resource = obj
+        return hs
+        end

@@ -20,6 +20,9 @@ var (
 	FetchResources          = fetchResources
 	GetMatchingResources    = getMatchingResources
 	DeleteMatchingResources = deleteMatchingResources
+	IsMatch                 = isMatch
+	Transform               = transform
+	AggregatedSelection     = aggregatedSelection
 )
 
 func (m *Manager) ClearInternalStruct() {
