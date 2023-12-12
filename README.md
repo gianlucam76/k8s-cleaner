@@ -9,13 +9,13 @@ The Kubernetes controller __Cleaner__ proactively identifies, removes, or update
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
 
-# 🤝 Contribute to Cleaner Examples
+# Contribute to Cleaner Examples
 
-We encourage you to contribute to the _example_ directory by adding your own Cleaner configurations. This will help the community benefit from your expertise and build a stronger knowledge base of Cleaner use cases.
+We encourage you to contribute to the _example_ directory by adding your own Cleaner configurations 💡. This will help the community benefit from your expertise and build a stronger knowledge base of Cleaner use cases.
 
 To add an example, simply create a new file in the example directory with a descriptive name and put your Cleaner configuration within the file. Once you've added your example, feel free to submit a pull request to share it with the community.
 
-Together, we can expand the range of Cleaner applications and make it an even more valuable tool for managing Kubernetes resources efficiently.
+🤝 together we can expand the range of Cleaner applications and make it an even more valuable tool for managing Kubernetes resources efficiently.
 
 ## Flexibility and Customization:
 
