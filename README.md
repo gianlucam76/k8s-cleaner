@@ -325,6 +325,12 @@ To verify the correctness of your __Cleaner__ configuration, follow the comprehe
 
 In essence, you'll need to provide your Cleaner YAML file, along with YAML files representing matching and non-matching resources, and execute the simple ```make ut``` command. This will validate whether your configuration correctly identifies and manages the desired resources.
 
+## Code of Conduct
+
+This project adheres to the [CNCF Code of Conduct](https://github.com/cncf/foundation/blob/master/code-of-conduct.md)
+
+By participating, you are expected to honor this code.
+
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
