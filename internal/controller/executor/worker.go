@@ -171,6 +171,8 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	}
 
 	if cleaner.Spec.DryRun {
+		// Print all matching resources
+		printMatchingResources(resources, logger)
 		return nil
 	}
 
@@ -208,7 +210,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 			return nil, err
 		}
 		if isMatch {
-			l.Info("resource is a match for cleaner")
+			l.Info("found a match")
 			results = append(results, resource)
 		}
 	}
@@ -493,7 +495,7 @@ func aggregatedSelection(luaScript string, resources []*unstructured.Unstructure
 	for i := range result.Resources {
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
 			result.Resources[i].GetKind(), result.Resources[i].GetNamespace(), result.Resources[i].GetName()))
-		l.Info("resource is a match for cleaner")
+		l.Info("found a match")
 	}
 
 	return result.Resources, nil
@@ -720,5 +722,14 @@ func toGoValue(lv lua.LValue) interface{} {
 		}
 	default:
 		return v
+	}
+}
+
+func printMatchingResources(resources []*unstructured.Unstructured, logger logr.Logger) {
+	for i := range resources {
+		resource := resources[i]
+		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
+			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
+		l.Info("resource is a match for cleaner")
 	}
 }

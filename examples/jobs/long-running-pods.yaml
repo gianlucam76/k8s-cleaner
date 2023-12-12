@@ -1,0 +1,68 @@
+# This Cleaner instance finds any Pod that:
+# - has been running for longer than one hour (3600 seconds)
+# - was created by a Job
+# and instruct Cleaner to delete this Pod.
+# This does not delete the Job.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-from-job
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      evaluate: |
+        --  Convert creationTimestamp "2023-12-12T09:35:56Z"
+        function convertTimestampString(timestampStr)
+          local convertedTimestamp = string.gsub(
+            timestampStr,
+            '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)Z',
+            function(y, mon, d, h, mi, s)
+              return os.time({
+                year = tonumber(y),
+                month = tonumber(mon),
+                day = tonumber(d),
+                hour = tonumber(h),
+                min = tonumber(mi),
+                sec = tonumber(s)
+              })
+            end
+          )
+          return convertedTimestamp
+        end
+
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          currentTime = os.time()
+
+          creationTimestamp = convertTimestampString(obj.metadata.creationTimestamp)
+
+          hs.message = creationTimestamp
+          print('creationTimestamp: ' .. creationTimestamp)
+          print('currentTime: ' .. currentTime)
+
+          timeDifference = os.difftime(currentTime, tonumber(creationTimestamp))
+
+          print('timeDifference: ' .. timeDifference)
+
+          -- if pod has been running for over an hour
+          if timeDifference > 3600 then
+            if obj.metadata.ownerReferences ~= nil then
+              for _, owner in ipairs(obj.metadata.ownerReferences) do
+                if owner.kind == "Job" and owner.apiVersion == "batch/v1" then
+                  hs.matching = true
+                end
+              end
+            end
+          end
+
+
+          return hs
+        end
+    action: Delete

@@ -1,0 +1,28 @@
+# This Cleaner instance finds any Pod with conditions PodCompleted
+# set to true and instructs Cleaner to delete it.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: completed-pods
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+          if obj.status.conditions ~= nil then
+            for _, condition in ipairs(obj.status.conditions) do
+              if condition.reason == "PodCompleted" and condition.status == "True" then
+                hs.matching = true
+              end
+            end
+          end
+          return hs
+        end
+    action: Delete
