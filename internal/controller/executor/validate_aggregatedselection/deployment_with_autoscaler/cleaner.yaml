@@ -2,14 +2,14 @@
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: cleaner-sample3
+  name: deployment-with-no-autoscaler
 spec:
   schedule: "* 0 * * *"
   resourcePolicySet:
     resourceSelectors:
     - namespace: foo
       kind: Deployment
-      group: ""
+      group: "apps"
       version: v1
     - namespace: foo
       kind: HorizontalPodAutoscaler
