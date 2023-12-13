@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: matching
+type: Opaque
+data:
+  username: foo
