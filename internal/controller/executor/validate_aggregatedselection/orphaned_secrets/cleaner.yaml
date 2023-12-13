@@ -1,0 +1,143 @@
+# This Cleaner instance finds all Secret instances in
+# the namespace *bar* which are orphaned. Orphaned here means Secret is not used by:
+# - Secrets used through volumes (pod.spec.volumes)
+# - Secrets used through environment variables (pod.spec.containers.env and pod.spec.containers.envFrom)
+# - Secrets used for image pulls (pod.spec.imagePullSecrets)
+# - Secrets used by Ingress TLS (ingress.spec.tls)
+# - Secrets used by ServiceAccounts
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: completed-pods
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: bar
+      kind: Pod
+      group: ""
+      version: v1
+    - namespace: bar
+      kind: Secret
+      group: ""
+      version: v1
+    - namespace: bar
+      kind: Ingress
+      group: "networking.k8s.io"
+      version: v1      
+    action: Delete
+    aggregatedSelection: |
+      function secretsUsedByPods(pods)
+        local podSecrets = {}  -- Define podSecrets as a local variable
+
+        for _, pod in ipairs(pods) do
+          if pod.spec.containers ~= nil then
+            for _, container in ipairs(pod.spec.containers) do
+              
+              if container.env ~= nil then
+                for _, env in ipairs(container.env) do
+                  if env.valueFrom ~= nil and env.valueFrom.secretKeyRef ~= nil then
+                    podSecrets[env.valueFrom.secretKeyRef.name] = true
+                  end
+                end
+              end
+
+              if  container.envFrom ~= nil then
+                for _, envFrom in ipairs(container.envFrom) do
+                  if envFrom.secretRef ~= nil then
+                    podSecrets[envFrom.secretRef.name] = true
+                  end
+                end
+              end  
+            end
+          end
+
+          if pod.spec.initContainers ~= nil then
+            for _, initContainer in ipairs(pod.spec.initContainers) do
+              if initContainer.env ~= nil then
+                for _, env in ipairs(initContainer.env) do
+                  if env.valueFrom ~= nil and env.valueFrom.secretKeyRef ~= nil then
+                    podSecrets[env.valueFrom.secretKeyRef.name] = true
+                  end
+                end
+              end
+            end
+          end
+
+          if pod.spec.imagePullSecrets ~= nil then
+            for _, secret in ipairs(pod.spec.imagePullSecrets) do
+              podSecrets[secret.name] = true
+            end
+          end          
+
+          if pod.spec.volumes ~= nil then  
+            for _, volume in ipairs(pod.spec.volumes) do
+              if volume.secret ~= nil then
+                podSecrets[volume.secret.secretName] = true
+              end
+
+              if volume.projected ~= nil then
+                for _, projectedResource in ipairs(volume.projected.sources) do
+                  if projectedResource.secret ~= nil then
+                    podSecrets[projectedResource.secret.name] = true
+                  end
+                end
+              end
+            end
+          end
+        end  
+
+        return podSecrets
+      end
+
+      function secretsUsedByIngresses(ingresses)
+        local ingressSecret = {}
+
+        for _, ingress in ipairs(ingresses) do
+          if ingress.tls ~= nil  then
+            for _, tls in ipairs(ingress.tls) do
+              ingressSecrets[tls.secretName] = true
+            end
+          end
+        end
+        
+        return ingressSecret
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        local pods = {}
+        local secrets = {}
+        local ingresses = {}
+        local unusedSecrets = {}
+
+        -- Separate secrets and pods and ingresses from the resources
+        for _, resource in ipairs(resources) do
+            local kind = resource.kind
+            if kind == "Secret" then
+              table.insert(secrets, resource)
+            elseif kind == "Pod" then
+              table.insert(pods, resource)
+            elseif kind == "Ingress" then
+              table.insert(ingresses, resource)
+            end
+        end
+
+        podSecrets = secretsUsedByPods(pods)
+        ingressSecrets = secretsUsedByIngresses(ingresses)
+
+        for _, secret in ipairs(secrets) do
+          if secret.type ~= "kubernetes.io/service-account-token" then
+            if not podSecrets[secret.metadata.name] and not ingressSecrets[secret.metadata.name] then
+              table.insert(unusedSecrets, secret)
+            end
+          end
+        end
+
+        hs.resources = unusedSecrets
+        return hs
+      end
