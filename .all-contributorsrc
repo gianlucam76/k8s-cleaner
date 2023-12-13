@@ -1,0 +1,26 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "gianlucam76",
+      "name": "Gianluca Mardente",
+      "avatar_url": "https://avatars.githubusercontent.com/u/52940363?v=4",
+      "profile": "https://projectsveltos.github.io/sveltos/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "k8s-cleaner",
+  "projectOwner": "gianlucam76"
+}
