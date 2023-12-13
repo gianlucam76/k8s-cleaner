@@ -1,10 +1,10 @@
 # This Cleaner instance finds all Secret instances in
-# the namespace *bar* which are orphaned. Orphaned here means Secret is not used by:
-# - Secrets used through volumes (pod.spec.volumes)
-# - Secrets used through environment variables (pod.spec.containers.env and pod.spec.containers.envFrom)
-# - Secrets used for image pulls (pod.spec.imagePullSecrets)
-# - Secrets used by Ingress TLS (ingress.spec.tls)
-# - Secrets used by ServiceAccounts
+# the namespace *bar* which are orphaned. Orphaned here means a Secret that is not used by:
+# - Pod through volumes (pod.spec.volumes)
+# - Pod through environment variables (pod.spec.containers.env and pod.spec.containers.envFrom)
+# - Pod for image pulls (pod.spec.imagePullSecrets)
+# - Ingress TLS (ingress.spec.tls)
+# - ServiceAccounts
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
@@ -29,7 +29,7 @@ spec:
     action: Delete
     aggregatedSelection: |
       function secretsUsedByPods(pods)
-        local podSecrets = {}  -- Define podSecrets as a local variable
+        local podSecrets = {}
 
         for _, pod in ipairs(pods) do
           if pod.spec.containers ~= nil then
@@ -77,7 +77,7 @@ spec:
                 podSecrets[volume.secret.secretName] = true
               end
 
-              if volume.projected ~= nil then
+              if volume.projected ~= nil and volume.projected.sources ~= nil then
                 for _, projectedResource in ipairs(volume.projected.sources) do
                   if projectedResource.secret ~= nil then
                     podSecrets[projectedResource.secret.name] = true

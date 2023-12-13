@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: matching
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
