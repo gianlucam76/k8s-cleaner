@@ -1,0 +1,62 @@
+# This Cleaner instance finds all unused ClusterRole instances.
+# An unused ClusterRole is an instance that is not referenced
+# by any ClusterRoleBinding or RoleBinding
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unused-roles
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: ClusterRole
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    - kind: ClusterRoleBindings
+      group: "rbac.authorization.k8s.io"
+      version: v1      
+    - kind: RoleBindings
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    action: Delete
+    aggregatedSelection: |
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        -- Contains list of existing ClusterRoles
+        local existingClusterRoles = {}
+        -- Contains list of ClusterRoles currently referenced by
+        -- roleBindings or ClusterRoleBindings
+        local usedClusterRoles = {}
+
+        local unusedClusterRoles = {}
+
+        -- Create list of existingClusterRoles and usedClusterRoles
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "ClusterRole" then
+            table.insert(existingClusterRoles, resource)
+          elseif kind == "ClusterRoleBinding" then
+            if resource.roleRef.kind == "ClusterRole" then
+              usedClusterRoles[resource.roleRef.name] = true
+            end
+          elseif kind == "RoleBinding" then
+            if resource.roleRef.kind == "ClusterRole" then
+              usedClusterRoles[resource.roleRef.name] = true
+            end
+          end
+        end
+
+        -- Iterate over existing clusterRoles and find not used anymore
+        for _,clusterRole in ipairs(existingClusterRoles) do
+          if not usedClusterRoles[clusterRole.metadata.name] then
+            table.insert(unusedClusterRoles, clusterRole)
+          end
+        end
+        
+        hs.resources = unusedClusterRoles
+        return hs
+      end

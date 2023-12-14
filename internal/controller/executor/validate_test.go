@@ -344,8 +344,25 @@ func getResources(dirName, fileName string) []*unstructured.Unstructured {
 	return resources
 }
 
+func getKey(u *unstructured.Unstructured) string {
+	return fmt.Sprintf("%s:%s/%s", u.GetKind(), u.GetNamespace(), u.GetName())
+}
+
 func verifyMatchingResources(result, matchingResources []*unstructured.Unstructured) {
+	// This is used to keep track of resources that are expected to match
+	expected := map[string]bool{}
+
 	for i := range matchingResources {
 		Expect(result).To(ContainElement(matchingResources[i]))
+		expected[getKey(matchingResources[i])] = true
+	}
+
+	// verify only expected matching objects are found
+	for i := range result {
+		key := getKey(result[i])
+		if ok := expected[key]; !ok {
+			// Print the resource that is not expected to be a match
+			Expect(key).To(BeEmpty())
+		}
 	}
 }

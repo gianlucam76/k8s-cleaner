@@ -92,17 +92,16 @@ spec:
       end
 
       function secretsUsedByIngresses(ingresses)
-        local ingressSecret = {}
-
+        local ingressSecrets = {}
         for _, ingress in ipairs(ingresses) do
-          if ingress.tls ~= nil  then
-            for _, tls in ipairs(ingress.tls) do
+          if ingress.spec.tls ~= nil  then
+            for _, tls in ipairs(ingress.spec.tls) do
               ingressSecrets[tls.secretName] = true
             end
           end
         end
         
-        return ingressSecret
+        return ingressSecrets
       end
 
       function evaluate()

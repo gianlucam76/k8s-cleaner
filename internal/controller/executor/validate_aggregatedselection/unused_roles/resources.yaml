@@ -1,0 +1,73 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: used-role
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default 
+  name: example-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: example
+    namespace: default
+roleRef:
+  kind: Role
+  name: used-role
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: bar
+  name: used-role
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: bar 
+  name: example-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: example
+    namespace: bar
+roleRef:
+  kind: Role
+  name: used-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: unused-role
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: unused-role2
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
