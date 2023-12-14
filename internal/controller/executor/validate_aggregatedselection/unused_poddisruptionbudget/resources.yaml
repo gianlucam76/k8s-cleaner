@@ -1,0 +1,81 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-deployment
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: nginx
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3 # Number of replicas
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-statefulset
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: nginx
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: zookeper
+  serviceName: "zookeper"
+  replicas: 3 
+  minReadySeconds: 10
+  template:
+    metadata:
+      labels:
+        app: zookeper
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: zookeper
+        image: registry.k8s.io/zookeper:1.0
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "my-storage-class"
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pdb-unused
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: foo

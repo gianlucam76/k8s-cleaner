@@ -1,0 +1,78 @@
+# This Cleaner instance finds all PodDisruptionBudget instances which are stale. 
+# A PodDisruptionBudget is stale if:
+# - matches no Deployment instance
+# - matches no StatefulSet instance
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: completed-pods
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: PodDisruptionBudget
+      group: "policy"
+      version: v1
+    - kind: Deployment
+      group: "apps"
+      version: v1 
+    - kind: StatefulSet
+      group: "apps"
+      version: v1   
+    action: Delete
+    aggregatedSelection: |
+      function isMatch(pdbLabels, destLabels)
+        for k,v in pairs(pdbLabels) do
+          if destLabels[k] ~= v then
+            return false
+          end
+        end
+        return true
+      end
+
+      function isMatchingAny(pdb, resources)
+        if resources == nil then
+          return false
+        end
+        for _,resource in ipairs(resources) do
+          if pdb.metadata.namespace == resource.metadata.namespace then
+            if isMatch(pdb.spec.selector.matchLabels, resource.spec.template.metadata.labels) then
+              return true
+            end
+          end
+        end
+        return false
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+      
+        local pdbs= {}
+        local deployments = {}
+        local statefulsets = {}
+        local stalePdbs = {}
+
+        -- Separate pdbs and deployments and statefulsets from the resources
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "PodDisruptionBudget" then
+            table.insert(pdbs, resource)
+          elseif kind == "Deployment" then
+            table.insert(deployments, resource)
+          elseif kind == "StatefulSet" then
+            table.insert(statefulsets, resource)
+          end
+        end
+
+        for _,pdb in ipairs(pdbs) do
+          if not isMatchingAny(pdb,deployments) and not isMatchingAny(pdb,statefulsets) then
+            table.insert(stalePdbs, pdb)
+          end
+        end
+
+        hs.resources = stalePdbs
+        return hs
+      end
