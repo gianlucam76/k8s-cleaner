@@ -1,5 +1,5 @@
-# This Cleaner instance will find any deployment in the namespace
-# foo with has no associated Autoscaler and instructs Cleaner to
+# This Cleaner instance will find any deployment all namespaces
+# with has no associated Autoscaler and instructs Cleaner to
 # delete those instances
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
@@ -9,12 +9,10 @@ spec:
   schedule: "* 0 * * *"
   resourcePolicySet:
     resourceSelectors:
-    - namespace: foo
-      kind: Deployment
+    - kind: Deployment
       group: "apps"
       version: v1
-    - namespace: foo
-      kind: HorizontalPodAutoscaler
+    - kind: HorizontalPodAutoscaler
       group: "autoscaling"
       version: v2beta1
     action: Delete # Delete matching resources
@@ -30,12 +28,12 @@ spec:
 
         -- Separate deployments and services from the resources
         for _, resource in ipairs(resources) do
-            local kind = resource.kind
-                if kind == "Deployment" then
-                    table.insert(deployments, resource)
-                elseif kind == "HorizontalPodAutoscaler" then
-                    table.insert(autoscalers, resource)
-                end
+          local kind = resource.kind
+          if kind == "Deployment" then
+            table.insert(deployments, resource)
+          elseif kind == "HorizontalPodAutoscaler" then
+            table.insert(autoscalers, resource)
+          end
         end
 
         -- Check for each deployment if there is a matching HorizontalPodAutoscaler
@@ -44,10 +42,12 @@ spec:
             local matchingAutoscaler = false
 
             for _, autoscaler in ipairs(autoscalers) do
+              if autoscaler.metadata.namespace == deployment.metadata.namespace then
                 if autoscaler.spec.scaleTargetRef.name == deployment.metadata.name then
-                    matchingAutoscaler = true
-                    break
+                  matchingAutoscaler = true
+                  break
                 end
+              end
             end
 
             if not matchingAutoscaler then
