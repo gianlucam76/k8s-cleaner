@@ -1,5 +1,5 @@
-# This Cleaner instance finds all ConfigMaps instances in
-# the namespace *bar* which are orphaned. Orphaned here means a ConfigMap that is not used by:
+# This Cleaner instance finds all ConfigMaps instances in all namespaces which are orphaned.
+# Orphaned here means a ConfigMap that is not used by:
 # - Pod through volumes (pod.spec.volumes)
 # - Pod through environment variables (pod.spec.containers.env and pod.spec.containers.envFrom)
 apiVersion: apps.projectsveltos.io/v1alpha1
@@ -11,16 +11,18 @@ spec:
   dryRun: false
   resourcePolicySet:
     resourceSelectors:
-    - namespace: bar
-      kind: Pod
+    - kind: Pod
       group: ""
       version: v1
-    - namespace: bar
-      kind: ConfigMap
+    - kind: ConfigMap
       group: ""
       version: v1   
     action: Delete
     aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end 
+
       function configMapsUsedByPods(pods)
         local podConfigMaps = {}
 
@@ -31,7 +33,8 @@ spec:
               if container.env ~= nil then
                 for _, env in ipairs(container.env) do
                   if env.valueFrom ~= nil and env.valueFrom.configMapKeyRef ~= nil then
-                    podConfigMaps[env.valueFrom.configMapKeyRef.name] = true
+                    key = getKey(pod.metadata.namespace, env.valueFrom.configMapKeyRef.name)
+                    podConfigMaps[key] = true
                   end
                 end
               end
@@ -39,7 +42,8 @@ spec:
               if container.envFrom ~= nil then
                 for _, envFrom in ipairs(container.envFrom) do
                   if envFrom.configMapRef ~= nil then
-                    podConfigMaps[envFrom.configMapRef.name] = true
+                    key = getKey(pod.metadata.namespace, envFrom.configMapRef.name)
+                    podConfigMaps[key] = true
                   end
                 end
               end  
@@ -52,7 +56,8 @@ spec:
               if initContainer.env ~= nil then
                 for _, env in ipairs(initContainer.env) do
                   if env.valueFrom ~= nil and env.valueFrom.configMapKeyRef ~= nil then
-                    podConfigMaps[env.valueFrom.configMapKeyRef.name] = true
+                    key = getKey(pod.metadata.namespace, env.valueFrom.configMapKeyRef.name)
+                    podConfigMaps[key] = true
                   end
                 end
               end
@@ -60,7 +65,8 @@ spec:
               if initContainer.envFrom ~= nil then
                 for _, envFrom in ipairs(initContainer.envFrom) do
                   if envFrom.configMapRef ~= nil then
-                    podConfigMaps[envFrom.configMapRef.name] = true
+                    key = getKey(pod.metadata.namespace,envFrom.configMapRef.name)
+                    podConfigMaps[key] = true
                   end
                 end
               end  
@@ -71,13 +77,15 @@ spec:
           if pod.spec.volumes ~= nil then  
             for _, volume in ipairs(pod.spec.volumes) do
               if volume.configMap ~= nil then
-                podConfigMaps[volume.configMap.name] = true
+                key = getKey(pod.metadata.namespace,volume.configMap.name)
+                podConfigMaps[key] = true
               end
 
               if volume.projected ~= nil and volume.projected.sources ~= nil then
                 for _, projectedResource in ipairs(volume.projected.sources) do
                   if projectedResource.configMap ~= nil then
-                    podConfigMaps[projectedResource.configMap.name] = true
+                    key = getKey(pod.metadata.namespace,projectedResource.configMap.name)
+                    podConfigMaps[key] = true
                   end
                 end
               end
@@ -110,7 +118,8 @@ spec:
         podConfigMaps = configMapsUsedByPods(pods)
 
         for _, configMap in ipairs(configMaps) do
-          if not podConfigMaps[configMap.metadata.name] then
+          key = getKey(configMap.metadata.namespace,configMap.metadata.name)
+          if not podConfigMaps[key] then
             table.insert(unusedConfigMaps, configMap)
           end
         end

@@ -2,17 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: orphaned-deployment
+  namespace: baz
   labels:
-    app: orphaned
+    app: nginx
 spec:
   replicas: 3 # Number of replicas
   selector:
     matchLabels:
-      app: orphaned
+      app: nginx
   template:
     metadata:
       labels:
-        app: orphaned
+        app: nginx
     spec:
       containers:
       - name: nginx

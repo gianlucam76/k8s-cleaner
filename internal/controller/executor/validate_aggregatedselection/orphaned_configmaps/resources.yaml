@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-env
+  namespace: bar
 data:
   special.how: very
 ---
@@ -9,6 +10,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-env
+  namespace: bar
 spec:
   containers:
     - name: test-container
@@ -29,6 +31,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-envfrom
+  namespace: foo
 data:
   SPECIAL_LEVEL: very
   SPECIAL_TYPE: charm
@@ -37,6 +40,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: pod-envfrom
+  namespace: foo
 spec:
   containers:
     - name: test-container
@@ -51,13 +55,16 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-volume
+  namespace: baz
 data:
   SPECIAL_LEVEL: very
   SPECIAL_TYPE: charm
+---
 apiVersion: v1
 kind: Pod
 metadata:
   name: dapi-test-pod
+  namespace: baz
 spec:
   containers:
     - name: test-container
@@ -78,6 +85,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: matching
+  namespace: bar
 data:
   SPECIAL_LEVEL: very
   SPECIAL_TYPE: charm
