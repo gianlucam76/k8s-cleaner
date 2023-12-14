@@ -13,7 +13,7 @@ spec:
   volumes:
     - name: secret-volume
       secret:
-        secretName: olume-secret
+        secretName: volume-secret
   containers:
     - name: dotfile-test-container
       image: registry.k8s.io/busybox

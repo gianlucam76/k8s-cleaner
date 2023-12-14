@@ -1,0 +1,62 @@
+# This Cleaner instance finds all unused Role instances.
+# All namespaces are considered.
+# An unused Role is an instance that is not referenced
+# by any RoleBinding
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unused-roles
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Role
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    - kind: RoleBindings
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    action: Delete
+    aggregatedSelection: |
+      -- Given Role namespace and name returns a unique Key
+      function getRoleKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.valid = true
+        hs.message = ""
+
+        -- Contains list of existing roles
+        local existingRoles = {}
+        -- Contains list of roles currently referenced by roleBindings
+        local usedRoles = {}
+
+        local unusedRoles = {}
+
+        -- Create list of existingRoles and usedRoles
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Role" then
+            table.insert(existingRoles, resource)
+          elseif kind == "RoleBinding" then
+            if resource.roleRef.kind == "Role" then
+              roleKey = getRoleKey(resource.metadata.namespace, resource.roleRef.name)
+              usedRoles[roleKey] = true
+            end
+          end
+        end
+
+        -- Iterate over existing roles and find not used anymore
+        for _,role in ipairs(existingRoles) do
+          roleKey = getRoleKey(role.metadata.namespace, role.metadata.name)
+          if not usedRoles[roleKey] then
+            table.insert(unusedRoles, role)
+          end
+        end
+        
+        hs.resources = unusedRoles
+        return hs
+      end

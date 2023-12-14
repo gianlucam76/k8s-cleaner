@@ -1,0 +1,53 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: used-by-clusterrolebinding
+rules:
+- apiGroups: ["*"]
+  resources: ["Pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: example-clusterbinding
+subjects:
+  - kind: ServiceAccount
+    name: example
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name:  used-by-clusterrolebinding
+  apiGroup: rbac.authorization.k8s.io 
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: used-by-rolebinding
+rules:
+- apiGroups: ["apps"]
+  resources: ["Deployments", "ReplicaSets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: example-rolebinding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: example
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: used-by-rolebinding
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: unused
+rules:
+- apiGroups: ["apps"]
+  resources: ["Deployments", "ReplicaSets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
