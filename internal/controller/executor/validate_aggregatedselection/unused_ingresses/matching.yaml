@@ -1,0 +1,9 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-default-backend
+  namespace: foobar
+spec:
+  defaultBackend:
+    service:
+      name: default-backend

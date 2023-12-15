@@ -19,7 +19,6 @@ spec:
     aggregatedSelection: |
       function evaluate()
         local hs = {}
-        hs.valid = true
         hs.message = ""
 
         local deployments = {}

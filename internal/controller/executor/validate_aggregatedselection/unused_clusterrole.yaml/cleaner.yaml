@@ -23,7 +23,6 @@ spec:
     aggregatedSelection: |
       function evaluate()
         local hs = {}
-        hs.valid = true
         hs.message = ""
 
         -- Contains list of existing ClusterRoles
