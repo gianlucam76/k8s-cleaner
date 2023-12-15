@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl:5.34.0
+        command: ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]
+      restartPolicy: Never
+  backoffLimit: 4
+status:
+  conditions:
+    - type: Complete
+      status: True
+      lastProbeTime: "2023-12-15T14:21:53Z"
+      lastTransitionTime: "2023-12-15T14:21:53Z"
+      reason: JobSucceeded
+      message: Job has completed successfully
+  active: 0
+  succeeded: 5
+  failed: 0
+  completionTime: "2023-12-15T14:21:53Z"

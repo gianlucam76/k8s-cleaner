@@ -116,7 +116,6 @@ func verifyCleanerResourceSelector(dirName string) {
 	for i := range files {
 		if files[i].IsDir() {
 			verifyCleanerResourceSelectors(filepath.Join(dirName, files[i].Name()))
-			continue
 		}
 	}
 
