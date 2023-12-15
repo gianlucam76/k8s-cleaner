@@ -1,0 +1,23 @@
+# This Cleaner instance will find any StatefulSets in any namespace
+# with spec.replicas set to 0 and deletes those instances
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: deployment-with-zero-replicas
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: StatefulSet
+      group: "apps"
+      version: v1
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+          if obj.spec.replicas == 0 then
+            hs.matching = true
+          end
+          return hs
+        end
+    action: Delete
