@@ -1,0 +1,91 @@
+# This Cleaner instance finds all unused ServiceAccounts instances. All namespaces are considered.
+# A ServiceAccount is unused if:
+# - used by no Pod instance
+# - referenced in no RoleBinding
+# - referenced in no ClusterRoleBinding
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unused-service-accounts
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+    - kind: ServiceAccounts
+      group: ""
+      version: v1
+    - kind: RoleBindings
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    - kind: ClusterRoleBindings
+      group: "rbac.authorization.k8s.io"
+      version: v1
+    action: Delete
+    aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      func addRoleBindingServiceAccounts(roleBinding, usedServiceAccounts)
+        if roleBinding.subjects ~= nil then
+          for _,subject in ipairs(roleBinding.subjects) do
+            if subject.kind == "ServiceAccount" then
+              key = getKey(roleBinding.metadata.namespace, subject.name)
+              usedServiceAccounts[key] = true
+            end
+          end
+        end
+      end
+
+      func addClusterRoleBindingServiceAccounts(clusterRoleBinding, usedServiceAccounts)
+        if clusterRoleBinding.subjects ~= nil then
+          for _,subject in ipairs(clusterRoleBinding.subjects) do
+            if subject.kind == "ServiceAccount" then
+              key = getKey(subject.namespace, subject.name)
+              usedServiceAccounts[key] = true
+            end
+          end
+        end
+      end
+
+      func addPodServiceAccount(pod, usedServiceAccounts)
+        key = getKey(pod.metadata.namespace, pod.spec.serviceAccountName)
+        usedServiceAccounts[key] = true
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local serviceAccounts = {}
+        local usedServiceAccounts = {}
+        local unusedServiceAccounts = {}
+
+        for _, resource in ipairs(resources) do
+            local kind = resource.kind
+            if kind == "ServiceAccounts" then
+              table.insert(serviceAccounts, resource)
+            elseif kind == "Pod" then
+              addPodServiceAccount(resource, usedServiceAccounts)
+            elseif kind == "RoleBinding" then
+              addRoleBindingServiceAccounts(resource, usedServiceAccounts)
+            elseif kind == "ClusterRoleBinding" then
+              addClusterRoleBindingServiceAccounts(resource, usedServiceAccounts)              
+            end
+        end
+
+        -- walk all existing serviceAccounts and find the unused ones
+        for _,serviceAccount in ipars(serviceAccounts) do
+          key = getKey(serviceAccount.metadata.namespace, serviceAccount.metadata.name)
+          if not in usedServiceAccounts then
+            table.insert(unusedServiceAccounts, serviceAccount)
+          end
+        end
+
+        hs.resources = unusedServiceAccounts
+        return hs
+      end        
