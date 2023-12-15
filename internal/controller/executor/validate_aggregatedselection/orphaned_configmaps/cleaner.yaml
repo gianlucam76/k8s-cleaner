@@ -98,7 +98,6 @@ spec:
 
       function evaluate()
         local hs = {}
-        hs.valid = true
         hs.message = ""
 
         local pods = {}
