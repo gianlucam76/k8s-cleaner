@@ -72,6 +72,8 @@ spec:
           end
         end
 
-        hs.resources = stalePdbs
+        if #stalePdbs > 0 then
+          hs.resources = stalePdbs
+        end
         return hs
       end

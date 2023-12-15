@@ -87,7 +87,7 @@ type transformStatus struct {
 }
 
 type aggregatedStatus struct {
-	Resources []*unstructured.Unstructured `json:"resources"`
+	Resources []*unstructured.Unstructured `json:"resources,omitempty"`
 	Message   string                       `json:"message"`
 }
 

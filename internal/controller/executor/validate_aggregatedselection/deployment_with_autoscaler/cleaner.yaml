@@ -14,7 +14,7 @@ spec:
       version: v1
     - kind: HorizontalPodAutoscaler
       group: "autoscaling"
-      version: v2beta1
+      version: v2
     action: Delete # Delete matching resources
     aggregatedSelection: |
       function evaluate()
@@ -31,7 +31,9 @@ spec:
           if kind == "Deployment" then
             table.insert(deployments, resource)
           elseif kind == "HorizontalPodAutoscaler" then
-            table.insert(autoscalers, resource)
+            if resource.spec.scaleTargetRef.kind == "Deployment" then
+              table.insert(autoscalers, resource)
+            end
           end
         end
 
@@ -55,6 +57,8 @@ spec:
             end
         end
 
-        hs.resources = deploymentWithNoAutoscaler
+        if #deploymentWithNoAutoscaler > 0 then
+          hs.resources = deploymentWithNoAutoscaler
+        end
         return hs
       end

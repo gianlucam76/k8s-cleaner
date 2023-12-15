@@ -66,6 +66,8 @@ spec:
           end
         end
         
-        hs.resources = unusedPVCs
+        if #unusedPVCs > 0 then
+          hs.resources = unusedPVCs
+        end
         return hs
       end

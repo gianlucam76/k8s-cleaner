@@ -105,6 +105,8 @@ spec:
           end
         end
 
-        hs.resources = orphanedDeployments
+        if #orphanedDeployments > 0 then
+          hs.resources = orphanedDeployments
+        end
         return hs
       end

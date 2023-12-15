@@ -123,6 +123,8 @@ spec:
           end
         end
 
-        hs.resources = unusedConfigMaps
+        if #unusedConfigMaps > 0 then
+          hs.resources = unusedConfigMaps
+        end
         return hs
       end
