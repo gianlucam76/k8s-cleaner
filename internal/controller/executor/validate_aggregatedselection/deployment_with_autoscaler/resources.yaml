@@ -1,5 +1,5 @@
 # This file contains all resources present in the system when Cleaner is processed
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: php-apache

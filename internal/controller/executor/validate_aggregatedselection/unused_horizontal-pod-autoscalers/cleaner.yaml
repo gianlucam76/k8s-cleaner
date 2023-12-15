@@ -1,0 +1,66 @@
+# This Cleaner instance find any HorizontalPodAutoscaler instance
+# matching no Deployment or StatefulSet and delete those nstances
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unused-horizontal-pod-autoscalers
+spec:
+  schedule: "* 0 * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Deployment
+      group: "apps"
+      version: v1
+    - kind: StatefulSet
+      group: "apps"
+      version: v1      
+    - kind: HorizontalPodAutoscaler
+      group: "autoscaling"
+      version: v2
+    action: Delete # Delete matching resources
+    aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local deployments = {}
+        local statefulSets = {}
+        local autoscalers = {}
+        local unusedAutoscalers = {}
+
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Deployment" then
+            key = getKey(resource.metadata.namespace, resource.metadata.name)
+            deployments[key] = true
+          elseif kind == "StatefulSet" then
+            key = getKey(resource.metadata.namespace, resource.metadata.name)
+            statefulSets[key] = true  
+          elseif kind == "HorizontalPodAutoscaler" then
+            table.insert(autoscalers, resource)
+          end
+        end
+
+        -- Check for each horizontalPodAutoscaler if there is a matching Deployment or StatefulSet
+        for _,hpa in ipairs(autoscalers) do
+            key = getKey(hpa.metadata.namespace, hpa.spec.scaleTargetRef.name)
+            if hpa.spec.scaleTargetRef.kind == "Deployment" then
+              if not deployments[key] then
+                table.insert(unusedAutoscalers, hpa)
+              end
+            elseif hpa.spec.scaleTargetRef.kind == "StatefulSet" then
+              if not statefulSets[key] then
+                table.insert(unusedAutoscalers, hpa)
+              end
+            end
+        end
+
+        if #unusedAutoscalers > 0 then
+          hs.resources = unusedAutoscalers
+        end
+        return hs
+      end

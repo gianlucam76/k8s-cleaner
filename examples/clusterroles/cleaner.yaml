@@ -56,6 +56,8 @@ spec:
           end
         end
         
-        hs.resources = unusedClusterRoles
+        if #unusedClusterRoles > 0 then
+          hs.resources = unusedClusterRoles
+        end
         return hs
       end

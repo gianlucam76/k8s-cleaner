@@ -1,15 +1,15 @@
-# This Cleaner instance will find any deployment all namespaces
+# This Cleaner instance will find StatefulSet instances in all namespaces
 # with has no associated Autoscaler and instructs Cleaner to
 # delete those instances
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: deployment-with-no-autoscaler
+  name: statefulset-with-no-autoscaler
 spec:
   schedule: "* 0 * * *"
   resourcePolicySet:
     resourceSelectors:
-    - kind: Deployment
+    - kind: StatefulSet
       group: "apps"
       version: v1
     - kind: HorizontalPodAutoscaler
@@ -21,30 +21,30 @@ spec:
         local hs = {}
         hs.message = ""
 
-        local deployments = {}
+        local statefulSets = {}
         local autoscalers = {}
-        local deploymentWithNoAutoscaler = {}
+        local statefulSetWithNoAutoscaler = {}
 
-        -- Separate deployments and services from the resources
+        -- Separate statefulSets and services from the resources
         for _, resource in ipairs(resources) do
           local kind = resource.kind
-          if kind == "Deployment" then
-            table.insert(deployments, resource)
+          if kind == "StatefulSet" then
+            table.insert(statefulSets, resource)
           elseif kind == "HorizontalPodAutoscaler" then
-            if resource.spec.scaleTargetRef.kind == "Deployment" then
+            if resource.spec.scaleTargetRef.kind == "StatefulSet" then
               table.insert(autoscalers, resource)
             end
           end
         end
 
-        -- Check for each deployment if there is a matching HorizontalPodAutoscaler
-        for _, deployment in ipairs(deployments) do
-            local deploymentName = deployment.metadata.name
+        -- Check for each statefulSets if there is a matching HorizontalPodAutoscaler
+        for _, statefulSet in ipairs(statefulSets) do
+            local statefulSetName = statefulSet.metadata.name
             local matchingAutoscaler = false
 
             for _, autoscaler in ipairs(autoscalers) do
-              if autoscaler.metadata.namespace == deployment.metadata.namespace then
-                if autoscaler.spec.scaleTargetRef.name == deployment.metadata.name then
+              if autoscaler.metadata.namespace == statefulSet.metadata.namespace then
+                if autoscaler.spec.scaleTargetRef.name == statefulSet.metadata.name then
                   matchingAutoscaler = true
                   break
                 end
@@ -52,13 +52,13 @@ spec:
             end
 
             if not matchingAutoscaler then
-                table.insert(deploymentWithNoAutoscaler, deployment)
+                table.insert(statefulSetWithNoAutoscaler, statefulSet)
                 break
             end
         end
 
-        if #deploymentWithNoAutoscaler > 0 then
-          hs.resources = deploymentWithNoAutoscaler
+        if #statefulSetWithNoAutoscaler > 0 then
+          hs.resources = statefulSetWithNoAutoscaler
         end
         return hs
       end

@@ -87,16 +87,16 @@ spec:
           if isDefaultBackendValid(ingress, services) then
             used = true
           elseif isAnyReferencedServiceValid(ingress, services) then
-            print("MGIANLUC ingress used by service")
             used = true
           end
 
           if not used then
-            print("MGIANLUC ingress not used") 
             table.insert(unusedIngresses, ingress)
           end
         end
 
-        hs.resources = unusedIngresses
+        if #unusedIngresses > 0 then
+          hs.resources = unusedIngresses
+        end
         return hs
       end

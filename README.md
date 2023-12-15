@@ -237,7 +237,7 @@ spec:
     - namespace: foo
       kind: HorizontalPodAutoscaler
       group: "autoscaling"
-      version: v2beta1
+      version: v2
     action: Delete # Delete matching resources
     aggregatedSelection: |
       function evaluate()
