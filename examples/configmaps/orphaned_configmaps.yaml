@@ -5,7 +5,7 @@
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: completed-pods
+  name: unused-configmaps
 spec:
   schedule: "* 0 * * *"
   dryRun: false
