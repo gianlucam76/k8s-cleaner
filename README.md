@@ -9,7 +9,13 @@
 
 The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale resources to maintain a clean and efficient Kubernetes environment. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
 
-k8s-cleaner keeps you in the loop with handy notifications through <img src="assets/slack_logo.png" alt="Slack" width="25" /> [__Slack__](#slack-notification), <img src="assets/webex_logo.png" alt="Slack" width="25" />[__Webex__](#webex-notifications), or [__reports__](#cleaner-report). Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
+k8s-cleaner keeps you in the loop with handy notifications through:
+
+1. <img src="assets/slack_logo.png" alt="Slack" width="25" />  [__Slack__](#slack-notification)
+2. <img src="assets/webex_logo.png" alt="Slack" width="25" />  [__Webex__](#webex-notifications)
+3.  [__reports__](#cleaner-report)
+  
+Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
