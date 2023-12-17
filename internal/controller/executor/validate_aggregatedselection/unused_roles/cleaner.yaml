@@ -8,6 +8,7 @@ metadata:
   name: unused-roles
 spec:
   schedule: "* 0 * * *"
+  action: Delete
   dryRun: false
   resourcePolicySet:
     resourceSelectors:
@@ -17,7 +18,6 @@ spec:
     - kind: RoleBindings
       group: "rbac.authorization.k8s.io"
       version: v1
-    action: Delete
     aggregatedSelection: |
       -- Given Role namespace and name returns a unique Key
       function getRoleKey(namespace, name)

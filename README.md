@@ -65,7 +65,7 @@ spec:
       kind: Secret
       group: ""
       version: v1
-    action: Delete # Deletes matching Secrets
+  action: Delete # Deletes matching Secrets
 ```
 
 This configuration instructs the Cleaner to scan the test namespace every day at 1 AM, identify all Secrets, and effectively eliminate them, ensuring a clean and organized cluster.
@@ -94,7 +94,7 @@ spec:
       - key: environment
         operation: Different
         value: prouction # Identifies Deployments with "environment" label different from "production"
-    action: Delete # Deletes matching Deployments
+  action: Delete # Deletes matching Deployments
 ```
 
 By utilizing label filters, you can refine the scope of resource management, ensuring that only specific resources are targeted for removal or update. This targeted approach helps maintain a clean and organized Kubernetes environment without affecting unintended resources.
@@ -131,7 +131,7 @@ spec:
           end
           return hs
         end
-    action: Delete
+  action: Delete
 ```
 
 By leveraging Lua scripts, Cleaner empowers users to define complex and dynamic selection criteria, catering to specific resource management needs. This flexibility enables accurate and targeted identification of stale resources, ensuring effective resource utilization and maintenance of a clean Kubernetes environment.
@@ -164,7 +164,7 @@ spec:
           end
           return hs
         end
-    action: Delete
+  action: Delete
 ```
 
 ## Updating Resources
@@ -201,8 +201,8 @@ spec:
           end
           return hs
           end
-    action: Transform # Update matching resources
-    transform: |
+  action: Transform # Update matching resources
+  transform: |
       -- Define how resources will be updated
       function transform()
         hs = {}
@@ -228,6 +228,7 @@ metadata:
   name: cleaner-sample3
 spec:
   schedule: "* 0 * * *"
+  action: Delete # Delete matching resources
   resourcePolicySet:
     resourceSelectors:
     - namespace: foo
@@ -238,7 +239,6 @@ spec:
       kind: HorizontalPodAutoscaler
       group: "autoscaling"
       version: v2
-    action: Delete # Delete matching resources
     aggregatedSelection: |
       function evaluate()
         local hs = {}
@@ -307,7 +307,7 @@ spec:
       - key: environment
         operation: Different
         value: prouction # Match deployments with the "environment" label different from "production"
-    action: Delete
+  action: Delete
 ```
 
 By setting DryRun to true, you can safely test the Cleaner's filtering logic without affecting your actual deployment configurations. Once you're confident in the filtering criteria, you can set DryRun back to false to enable automatic resource deletion.

@@ -171,9 +171,9 @@ var _ = Describe("Aggregated Filtering", func() {
 							Namespace: ns,
 						},
 					},
-					Action:              appsv1alpha1.ActionDelete,
 					AggregatedSelection: aggregatedSelection,
 				},
+				Action:   appsv1alpha1.ActionDelete,
 				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}

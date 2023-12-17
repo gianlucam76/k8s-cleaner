@@ -20,4 +20,4 @@ spec:
           end
           return hs
         end
-    action: Delete
+  action: Delete

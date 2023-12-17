@@ -6,6 +6,7 @@ metadata:
   name: stale-persistent-volume-claim
 spec:
   schedule: "* 0 * * *"
+  action: Delete # Delete matching resources
   resourcePolicySet:
     resourceSelectors:
     - kind: Pods
@@ -14,7 +15,6 @@ spec:
     - kind: PersistentVolumeClaim
       group: ""
       version: v1
-    action: Delete # Delete matching resources
     aggregatedSelection: |
       function isUsed(pvc, pods)
         if pods == nil then

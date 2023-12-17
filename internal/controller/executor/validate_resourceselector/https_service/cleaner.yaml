@@ -4,13 +4,13 @@ kind: Cleaner
 metadata:
  name: https-service
 spec:
- schedule: "* 0 * * *"
- resourcePolicySet: 
-   resourceSelectors:
-   -  group: ""
-      version: "v1"
-      kind: "Service"
-      evaluate: |
+  schedule: "* 0 * * *"
+  resourcePolicySet: 
+    resourceSelectors:
+    -  group: ""
+       version: "v1"
+       kind: "Service"
+       evaluate: |
         function evaluate()
           hs = {}
           hs.matching = false
@@ -23,4 +23,4 @@ spec:
           end
           return hs
         end
-      action: Delete
+  action: Delete

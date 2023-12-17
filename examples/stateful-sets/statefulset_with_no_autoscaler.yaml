@@ -7,6 +7,7 @@ metadata:
   name: statefulset-with-no-autoscaler
 spec:
   schedule: "* 0 * * *"
+  action: Delete # Delete matching resources
   resourcePolicySet:
     resourceSelectors:
     - kind: StatefulSet
@@ -15,7 +16,6 @@ spec:
     - kind: HorizontalPodAutoscaler
       group: "autoscaling"
       version: v2
-    action: Delete # Delete matching resources
     aggregatedSelection: |
       function evaluate()
         local hs = {}

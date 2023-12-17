@@ -23,8 +23,8 @@ spec:
           end
           return hs
           end
-    action: Transform # Update matching resources
-    transform: |
+  action: Transform # Update matching resources
+  transform: |
       -- Define how resources will be updated
       function transform()
         hs = {}

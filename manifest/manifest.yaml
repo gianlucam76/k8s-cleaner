@@ -38,24 +38,23 @@ spec:
           spec:
             description: CleanerSpec defines the desired state of Cleaner
             properties:
+              action:
+                default: Delete
+                description: Action indicates the action to take on selected object.
+                  Default action is to delete object. If set to transform, the transform
+                  function will be invoked and then object will be updated.
+                enum:
+                - Delete
+                - Transform
+                type: string
               dryRun:
                 default: false
                 description: DryRun if set to true, will have controller delete no
                   resource. All matching resources will be listed in status section
                 type: boolean
               resourcePolicySet:
-                description: ResourcePolicySet identifies a group of resources and
-                  the action to take on those.
+                description: ResourcePolicySet identifies a group of resources
                 properties:
-                  action:
-                    default: Delete
-                    description: Action indicates the action to take. Default action
-                      is to delete object. If set to transform, the transform function
-                      will be invoked and then object will be updated.
-                    enum:
-                    - Delete
-                    - Transform
-                    type: string
                   aggregatedSelection:
                     description: This field is optional and can be used to specify
                       a Lua function that will be used to further select a subset
@@ -122,12 +121,6 @@ spec:
                       - version
                       type: object
                     type: array
-                  transform:
-                    description: Transform contains a function "transform" in lua
-                      language. When Action is set to *Transform*, this function will
-                      be invoked and be passed one of the object selected based on
-                      above criteria. Must the new object that will be applied
-                    type: string
                 required:
                 - resourceSelectors
                 type: object
@@ -140,6 +133,12 @@ spec:
                   will be counted as failed ones.
                 format: int64
                 type: integer
+              transform:
+                description: Transform contains a function "transform" in lua language.
+                  When Action is set to *Transform*, this function will be invoked
+                  and be passed one of the object selected based on above criteria.
+                  Must the new object that will be applied
+                type: string
             required:
             - resourcePolicySet
             - schedule

@@ -176,10 +176,10 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		return nil
 	}
 
-	if cleaner.Spec.ResourcePolicySet.Action == appsv1alpha1.ActionDelete {
+	if cleaner.Spec.Action == appsv1alpha1.ActionDelete {
 		return deleteMatchingResources(ctx, resources, logger)
 	}
-	return updateMatchingResources(ctx, resources, cleaner.Spec.ResourcePolicySet.Transform, logger)
+	return updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
 }
 
 func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,

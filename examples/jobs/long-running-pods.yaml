@@ -65,4 +65,4 @@ spec:
 
           return hs
         end
-    action: Delete
+  action: Delete

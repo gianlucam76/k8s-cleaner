@@ -223,7 +223,7 @@ func verifyCleanerTransform(dirName string) {
 	}
 
 	var updatedResource *unstructured.Unstructured
-	updatedResource, err = executor.Transform(matchingResource, cleaner.Spec.ResourcePolicySet.Transform, klogr.New())
+	updatedResource, err = executor.Transform(matchingResource, cleaner.Spec.Transform, klogr.New())
 	Expect(err).To(BeNil())
 
 	expectedUpdatedResource := getResource(dirName, updatedFileName)

@@ -6,6 +6,7 @@ metadata:
   name: unused-horizontal-pod-autoscalers
 spec:
   schedule: "* 0 * * *"
+  action: Delete # Delete matching resources
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment
@@ -17,7 +18,6 @@ spec:
     - kind: HorizontalPodAutoscaler
       group: "autoscaling"
       version: v2
-    action: Delete # Delete matching resources
     aggregatedSelection: |
       function getKey(namespace, name)
         return namespace .. ":" .. name

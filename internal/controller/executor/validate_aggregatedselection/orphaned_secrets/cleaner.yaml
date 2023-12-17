@@ -11,6 +11,7 @@ metadata:
   name: unused-secrets
 spec:
   schedule: "* 0 * * *"
+  action: Delete
   dryRun: false
   resourcePolicySet:
     resourceSelectors:
@@ -23,7 +24,6 @@ spec:
     - kind: Ingress
       group: "networking.k8s.io"
       version: v1      
-    action: Delete
     aggregatedSelection: |
       function getKey(namespace, name)
         return namespace .. ":" .. name

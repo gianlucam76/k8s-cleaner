@@ -131,10 +131,10 @@ var _ = Describe("CleanerClient", func() {
 							Evaluate:  fmt.Sprintf(evaluateService, key, value),
 						},
 					},
-					Transform: fmt.Sprintf(tranformService, key, newValue),
-					Action:    appsv1alpha1.ActionTransform,
 				},
-				Schedule: fmt.Sprintf("%d * * * *", minute),
+				Transform: fmt.Sprintf(tranformService, key, newValue),
+				Action:    appsv1alpha1.ActionTransform,
+				Schedule:  fmt.Sprintf("%d * * * *", minute),
 			},
 		}
 

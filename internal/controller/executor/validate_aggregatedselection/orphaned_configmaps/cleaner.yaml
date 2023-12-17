@@ -8,6 +8,7 @@ metadata:
   name: unused-configmaps
 spec:
   schedule: "* 0 * * *"
+  action: Delete
   dryRun: false
   resourcePolicySet:
     resourceSelectors:
@@ -17,7 +18,6 @@ spec:
     - kind: ConfigMap
       group: ""
       version: v1   
-    action: Delete
     aggregatedSelection: |
       function getKey(namespace, name)
         return namespace .. ":" .. name
