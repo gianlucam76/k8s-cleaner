@@ -173,13 +173,22 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	if cleaner.Spec.DryRun {
 		// Print all matching resources
 		printMatchingResources(resources, logger)
-		return nil
+		return sendNotifications(ctx, resources, cleaner, logger)
 	}
 
+	var processedResources []*unstructured.Unstructured
 	if cleaner.Spec.Action == appsv1alpha1.ActionDelete {
-		return deleteMatchingResources(ctx, resources, logger)
+		processedResources, err = deleteMatchingResources(ctx, resources, logger)
+	} else {
+		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
 	}
-	return updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
+
+	sendErr := sendNotifications(ctx, processedResources, cleaner, logger)
+	if sendErr != nil {
+		return sendErr
+	}
+
+	return err
 }
 
 func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,
@@ -219,7 +228,9 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 }
 
 func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
-	logger logr.Logger) error {
+	logger logr.Logger) ([]*unstructured.Unstructured, error) {
+
+	processedResources := make([]*unstructured.Unstructured, 0)
 
 	for i := range resources {
 		resource := resources[i]
@@ -228,15 +239,18 @@ func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unst
 		l.Info("deleting resource")
 		if err := k8sClient.Delete(ctx, resource); err != nil {
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
-			return err
+			return processedResources, err
 		}
+		processedResources = append(processedResources, resource)
 	}
 
-	return nil
+	return processedResources, nil
 }
 
 func updateMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
-	transformFunction string, logger logr.Logger) error {
+	transformFunction string, logger logr.Logger) ([]*unstructured.Unstructured, error) {
+
+	processedResources := make([]*unstructured.Unstructured, 0)
 
 	for i := range resources {
 		resource := resources[i]
@@ -246,15 +260,16 @@ func updateMatchingResources(ctx context.Context, resources []*unstructured.Unst
 		newResource, err := transform(resource, transformFunction, l)
 		if err != nil {
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
-			return err
+			return processedResources, err
 		}
 		if err := k8sClient.Update(ctx, newResource); err != nil {
 			l.Info(fmt.Sprintf("failed to update resource: %v", err))
-			return err
+			return processedResources, err
 		}
+		processedResources = append(processedResources, resource)
 	}
 
-	return nil
+	return processedResources, nil
 }
 
 func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.ResourceSelector,

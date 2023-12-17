@@ -9,6 +9,8 @@
 
 The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale resources to maintain a clean and efficient Kubernetes environment. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
 
+k8s-cleaner keeps you in the loop with handy notifications through <img src="assets/slack_logo.png" alt="Slack" width="25" /> [__Slack__](#slack-notification), <img src="assets/webex_logo.png" alt="Slack" width="25" />[__Webex__](#webex-notifications), or [__reports__](#cleaner-report). Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
+
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
 - 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples) section.
@@ -233,7 +235,7 @@ spec:
     resourceSelectors:
     - namespace: foo
       kind: Deployment
-      group: ""
+      group: "apps"
       version: v1
     - namespace: foo
       kind: HorizontalPodAutoscaler
@@ -322,6 +324,133 @@ It also accepts
 
 - Standard crontab specs, e.g. "* * * * ?"
 - Descriptors, e.g. "@midnight", "@every 1h30m"
+
+## Notifications
+
+k8s-cleaner keeps you in the loop with handy notifications through Slack, Webex, or reports. Choose what works best for you!
+
+### Slack Notification
+
+Your app needs permission to:
+
+1. write messages to a channel
+2. upload files to a channel
+
+Create a Kubernetes Secret:
+
+```
+kubectl create secret generic slack --from-literal=SLACK_TOKEN=<YOUR TOKEN> --from-literal=SLACK_CHANNEL_ID=<YOUR CHANNEL ID>                           
+```
+
+Set then the notifications field of a Cleaner instance
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-with-slack-notifications
+spec:
+  schedule: "0 * * * *"
+  action: Delete # Delete matching resources
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+  notifications:
+  - name: slack
+    type: Slack
+    notificationRef:
+     apiVersion: v1
+     kind: Secret
+     name: slack
+     namespace: default
+```
+
+Anytime this Cleaner instance is processed, a Slack message is sent containing all the resources that were deleted by k8s-cleaner.
+
+### Webex Notifications
+
+```
+ kubectl create secret generic webex --from-literal=WEBEX_TOKEN=<YOUR TOKEN> --from-literal=WEBEX_ROOM_ID=<YOUR WEBEX CHANNEL ID>
+ ```
+
+Set then the notifications field of a Cleaner instance
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-with-webex-notifications
+spec:
+  schedule: "0 * * * *"
+  action: Delete # Delete matching resources
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+  notifications:
+  - name: webex
+    type: Webex
+    notificationRef:
+     apiVersion: v1
+     kind: Secret
+     name: webex
+     namespace: default
+```
+
+### Cleaner Report
+
+To instruct k8s-cleaner to generate a report with all resources deleted (or modified) set the notification fields:
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-with-report
+spec:
+  schedule: "0 * * * *"
+  action: Delete # Delete matching resources
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+  notifications:
+  - name: report
+    type: CleanerReport
+```
+
+k8s-cleaner will create a __Report__ instance (name of the __Report__ instance is same as the Cleaner instance)
+
+```
+kubectl get report           
+NAME              AGE
+cleaner-sample3   51m
+```
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Report
+metadata:
+  creationTimestamp: "2023-12-17T17:05:00Z"
+  generation: 2
+  name: cleaner-with-report
+  resourceVersion: "1625"
+  uid: dda9a231-9a51-4133-aeb5-f0520feb8746
+spec:
+  action: Delete
+  message: 'time: 2023-12-17 17:07:00.394736089 +0000 UTC m=+129.172023518'
+  resources:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: my-nginx-deployment
+    namespace: test
+```
 
 ## Validate Your Cleaner Configuration 
 

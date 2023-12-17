@@ -1,0 +1,31 @@
+# permissions for end users to edit reports.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: report-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: k8s-cleaner
+    app.kubernetes.io/part-of: k8s-cleaner
+    app.kubernetes.io/managed-by: kustomize
+  name: report-editor-role
+rules:
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - reports
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - reports/status
+  verbs:
+  - get

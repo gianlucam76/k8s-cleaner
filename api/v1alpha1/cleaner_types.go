@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
@@ -85,6 +86,35 @@ type ResourcePolicySet struct {
 	AggregatedSelection string `json:"aggregatedSelection,omitempty"`
 }
 
+// NotificationType specifies different type of notifications
+// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex
+type NotificationType string
+
+const (
+	// NotificationTypeCleanerReport refers to generating a CleanerReport instance
+	NotificationTypeCleanerReport = NotificationType("CleanerReport")
+
+	// NotificationTypeSlack refers to generating a Slack message
+	NotificationTypeSlack = NotificationType("Slack")
+
+	// NotificationTypeWebex refers to generating a Webex message
+	NotificationTypeWebex = NotificationType("Webex")
+)
+
+type Notification struct {
+	// Name of the notification check.
+	// Must be a DNS_LABEL and unique within the Cleaner.
+	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
+
+	// NotificationType specifies the type of notification
+	Type NotificationType `json:"type"`
+
+	// NotificationRef is a reference to a notification-specific resource that holds
+	// the details for the notification.
+	// +optional
+	NotificationRef *corev1.ObjectReference `json:"notificationRef,omitempty"`
+}
+
 // CleanerSpec defines the desired state of Cleaner
 type CleanerSpec struct {
 	// ResourcePolicySet identifies a group of resources
@@ -104,8 +134,8 @@ type CleanerSpec struct {
 	// +optional
 	Transform string `json:"transform,omitempty"`
 
-	// DryRun if set to true, will have controller delete no resource.
-	// All matching resources will be listed in status section
+	// DryRun if set to true, will have controller delete/update no resource.
+	// All matching resources will be listed in logs
 	// +kubebuilder:default:=false
 	// +optional
 	DryRun bool `json:"dryRun,omitempty"`
@@ -117,6 +147,12 @@ type CleanerSpec struct {
 	// time for any reason.  Missed jobs executions will be counted as failed ones.
 	// +optional
 	StartingDeadlineSeconds *int64 `json:"startingDeadlineSeconds,omitempty"`
+
+	// Notification is a list of source of events to evaluate.
+	// +patchMergeKey=name
+	// +patchStrategy=merge,retainKeys
+	// +optional
+	Notifications []Notification `json:"notifications,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner
