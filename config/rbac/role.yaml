@@ -10,6 +10,10 @@ rules:
   - '*'
   verbs:
   - '*'
+  - delete
+  - get
+  - list
+  - watch
 - apiGroups:
   - apps.projectsveltos.io
   resources:
@@ -36,3 +40,9 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - apps.projectsveltos.io
+  resources:
+  - reports
+  verbs:
+  - '*'

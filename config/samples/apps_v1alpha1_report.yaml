@@ -1,0 +1,12 @@
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Report
+metadata:
+  labels:
+    app.kubernetes.io/name: report
+    app.kubernetes.io/instance: report-sample
+    app.kubernetes.io/part-of: k8s-cleaner
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: k8s-cleaner
+  name: report-sample
+spec:
+  # TODO(user): Add fields here

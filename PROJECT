@@ -17,4 +17,12 @@ resources:
   kind: Cleaner
   path: gianlucam76/k8s-cleaner/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: projectsveltos.io
+  group: apps
+  kind: Report
+  path: gianlucam76/k8s-cleaner/api/v1alpha1
+  version: v1alpha1
 version: "3"
