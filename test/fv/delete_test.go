@@ -106,8 +106,8 @@ var _ = Describe("CleanerClient", func() {
 							Evaluate:  fmt.Sprintf(evaluateServiceAccounts, key, value),
 						},
 					},
-					Action: appsv1alpha1.ActionDelete,
 				},
+				Action:   appsv1alpha1.ActionDelete,
 				Schedule: fmt.Sprintf("%d * * * *", minute),
 			},
 		}

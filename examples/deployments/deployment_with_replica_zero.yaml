@@ -9,7 +9,7 @@ spec:
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment
-      group: "apps"
+      group: ""
       version: v1
       evaluate: |
         function evaluate()
@@ -20,4 +20,4 @@ spec:
           end
           return hs
         end
-    action: Delete
+  action: Delete

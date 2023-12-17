@@ -83,8 +83,14 @@ type ResourcePolicySet struct {
 	// This can be useful for more sophisticated tasks, such as identifying resources
 	// that are related to each other or that have similar properties.
 	AggregatedSelection string `json:"aggregatedSelection,omitempty"`
+}
 
-	// Action indicates the action to take. Default action
+// CleanerSpec defines the desired state of Cleaner
+type CleanerSpec struct {
+	// ResourcePolicySet identifies a group of resources
+	ResourcePolicySet ResourcePolicySet `json:"resourcePolicySet"`
+
+	// Action indicates the action to take on selected object. Default action
 	// is to delete object. If set to transform, the transform function
 	// will be invoked and then object will be updated.
 	// +kubebuilder:default:=Delete
@@ -97,13 +103,12 @@ type ResourcePolicySet struct {
 	// Must the new object that will be applied
 	// +optional
 	Transform string `json:"transform,omitempty"`
-}
 
-// CleanerSpec defines the desired state of Cleaner
-type CleanerSpec struct {
-	// ResourcePolicySet identifies a group of resources and the action
-	// to take on those.
-	ResourcePolicySet ResourcePolicySet `json:"resourcePolicySet"`
+	// DryRun if set to true, will have controller delete no resource.
+	// All matching resources will be listed in status section
+	// +kubebuilder:default:=false
+	// +optional
+	DryRun bool `json:"dryRun,omitempty"`
 
 	// Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 	Schedule string `json:"schedule"`
@@ -112,12 +117,6 @@ type CleanerSpec struct {
 	// time for any reason.  Missed jobs executions will be counted as failed ones.
 	// +optional
 	StartingDeadlineSeconds *int64 `json:"startingDeadlineSeconds,omitempty"`
-
-	// DryRun if set to true, will have controller delete no resource.
-	// All matching resources will be listed in status section
-	// +kubebuilder:default:=false
-	// +optional
-	DryRun bool `json:"dryRun,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner
