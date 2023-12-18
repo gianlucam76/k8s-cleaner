@@ -39,6 +39,8 @@ To add an example, simply create a new file in the example directory with a desc
 
 4️⃣ **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
+5️⃣ **Notifications**: Stay informed! k8s-cleaner keeps you in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, or reports.
+
 ## Maintaining a Clean and Efficient Cluster:
 
 💪 **Resource Removal**: Efficiently remove stale resources from your cluster, reclaiming unused resources and improving resource utilization.
