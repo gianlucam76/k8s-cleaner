@@ -1,13 +1,13 @@
 [![CI](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/main.yaml/badge.svg)](https://github.com/gianlucam76/k8s-cleaner/actions)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![Go Report Card](https://goreportcard.com/badge/github.com/gianlucam76/k8s-cleaner)](https://goreportcard.com/report/github.com/gianlucam76/k8s-cleaner)
 [![Slack](https://img.shields.io/badge/join%20slack-%23projectsveltos-brighteen)](https://join.slack.com/t/projectsveltos/shared_invite/zt-1hraownbr-W8NTs6LTimxLPB8Erj8Q6Q)
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](LICENSE)
 [![Twitter Follow](https://img.shields.io/twitter/follow/projectsveltos?style=social)](https://twitter.com/projectsveltos)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale resources to maintain a clean and efficient Kubernetes environment. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
+The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale/orphaned resources to maintain a clean and efficient Kubernetes cluster. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
 
 k8s-cleaner keeps you in the loop with handy notifications through:
 
@@ -20,6 +20,15 @@ Each notification contains list of all resources successfully deleted (or modifi
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
 - 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples) section.
+
+Currently k8s-cleaner has working [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples) to identify and list unused:
+
+- ConfigMaps/Secrets
+- ClusterRoles/Roles
+- ServiceAccounts
+- PersistentVolumes/PersistentVolumeClaims
+- Deployments/StatefulSets
+- many more 
 
 # Contribute to Cleaner Examples
 
