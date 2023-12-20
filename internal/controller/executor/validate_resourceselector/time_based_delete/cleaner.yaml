@@ -1,0 +1,63 @@
+# This Cleaner instance finds any Pod that:
+# - has been running for longer than 24 hour
+# and instruct Cleaner to delete this Pod.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-from-job
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      evaluate: |
+        --  Convert creationTimestamp "2023-12-12T09:35:56Z"
+        function convertTimestampString(timestampStr)
+          local convertedTimestamp = string.gsub(
+            timestampStr,
+            '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)Z',
+            function(y, mon, d, h, mi, s)
+              return os.time({
+                year = tonumber(y),
+                month = tonumber(mon),
+                day = tonumber(d),
+                hour = tonumber(h),
+                min = tonumber(mi),
+                sec = tonumber(s)
+              })
+            end
+          )
+          return convertedTimestamp
+        end
+
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          -- any resource older than this time will be removed 
+          local removeAfterHour = 24
+
+          currentTime = os.time()
+
+          creationTimestamp = convertTimestampString(obj.metadata.creationTimestamp)
+
+          hs.message = creationTimestamp
+          print('creationTimestamp: ' .. creationTimestamp)
+          print('currentTime: ' .. currentTime)
+
+          timeDifference = os.difftime(currentTime, tonumber(creationTimestamp))
+
+          print('timeDifference: ' .. timeDifference)
+
+          -- if resource has been running for over 24 hours
+          if timeDifference > removeAfterHour*60*60 then
+            hs.matching = true
+          end
+
+
+          return hs
+        end
+  action: Delete

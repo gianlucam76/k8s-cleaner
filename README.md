@@ -222,6 +222,102 @@ spec:
         end
 ```
 
+## Remove resources based on their creation timestamp
+
+The provided code snippet defines a Cleaner instance that targets Pods with a creation timestamp older than 24 hours and instructs
+Cleaner to delete them automatically. This feature helps maintain resource cleanliness and avoid unnecessary resource usage in Kubernetes clusters.
+By automatically deleting these resources at the end of the working day, you can significantly reduce the overall resource consumption and associated costs.
+
+```yaml
+# This Cleaner instance finds any Pod that:
+# - has been running for longer than 24 hour
+# and instruct Cleaner to delete this Pod.
+#
+# If you want to filter Pods based on namespace =>
+#     - kind: Pod
+#       group: ""
+#       version: v1
+#       namespace: <YOUR_NAMESPACE>
+#
+# If you want to filter Pods based on labels =>
+#     - kind: Pod
+#       group: ""
+#       version: v1
+#       labelFilters:
+#       - key: app
+#         operation: Equal
+#         value: nginx 
+#       - key: environment
+#         operation: Different
+#         value: prouction 
+#
+# If you need further filtering modify `function evaluate` you can access any
+# field of obj
+#
+# If you want to remove any other resource including your own custom resources
+# replace kind/group/version
+#
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-from-job
+spec:
+  schedule: "* 0 * * *"
+  dryRun: false
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      evaluate: |
+        --  Convert creationTimestamp "2023-12-12T09:35:56Z"
+        function convertTimestampString(timestampStr)
+          local convertedTimestamp = string.gsub(
+            timestampStr,
+            '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)Z',
+            function(y, mon, d, h, mi, s)
+              return os.time({
+                year = tonumber(y),
+                month = tonumber(mon),
+                day = tonumber(d),
+                hour = tonumber(h),
+                min = tonumber(mi),
+                sec = tonumber(s)
+              })
+            end
+          )
+          return convertedTimestamp
+        end
+
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          -- any resource older than this time will be removed 
+          local removeAfterHour = 24
+
+          currentTime = os.time()
+
+          creationTimestamp = convertTimestampString(obj.metadata.creationTimestamp)
+
+          hs.message = creationTimestamp
+          print('creationTimestamp: ' .. creationTimestamp)
+          print('currentTime: ' .. currentTime)
+
+          timeDifference = os.difftime(currentTime, tonumber(creationTimestamp))
+
+          print('timeDifference: ' .. timeDifference)
+
+          -- if resource has been running for over 24 hours
+          if timeDifference > removeAfterHour*60*60 then
+            hs.matching = true
+          end
+
+          return hs
+        end
+  action: Delete
+```
+
 ## Considering resources of different types together
 
 Occasionally, it's necessary to examine resources of distinct types simultaneously. Imagine wanting to eliminate all Deployment instances that aren't backed by an Autoscaler instance. Cleaner allows you to do this. By employing __resourceSelector__, you can select all Deployment and Autoscaler instances.
