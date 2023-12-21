@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/go-logr/logr"
 	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
 	"github.com/slack-go/slack"
@@ -47,6 +48,11 @@ type slackInfo struct {
 type webexInfo struct {
 	token string
 	room  string
+}
+
+type discordInfo struct {
+	token    string
+	serverID string
 }
 
 // sendNotification delivers notification
@@ -73,6 +79,8 @@ func sendNotifications(ctx context.Context, resources []*unstructured.Unstructur
 			err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
 		case appsv1alpha1.NotificationTypeWebex:
 			err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeDiscord:
+			err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
 		default:
 			logger.V(logs.LogInfo).Info("no handler registered for notification")
 			panic(1)
@@ -163,6 +171,82 @@ func sendSlackNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 	}
 
 	return nil
+}
+
+func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
+	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+
+	info, err := getDiscordInfo(ctx, notification)
+	if err != nil {
+		return err
+	}
+
+	l := logger.WithValues("room", info.serverID)
+	l.V(logs.LogInfo).Info("send discord message")
+
+	// Create a new Discord session using the provided token
+	dg, err := discordgo.New("Bot " + info.token)
+	if err != nil {
+		l.V(logs.LogInfo).Info("failed to get discord session")
+		return err
+	}
+
+	resourceSpecData, err := json.Marshal(*reportSpec)
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
+		return err
+	}
+
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp(os.TempDir(), "k8s-cleaner-webex")
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("error creating temporary file: %v", err))
+		return err
+	}
+
+	defer func() {
+		// Close the file
+		tmpFile.Close()
+
+		// Remove the temporary file
+		os.Remove(tmpFile.Name())
+	}()
+
+	_, err = tmpFile.Write(resourceSpecData)
+	if err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to write to file: %s", err))
+		return err
+	}
+
+	// Open the temporary file for reading
+	withFileReader := func() (io.Reader, error) {
+		var fileContentReader *os.File
+		fileContentReader, err = os.Open(tmpFile.Name())
+		if err != nil {
+			return nil, fmt.Errorf("Error opening file: %w", err)
+		}
+
+		return fileContentReader, nil
+	}
+
+	// Create the attachment object
+	fileReader, err := withFileReader()
+	if err != nil {
+		return err
+	}
+
+	// Create a new message with both a text content and the file attachment
+	_, err = dg.ChannelMessageSendComplex(info.serverID, &discordgo.MessageSend{
+		Content: message,
+		Files: []*discordgo.File{
+			{
+				Name:   "k8s-cleaner-report", // Replace with desired filename
+				Reader: fileReader,
+			},
+		},
+	})
+
+	return err
 }
 
 func sendWebexNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
@@ -270,6 +354,25 @@ func getSlackInfo(ctx context.Context, notification *appsv1alpha1.Notification) 
 	}
 
 	return &slackInfo{token: string(authToken), channelID: string(channelID)}, nil
+}
+
+func getDiscordInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*discordInfo, error) {
+	secret, err := getSecret(ctx, notification)
+	if err != nil {
+		return nil, err
+	}
+
+	authToken, ok := secret.Data["DISCORD_TOKEN"]
+	if !ok {
+		return nil, fmt.Errorf("secret does not contain discord token")
+	}
+
+	serverID, ok := secret.Data["DISCORD_CHANNEL_ID"]
+	if !ok {
+		return nil, fmt.Errorf("secret does not contain discord channel id")
+	}
+
+	return &discordInfo{token: string(authToken), serverID: string(serverID)}, nil
 }
 
 func getWebexInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*webexInfo, error) {

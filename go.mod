@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/TwiN/go-color v1.4.1
+	github.com/bwmarrin/discordgo v0.27.1
 	github.com/go-logr/logr v1.3.0
 	github.com/go-logr/zapr v1.2.4
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
@@ -69,6 +70,7 @@ require (
 	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/spf13/cobra v1.8.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
+	golang.org/x/crypto v0.15.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.18.0 // indirect
 	golang.org/x/oauth2 v0.14.0 // indirect
