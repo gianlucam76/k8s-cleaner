@@ -87,7 +87,7 @@ type ResourcePolicySet struct {
 }
 
 // NotificationType specifies different type of notifications
-// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex
+// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex;Discord
 type NotificationType string
 
 const (
@@ -99,6 +99,9 @@ const (
 
 	// NotificationTypeWebex refers to generating a Webex message
 	NotificationTypeWebex = NotificationType("Webex")
+
+	// NotificationTypeDiscord refers to generating a Discord message
+	NotificationTypeDiscord = NotificationType("Discord")
 )
 
 type Notification struct {

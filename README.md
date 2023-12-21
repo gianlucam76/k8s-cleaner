@@ -11,9 +11,10 @@ The Kubernetes controller __Cleaner__ proactively identifies, removes, or update
 
 k8s-cleaner keeps you in the loop with handy notifications through:
 
-1. <img src="assets/slack_logo.png" alt="Slack" width="25" />  [__Slack__](#slack-notification)
-2. <img src="assets/webex_logo.png" alt="Slack" width="25" />  [__Webex__](#webex-notifications)
-3.  [__reports__](#cleaner-report)
+1. <img src="assets/slack_logo.png" alt="Slack" width="30" />  [__Slack__](#slack-notification)
+2. <img src="assets/webex_logo.png" alt="Webex" width="30" />  [__Webex__](#webex-notifications)
+3. <img src="assets/discord_logo.png" alt="Discord" width="30" />  [__Webex__](#discord-notifications)
+4.  [__reports__](#cleaner-report)
   
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
@@ -512,6 +513,38 @@ spec:
      apiVersion: v1
      kind: Secret
      name: webex
+     namespace: default
+```
+
+### Discord Notifications
+
+```
+ kubectl create secret generic discord --from-literal=DISCORD_TOKEN=<YOUR TOKEN> --from-literal=DISCORD_CHANNEL_ID=<YOUR DISCORD CHANNEL ID>
+ ```
+
+Set then the notifications field of a Cleaner instance
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-with-discord-notifications
+spec:
+  schedule: "0 * * * *"
+  action: Delete # Delete matching resources
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+  notifications:
+  - name: discord
+    type: Discord
+    notificationRef:
+     apiVersion: v1
+     kind: Secret
+     name: discord
      namespace: default
 ```
 
