@@ -398,6 +398,11 @@ spec:
       end
 ```
 
+## Delete Kubernetes resources on a configured time to live
+
+Finds resources that have a __cleaner/ttl__ annotation, which specifies their maximum lifespan. Deletes resources that have lived longer than their specified TTL.
+YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples/time_based_delete/delete_resource_based_on_ttl_annotation.yaml).
+
 ## DryRun 
 
 To preview which resources match the __Cleaner__'s criteria, set the __DryRun__ flag to true. The Cleaner will still execute its logic but will not actually delete or update any resources. To identify matching resources, search the controller logs for the message "resource is a match for cleaner".
