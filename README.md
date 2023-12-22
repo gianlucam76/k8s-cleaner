@@ -29,6 +29,7 @@ Currently k8s-cleaner has working [examples](https://github.com/gianlucam76/k8s-
 - ServiceAccounts
 - PersistentVolumes/PersistentVolumeClaims
 - Deployments/StatefulSets
+- Identify resources based on annotation indicating the maximum lifespan or the expiration date
 - many more 
 
 # Contribute to Cleaner Examples
