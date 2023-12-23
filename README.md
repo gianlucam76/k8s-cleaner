@@ -50,7 +50,7 @@ To add an example, simply create a new file in the example directory with a desc
 
 4️⃣ **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
-5️⃣ **Notifications**: Stay informed! k8s-cleaner keeps you in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, or reports.
+5️⃣ **Notifications**: Stay informed! k8s-cleaner keeps you in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord or reports.
 
 ## Maintaining a Clean and Efficient Cluster:
 
@@ -450,7 +450,7 @@ It also accepts
 
 ## Notifications
 
-k8s-cleaner keeps you in the loop with handy notifications through Slack, Webex, or reports. Choose what works best for you!
+k8s-cleaner keeps you in the loop with handy notifications through Slack, , or reports. Choose what works best for you!
 
 ### Slack Notification
 
