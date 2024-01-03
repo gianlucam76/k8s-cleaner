@@ -1,24 +1,4 @@
 linters-settings:
-  depguard:
-    list-type: blacklist
-    packages:
-      # Following logging implementations are allowed:
-      #   k8s.io/klog
-      #   go.uber.org/zap
-      #   go-logr/logr
-      #
-      # note that the following list will grow.
-      - github.com/google/glog
-      - log
-      - github.com/sirupsen/logrus
-      - github.com/wojas/genericr
-      - logfmt
-    packages-with-error-message:
-      - github.com/google/glog: "Use klog, zap, or logr for logging."
-      - log: "Use klog, zap, or logr for logging."
-      - github.com/sirupsen/logrus: "Use klog, zap, or logr for logging."
-      - github.com/wojas/genericr: "Use klog, zap, or logr for logging."
-      - logfmt: "Use klog, zap, or logr for logging."
   dupl:
     threshold: 200
   errorlint:
@@ -116,7 +96,6 @@ linters:
     - bidichk
     - containedctx
     - bodyclose
-    - depguard
     - dogsled
     - dupl
     - durationcheck

@@ -362,12 +362,12 @@ func getDiscordInfo(ctx context.Context, notification *appsv1alpha1.Notification
 		return nil, err
 	}
 
-	authToken, ok := secret.Data["DISCORD_TOKEN"]
+	authToken, ok := secret.Data[libsveltosv1alpha1.DiscordToken]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain discord token")
 	}
 
-	serverID, ok := secret.Data["DISCORD_CHANNEL_ID"]
+	serverID, ok := secret.Data[libsveltosv1alpha1.DiscordChannelID]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain discord channel id")
 	}
