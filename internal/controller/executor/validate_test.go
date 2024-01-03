@@ -29,7 +29,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/klog/v2/klogr"
+	"k8s.io/klog/v2/textlogger"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
@@ -110,6 +110,8 @@ func verifyCleanerResourceSelectors(dirName string) {
 }
 
 func verifyCleanerResourceSelector(dirName string) {
+	logger := textlogger.NewLogger(textlogger.NewConfig())
+
 	files, err := os.ReadDir(dirName)
 	Expect(err).To(BeNil())
 
@@ -120,7 +122,7 @@ func verifyCleanerResourceSelector(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), klogr.New(), nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 
@@ -136,7 +138,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, err := executor.IsMatch(matchingResource, rs.Evaluate, klogr.New())
+			tmpIsMatch, err := executor.IsMatch(matchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -153,7 +155,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, klogr.New())
+			tmpIsMatch, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -185,6 +187,8 @@ func verifyCleanerTransforms(dirName string) {
 }
 
 func verifyCleanerTransform(dirName string) {
+	logger := textlogger.NewLogger(textlogger.NewConfig())
+
 	files, err := os.ReadDir(dirName)
 	Expect(err).To(BeNil())
 
@@ -196,7 +200,7 @@ func verifyCleanerTransform(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), klogr.New(), nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 
@@ -213,7 +217,7 @@ func verifyCleanerTransform(dirName string) {
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 			var tmpIsMatch bool
-			tmpIsMatch, err = executor.IsMatch(matchingResource, rs.Evaluate, klogr.New())
+			tmpIsMatch, err = executor.IsMatch(matchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -223,7 +227,7 @@ func verifyCleanerTransform(dirName string) {
 	}
 
 	var updatedResource *unstructured.Unstructured
-	updatedResource, err = executor.Transform(matchingResource, cleaner.Spec.Transform, klogr.New())
+	updatedResource, err = executor.Transform(matchingResource, cleaner.Spec.Transform, logger)
 	Expect(err).To(BeNil())
 
 	expectedUpdatedResource := getResource(dirName, updatedFileName)
@@ -256,6 +260,8 @@ func verifyCleanerAggregatedSelections(dirName string) {
 }
 
 func verifyCleanerAggregatedSelection(dirName string) {
+	logger := textlogger.NewLogger(textlogger.NewConfig())
+
 	files, err := os.ReadDir(dirName)
 	Expect(err).To(BeNil())
 
@@ -267,7 +273,7 @@ func verifyCleanerAggregatedSelection(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), klogr.New(), nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 
@@ -281,7 +287,7 @@ func verifyCleanerAggregatedSelection(dirName string) {
 		By(fmt.Sprintf("%s file not present", matchingFileName))
 	} else {
 		result, err := executor.AggregatedSelection(cleaner.Spec.ResourcePolicySet.AggregatedSelection,
-			resources, klogr.New())
+			resources, logger)
 		Expect(err).To(BeNil())
 		verifyMatchingResources(result, matchingResources)
 	}

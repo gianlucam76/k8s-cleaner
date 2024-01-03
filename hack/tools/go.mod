@@ -1,13 +1,13 @@
 module github.com/projectsveltos/addon-controller/hack/tools
 
-go 1.20
+go 1.21
 
 require (
 	github.com/a8m/envsubst v1.1.0
-	github.com/onsi/ginkgo/v2 v2.13.1
+	github.com/onsi/ginkgo/v2 v2.13.2
 	golang.org/x/oauth2 v0.14.0
-	k8s.io/client-go v0.28.4
-	sigs.k8s.io/controller-runtime/tools/setup-envtest v0.0.0-20231121004636-2154ffbc22e2
+	k8s.io/client-go v0.28.5
+	sigs.k8s.io/controller-runtime/tools/setup-envtest v0.0.0-20240102165319-7f316f1309b1
 	sigs.k8s.io/controller-tools v0.13.0
 	sigs.k8s.io/kind v0.20.0
 )
@@ -56,9 +56,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.28.4 // indirect
+	k8s.io/api v0.28.5 // indirect
 	k8s.io/apiextensions-apiserver v0.28.3 // indirect
-	k8s.io/apimachinery v0.28.4 // indirect
+	k8s.io/apimachinery v0.28.5 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
