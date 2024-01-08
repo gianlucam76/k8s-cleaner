@@ -23,7 +23,7 @@ spec:
         for _, pod in ipairs(pods) do
           if pod.spec.volumes ~= nil then
             for _,volume in ipairs(pod.spec.volumes) do
-              if volume.persistentVolumeClaim.claimName == pvc.metadata.name then
+              if volume.persistentVolumeClaim ~= nil and volume.persistentVolumeClaim.claimName == pvc.metadata.name then
                 return true
               end
             end
