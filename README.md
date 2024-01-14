@@ -1,3 +1,4 @@
+
 [![CI](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/main.yaml/badge.svg)](https://github.com/gianlucam76/k8s-cleaner/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gianlucam76/k8s-cleaner)](https://goreportcard.com/report/github.com/gianlucam76/k8s-cleaner)
 [![Slack](https://img.shields.io/badge/join%20slack-%23projectsveltos-brighteen)](https://join.slack.com/t/projectsveltos/shared_invite/zt-1hraownbr-W8NTs6LTimxLPB8Erj8Q6Q)
@@ -10,6 +11,7 @@
 <img src="https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png" width="200">
 
 The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale/orphaned resources to maintain a clean and efficient Kubernetes cluster. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
+__Cleaner__ can also be used to identify unhealthy resources.
 
 k8s-cleaner keeps you in the loop with handy notifications through:
 
@@ -22,17 +24,22 @@ Each notification contains list of all resources successfully deleted (or modifi
 
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
-- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples) section.
+- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples) section.
 
-Currently k8s-cleaner has working [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples) to identify and list unused:
+Currently k8s-cleaner has rich set of working examples to identify and list unused:
 
-- ConfigMaps/Secrets
-- ClusterRoles/Roles
-- ServiceAccounts
-- PersistentVolumes/PersistentVolumeClaims
-- Deployments/StatefulSets
-- Identify resources based on annotation indicating the maximum lifespan or the expiration date
+- [ConfigMaps](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/configmaps)/[Secrets](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/secrets)
+- [ClusterRoles](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/clusterroles)/[Roles](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/roles)
+- [ServiceAccounts](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/service-accounts)
+- [PersistentVolumes](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/presistent-volumes)/[PersistentVolumeClaims](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/persistent-volume-claims)
+- [Deployments](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/deployments)/[StatefulSets](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/stateful-sets)
+- [Identify resources based on annotation indicating the maximum lifespan or the expiration date](https://github.com/gianlucam76/k8s-cleaner/tree/main/unused-resources-examples/time_based_delete)
 - many more 
+
+There are also examples to identify unhealthy resources:
+
+- [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-expired-certificates): Detect pods that are not utilizing the most recent Secret data.
+- [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-outdated-secrets): Pinpoint pods that are operating with expired security certificates.
 
 # Contribute to Cleaner Examples
 
@@ -391,12 +398,14 @@ spec:
             end
 
             if not matchingAutoscaler then
-                table.insert(deploymentWithNoAutoscaler, deployment)
+                table.insert(deploymentWithNoAutoscaler, {resource = deployment})
                 break
             end
         end
 
-        hs.resources = deploymentWithNoAutoscaler
+        if #deploymentWithNoAutoscaler > 0 then
+          hs.resources = deploymentWithNoAutoscaler
+        end
         return hs
       end
 ```
@@ -404,10 +413,10 @@ spec:
 ## Delete Kubernetes resources on a configured time to live or expiration date
 
 Finds resources that have the __cleaner/ttl__ annotation, which specifies their maximum lifespan. Deletes resources that have lived longer than their specified TTL.
-YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples/time_based_delete/delete_resource_based_on_ttl_annotation.yaml).
+YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/unused-resources-examples/time_based_delete/delete_resource_based_on_ttl_annotation.yaml).
 
 Find resources that have the __cleaner_expires__ annotation, which specifies their expiration date. Deletes resources that have that have surpassed their expiration date.
-YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples/time_based_delete/delete_resource_based_on_expire_date.yaml).
+YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/unused-resources-examples/time_based_delete/delete_resource_based_on_expire_date.yaml).
 
 ## DryRun 
 

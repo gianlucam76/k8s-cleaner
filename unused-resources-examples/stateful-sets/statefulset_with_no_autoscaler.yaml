@@ -52,7 +52,7 @@ spec:
             end
 
             if not matchingAutoscaler then
-                table.insert(statefulSetWithNoAutoscaler, statefulSet)
+                table.insert(statefulSetWithNoAutoscaler, {resource = statefulSet})
                 break
             end
         end

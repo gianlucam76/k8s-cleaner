@@ -1,20 +1,9 @@
 # This Cleaner automatically manages resource lifespans:
 # It executes hourly tasks to:
-# - Identify eligible resources: Discover Deployments, StatefulSets, and Services bearing the cleaner/ttl annotation, indicating their maximum lifespan.
-# - Interpret time-to-live values: Decode cleaner/ttl annotations, which specify durations using a number followed by a suffix:
-#   s: seconds
-#   m: minutes
-#   h: hours
-#   d: days
-#   w: weeks
-# - Execute resource removal: Purge resources that have surpassed their specified time-to-live, ensuring a streamlined environment.
+# - Identify eligible resources: Discover Deployments, StatefulSets, and Services bearing the cleaner/expires annotation, indicating their expire date.
+# - Execute resource removal: Purge resources that have surpassed their expiration date, ensuring a streamlined environment.
 #
-# Example cleaner/ttl values:
-#   360s: 360 seconds
-#   10m: 10 minutes
-#   24h: 24 hours
-#   7d: 7 days
-#   2w: 2 weeks
+# Example cleaner/expires values: 2023-12-12T09:35:56Z
 # 
 # If you want to filter resources based on namespace =>
 #     - kind: Deployment
@@ -43,7 +32,7 @@
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: ttl-based-cleaner
+  name: expire-date-based-cleaner
 spec:
   schedule: "0 * * * *"
   dryRun: false
@@ -78,59 +67,31 @@ spec:
           return convertedTimestamp
         end
 
-        -- Convert ttl to seconds 
-        function toSeconds(durationString)
-          local number, suffix = durationString:match("^(%d+)(%a)$")
-
-          if not number or not suffix then
-            print("Invalid duration string format")
-            return 0
-          end
-
-          local multipliers = {
-            s = 1,
-            m = 60,
-            h = 60 * 60,
-            d = 60 * 60 * 24,
-            w = 60 * 60 * 24 * 7
-          }
-
-          local multiplier = multipliers[suffix]
-          if not multiplier then
-            print("Invalid duration suffix: " .. suffix)
-          end
-
-          return number * multiplier
-        end
 
         function getResourceKey(resource)
           return resource.kind .. ":" .. resource.metadata.namespace .. ":" .. resource.metadata.name
         end
 
-        -- Any resources that have surpassed their specified time-to-live, will be deleted
+        -- Any resources that have surpassed their expiration date, will be deleted
         function evaluate()
           hs = {}
 
           local expiredResources = {}
           
           currentTime = os.time()
-
+          print("current time:" .. currentTime)
+          
           for _, resource in ipairs(resources) do
             if resource.metadata.annotations ~= nil then
-              if resource.metadata.annotations["cleaner/ttl"] then
-                ttl = resource.metadata.annotations["cleaner/ttl"]
-                removeAfter = toSeconds(ttl)
-                if removeAfter > 0 then
-                  creationTimestamp = convertTimestampString(resource.metadata.creationTimestamp)
-                  print('creationTimestamp: ' .. creationTimestamp)
-                  print('currentTime: ' .. currentTime)
-                  timeDifference = os.difftime(currentTime, tonumber(creationTimestamp))
-                  resourceKey = getResourceKey(resource)
-                  print(resourceKey .. ' timeDifference: ' .. timeDifference)
-                  -- if resource has been running for over ttl
-                  if timeDifference > removeAfter then
-                     table.insert(expiredResources, resource)
-                  end
+              if resource.metadata.annotations["cleaner/expires"] then
+                resourceKey = getResourceKey(resource)
+                expireDate = convertTimestampString(resource.metadata.annotations["cleaner/expires"])
+                print(resourceKey .. ' expireDate: ' .. expireDate)
+                timeDifference = os.difftime(currentTime, tonumber(expireDate))
+                print(resourceKey .. ' timeDifference: ' .. timeDifference)
+                -- if resource has been running for over ttl
+                if timeDifference > 0 then
+                    table.insert(expiredResources, {resource = resource})
                 end
               end
             end

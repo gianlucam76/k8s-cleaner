@@ -174,6 +174,6 @@ var _ = Describe("Worker", func() {
 		Expect(err).To(BeNil())
 		Expect(resources).ToNot(BeNil())
 		Expect(len(resources)).To(Equal(1))
-		Expect(resources[0].GetName()).To(Equal(secret.Name))
+		Expect(resources[0].Resource.GetName()).To(Equal(secret.Name))
 	})
 })

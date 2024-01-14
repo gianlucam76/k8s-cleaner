@@ -119,7 +119,7 @@ spec:
         for _, configMap in ipairs(configMaps) do
           key = getKey(configMap.metadata.namespace,configMap.metadata.name)
           if not podConfigMaps[key] then
-            table.insert(unusedConfigMaps, configMap)
+            table.insert(unusedConfigMaps, {resource = configMap})
           end
         end
 

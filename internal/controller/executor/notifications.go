@@ -31,7 +31,6 @@ import (
 	"github.com/slack-go/slack"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
@@ -56,7 +55,7 @@ type discordInfo struct {
 }
 
 // sendNotification delivers notification
-func sendNotifications(ctx context.Context, resources []*unstructured.Unstructured,
+func sendNotifications(ctx context.Context, resources []ResourceResult,
 	cleaner *appsv1alpha1.Cleaner, logger logr.Logger) error {
 
 	reportSpec := &appsv1alpha1.ReportSpec{}
@@ -95,22 +94,25 @@ func sendNotifications(ctx context.Context, resources []*unstructured.Unstructur
 	return nil
 }
 
-func generateReportSpec(resources []*unstructured.Unstructured, cleaner *appsv1alpha1.Cleaner) *appsv1alpha1.ReportSpec {
+func generateReportSpec(resources []ResourceResult, cleaner *appsv1alpha1.Cleaner) *appsv1alpha1.ReportSpec {
 	reportSpec := appsv1alpha1.ReportSpec{}
 	reportSpec.Action = cleaner.Spec.Action
-	reportSpec.Message = fmt.Sprintf("time: %v", time.Now())
+	message := fmt.Sprintf(". time: %v", time.Now())
 	if cleaner.Spec.DryRun {
-		reportSpec.Message += fmt.Sprintf(" . Cleaner is set in DryRun mode so no resource was actually %s",
+		message += fmt.Sprintf(" . Cleaner is set in DryRun mode so no resource was actually %s",
 			strings.ToLower(string(cleaner.Spec.Action)))
 	}
 
-	reportSpec.Resources = make([]corev1.ObjectReference, len(resources))
+	reportSpec.ResourceInfo = make([]appsv1alpha1.ResourceInfo, len(resources))
 	for i := range resources {
-		reportSpec.Resources[i] = corev1.ObjectReference{
-			Namespace:  resources[i].GetNamespace(),
-			Name:       resources[i].GetName(),
-			Kind:       resources[i].GetKind(),
-			APIVersion: resources[i].GetAPIVersion(),
+		reportSpec.ResourceInfo[i] = appsv1alpha1.ResourceInfo{
+			Resource: corev1.ObjectReference{
+				Namespace:  resources[i].Resource.GetNamespace(),
+				Name:       resources[i].Resource.GetName(),
+				Kind:       resources[i].Resource.GetKind(),
+				APIVersion: resources[i].Resource.GetAPIVersion(),
+			},
+			Message: resources[i].Message + message,
 		}
 	}
 

@@ -21,17 +21,22 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ReportSpec defines the desired state of Report
-type ReportSpec struct {
-	// Resources identify a set of Kubernetes resource
-	Resources []corev1.ObjectReference `json:"resources"`
-
-	// Action indicates the action to take on selected object.
-	Action Action `json:"action"`
+type ResourceInfo struct {
+	// Resource identify a Kubernetes resource
+	Resource corev1.ObjectReference `json:"resource,omitempty"`
 
 	// Message is an optional field.
 	// +optional
 	Message string `json:"message,omitempty"`
+}
+
+// ReportSpec defines the desired state of Report
+type ReportSpec struct {
+	// Resources identify a set of Kubernetes resource
+	ResourceInfo []ResourceInfo `json:"resourceInfo"`
+
+	// Action indicates the action to take on selected object.
+	Action Action `json:"action"`
 }
 
 //+kubebuilder:object:root=true

@@ -138,7 +138,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, err := executor.IsMatch(matchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err := executor.IsMatch(matchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -155,7 +155,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -217,7 +217,7 @@ func verifyCleanerTransform(dirName string) {
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 			var tmpIsMatch bool
-			tmpIsMatch, err = executor.IsMatch(matchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err = executor.IsMatch(matchingResource, rs.Evaluate, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -326,7 +326,7 @@ func getResource(dirName, fileName string) *unstructured.Unstructured {
 	return u
 }
 
-func getResources(dirName, fileName string) []*unstructured.Unstructured {
+func getResources(dirName, fileName string) []executor.ResourceResult {
 	resourceFileName := filepath.Join(dirName, fileName)
 
 	_, err := os.Stat(resourceFileName)
@@ -338,12 +338,14 @@ func getResources(dirName, fileName string) []*unstructured.Unstructured {
 	content, err := os.ReadFile(resourceFileName)
 	Expect(err).To(BeNil())
 
-	resources := make([]*unstructured.Unstructured, 0)
+	resources := make([]executor.ResourceResult, 0)
 	elements := strings.Split(string(content), "---")
 	for i := range elements {
 		u, err := libsveltosutils.GetUnstructured([]byte(elements[i]))
 		Expect(err).To(BeNil())
-		resources = append(resources, u)
+		resources = append(resources, executor.ResourceResult{
+			Resource: u,
+		})
 	}
 
 	return resources
@@ -353,18 +355,18 @@ func getKey(u *unstructured.Unstructured) string {
 	return fmt.Sprintf("%s:%s/%s", u.GetKind(), u.GetNamespace(), u.GetName())
 }
 
-func verifyMatchingResources(result, matchingResources []*unstructured.Unstructured) {
+func verifyMatchingResources(result, matchingResources []executor.ResourceResult) {
 	// This is used to keep track of resources that are expected to match
 	expected := map[string]bool{}
 
 	for i := range matchingResources {
 		Expect(result).To(ContainElement(matchingResources[i]))
-		expected[getKey(matchingResources[i])] = true
+		expected[getKey(matchingResources[i].Resource)] = true
 	}
 
 	// verify only expected matching objects are found
 	for i := range result {
-		key := getKey(result[i])
+		key := getKey(result[i].Resource)
 		if ok := expected[key]; !ok {
 			// Print the resource that is not expected to be a match
 			Expect(key).To(BeEmpty())

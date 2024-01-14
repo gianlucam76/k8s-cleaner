@@ -42,6 +42,7 @@ spec:
                 enum:
                 - Delete
                 - Transform
+                - Scan
                 type: string
               dryRun:
                 default: false
@@ -132,7 +133,8 @@ spec:
                           description: Evaluate contains a function "evaluate" in
                             lua language. The function will be passed one of the object
                             selected based on above criteria. Must return struct with
-                            field "matching" representing whether object is a match.
+                            field "matching" representing whether object is a match
+                            and an optional "message" field.
                           type: string
                         group:
                           description: Group of the resource deployed in the Cluster.

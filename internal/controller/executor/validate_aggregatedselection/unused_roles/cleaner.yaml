@@ -52,7 +52,7 @@ spec:
         for _,role in ipairs(existingRoles) do
           roleKey = getRoleKey(role.metadata.namespace, role.metadata.name)
           if not usedRoles[roleKey] then
-            table.insert(unusedRoles, role)
+            table.insert(unusedRoles, {resource = role})
           end
         end
         

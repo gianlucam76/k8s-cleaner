@@ -61,6 +61,15 @@ import (
 // When worker is done, the request is removed from the inProgress set.
 // If the same request is also present in the dirty set, it is added back to the back of the jobQueue.
 
+type ResourceResult struct {
+	// Resource identify a Kubernetes resource
+	Resource *unstructured.Unstructured `json:"resource,omitempty"`
+
+	// Message is an optional field.
+	// +optional
+	Message string `json:"message,omitempty"`
+}
+
 type responseParams struct {
 	cleanerName string
 	err         error
@@ -87,8 +96,7 @@ type transformStatus struct {
 }
 
 type aggregatedStatus struct {
-	Resources []*unstructured.Unstructured `json:"resources,omitempty"`
-	Message   string                       `json:"message"`
+	Resources []ResourceResult `json:"resources,omitempty"`
 }
 
 func processRequests(ctx context.Context, i int, logger logr.Logger) {
@@ -148,10 +156,10 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		return nil
 	}
 
-	resources := make([]*unstructured.Unstructured, 0)
+	resources := make([]ResourceResult, 0)
 	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 		selector := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-		var tmpResources []*unstructured.Unstructured
+		var tmpResources []ResourceResult
 		tmpResources, err = getMatchingResources(ctx, selector, logger)
 		if err != nil {
 			logger.Info(fmt.Sprintf("failed to fetch resource (gvk: %s): %v",
@@ -176,7 +184,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		return sendNotifications(ctx, resources, cleaner, logger)
 	}
 
-	var processedResources []*unstructured.Unstructured
+	var processedResources []ResourceResult
 	if cleaner.Spec.Action == appsv1alpha1.ActionDelete {
 		processedResources, err = deleteMatchingResources(ctx, resources, logger)
 	} else {
@@ -192,7 +200,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 }
 
 func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,
-) ([]*unstructured.Unstructured, error) {
+) ([]ResourceResult, error) {
 
 	resources, err := fetchResources(ctx, sr)
 	if err != nil {
@@ -204,7 +212,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 		return nil, nil
 	}
 
-	results := make([]*unstructured.Unstructured, 0)
+	results := make([]ResourceResult, 0)
 	for i := range resources.Items {
 		resource := &resources.Items[i]
 		if !resource.GetDeletionTimestamp().IsZero() {
@@ -214,30 +222,36 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
 		l.V(logs.LogDebug).Info("considering resource for deletion")
 
-		isMatch, err := isMatch(resource, sr.Evaluate, l)
+		isMatch, message, err := isMatch(resource, sr.Evaluate, l)
 		if err != nil {
 			return nil, err
 		}
 		if isMatch {
-			l.Info("found a match")
-			results = append(results, resource)
+			l.Info("getMatchingResources: found a match")
+			resourceInfo := ResourceResult{
+				Resource: resource,
+				Message:  message,
+			}
+			results = append(results, resourceInfo)
 		}
 	}
 
 	return results, nil
 }
 
-func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
-	logger logr.Logger) ([]*unstructured.Unstructured, error) {
+func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
+	logger logr.Logger) ([]ResourceResult, error) {
 
-	processedResources := make([]*unstructured.Unstructured, 0)
+	processedResources := make([]ResourceResult, 0)
 
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
-			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
+			resource.Resource.GetKind(),
+			resource.Resource.GetNamespace(),
+			resource.Resource.GetName()))
 		l.Info("deleting resource")
-		if err := k8sClient.Delete(ctx, resource); err != nil {
+		if err := k8sClient.Delete(ctx, resource.Resource); err != nil {
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
 			return processedResources, err
 		}
@@ -247,17 +261,19 @@ func deleteMatchingResources(ctx context.Context, resources []*unstructured.Unst
 	return processedResources, nil
 }
 
-func updateMatchingResources(ctx context.Context, resources []*unstructured.Unstructured,
-	transformFunction string, logger logr.Logger) ([]*unstructured.Unstructured, error) {
+func updateMatchingResources(ctx context.Context, resources []ResourceResult,
+	transformFunction string, logger logr.Logger) ([]ResourceResult, error) {
 
-	processedResources := make([]*unstructured.Unstructured, 0)
+	processedResources := make([]ResourceResult, 0)
 
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
-			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
+			resource.Resource.GetKind(),
+			resource.Resource.GetNamespace(),
+			resource.Resource.GetName()))
 		l.Info("updating resource")
-		newResource, err := transform(resource, transformFunction, l)
+		newResource, err := transform(resource.Resource, transformFunction, l)
 		if err != nil {
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
 			return processedResources, err
@@ -335,9 +351,11 @@ func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.Resource
 	return list, nil
 }
 
-func isMatch(resource *unstructured.Unstructured, script string, logger logr.Logger) (bool, error) {
+func isMatch(resource *unstructured.Unstructured, script string, logger logr.Logger,
+) (matching bool, message string, err error) {
+
 	if script == "" {
-		return true, nil
+		return true, "", nil
 	}
 
 	l := lua.NewState()
@@ -345,41 +363,42 @@ func isMatch(resource *unstructured.Unstructured, script string, logger logr.Log
 
 	obj := mapToTable(resource.UnstructuredContent())
 
-	if err := l.DoString(script); err != nil {
+	if err = l.DoString(script); err != nil {
 		logger.Info(fmt.Sprintf("doString failed: %v", err))
-		return false, err
+		return false, "", err
 	}
 
 	l.SetGlobal("obj", obj)
 
-	if err := l.CallByParam(lua.P{
+	if err = l.CallByParam(lua.P{
 		Fn:      l.GetGlobal("evaluate"), // name of Lua function
 		NRet:    1,                       // number of returned values
 		Protect: true,                    // return err or panic
 	}, obj); err != nil {
 		logger.Info(fmt.Sprintf("failed to evaluate health for resource: %v", err))
-		return false, err
+		return false, "", err
 	}
 
 	lv := l.Get(-1)
 	tbl, ok := lv.(*lua.LTable)
 	if !ok {
 		logger.Info(luaTableError)
-		return false, fmt.Errorf("%s", luaTableError)
+		return false, "", fmt.Errorf("%s", luaTableError)
 	}
 
 	goResult := toGoValue(tbl)
-	resultJson, err := json.Marshal(goResult)
+	var resultJson []byte
+	resultJson, err = json.Marshal(goResult)
 	if err != nil {
 		logger.Info(fmt.Sprintf("failed to marshal result: %v", err))
-		return false, err
+		return false, "", err
 	}
 
 	var result evaluateStatus
 	err = json.Unmarshal(resultJson, &result)
 	if err != nil {
 		logger.Info(fmt.Sprintf("failed to marshal result: %v", err))
-		return false, err
+		return false, "", err
 	}
 
 	if result.Message != "" {
@@ -388,7 +407,7 @@ func isMatch(resource *unstructured.Unstructured, script string, logger logr.Log
 
 	logger.V(logs.LogDebug).Info(fmt.Sprintf("is a match: %t", result.Matching))
 
-	return result.Matching, nil
+	return result.Matching, result.Message, nil
 }
 
 func transform(resource *unstructured.Unstructured, script string, logger logr.Logger,
@@ -447,9 +466,7 @@ func transform(resource *unstructured.Unstructured, script string, logger logr.L
 	return result.Resource, nil
 }
 
-func aggregatedSelection(luaScript string, resources []*unstructured.Unstructured,
-	logger logr.Logger) ([]*unstructured.Unstructured, error) {
-
+func aggregatedSelection(luaScript string, resources []ResourceResult, logger logr.Logger) ([]ResourceResult, error) {
 	if luaScript == "" {
 		return resources, nil
 	}
@@ -467,7 +484,7 @@ func aggregatedSelection(luaScript string, resources []*unstructured.Unstructure
 	// Create an argument table
 	argTable := l.NewTable()
 	for _, resource := range resources {
-		obj := mapToTable(resource.UnstructuredContent())
+		obj := mapToTable(resource.Resource.UnstructuredContent())
 		argTable.Append(obj)
 	}
 
@@ -503,14 +520,16 @@ func aggregatedSelection(luaScript string, resources []*unstructured.Unstructure
 		return nil, err
 	}
 
-	if result.Message != "" {
-		logger.V(logs.LogInfo).Info(fmt.Sprintf("message: %s", result.Message))
-	}
-
 	for i := range result.Resources {
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
-			result.Resources[i].GetKind(), result.Resources[i].GetNamespace(), result.Resources[i].GetName()))
-		l.Info("found a match")
+			result.Resources[i].Resource.GetKind(),
+			result.Resources[i].Resource.GetNamespace(),
+			result.Resources[i].Resource.GetName()))
+		if result.Resources[i].Message != "" {
+			l.V(logs.LogInfo).Info(fmt.Sprintf("message: %s", result.Resources[i].Message))
+		}
+
+		l.Info("aggregatedSelection: found a match")
 	}
 
 	return result.Resources, nil
@@ -740,11 +759,14 @@ func toGoValue(lv lua.LValue) interface{} {
 	}
 }
 
-func printMatchingResources(resources []*unstructured.Unstructured, logger logr.Logger) {
+func printMatchingResources(resources []ResourceResult, logger logr.Logger) {
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
-			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
+			resource.Resource.GetKind(),
+			resource.Resource.GetNamespace(),
+			resource.Resource.GetName()))
+		l = l.WithValues("message", resource.Message)
 		l.Info("resource is a match for cleaner")
 	}
 }

@@ -91,7 +91,7 @@ spec:
                 end
             end
             if not mountedByPod then
-              table.insert(unmountedSecrets, secret)
+              table.insert(unmountedSecrets, {resource = secret})
             end
         end
 	
