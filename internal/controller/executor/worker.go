@@ -185,10 +185,13 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	}
 
 	var processedResources []ResourceResult
-	if cleaner.Spec.Action == appsv1alpha1.ActionDelete {
+	switch cleaner.Spec.Action {
+	case appsv1alpha1.ActionDelete:
 		processedResources, err = deleteMatchingResources(ctx, resources, logger)
-	} else {
+	case appsv1alpha1.ActionTransform:
 		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
+	case appsv1alpha1.ActionScan:
+		// Nothing to do do
 	}
 
 	sendErr := sendNotifications(ctx, processedResources, cleaner, logger)
