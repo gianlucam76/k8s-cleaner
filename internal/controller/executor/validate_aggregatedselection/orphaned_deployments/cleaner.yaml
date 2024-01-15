@@ -100,7 +100,7 @@ spec:
           end
 
           if not hasPod and not hasService then
-            table.insert(orphanedDeployments, deployment)
+            table.insert(orphanedDeployments, {resource = deployment})
             break
           end
         end

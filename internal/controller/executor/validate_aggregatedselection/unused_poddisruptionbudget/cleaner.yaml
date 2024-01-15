@@ -68,7 +68,7 @@ spec:
 
         for _,pdb in ipairs(pdbs) do
           if not isMatchingAny(pdb,deployments) and not isMatchingAny(pdb,statefulsets) then
-            table.insert(stalePdbs, pdb)
+            table.insert(stalePdbs, {resource = pdb})
           end
         end
 

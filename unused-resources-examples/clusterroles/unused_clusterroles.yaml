@@ -52,7 +52,7 @@ spec:
         -- Iterate over existing clusterRoles and find not used anymore
         for _,clusterRole in ipairs(existingClusterRoles) do
           if not usedClusterRoles[clusterRole.metadata.name] then
-            table.insert(unusedClusterRoles, clusterRole)
+            table.insert(unusedClusterRoles, {resource = clusterRole})
           end
         end
         

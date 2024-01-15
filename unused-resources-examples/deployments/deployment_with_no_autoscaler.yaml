@@ -52,7 +52,7 @@ spec:
             end
 
             if not matchingAutoscaler then
-                table.insert(deploymentWithNoAutoscaler, deployment)
+                table.insert(deploymentWithNoAutoscaler, {resource = deployment})
                 break
             end
         end

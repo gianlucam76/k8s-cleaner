@@ -91,7 +91,7 @@ spec:
           end
 
           if not used then
-            table.insert(unusedIngresses, ingress)
+            table.insert(unusedIngresses, {resource = ingress})
           end
         end
 

@@ -50,11 +50,11 @@ spec:
             key = getKey(hpa.metadata.namespace, hpa.spec.scaleTargetRef.name)
             if hpa.spec.scaleTargetRef.kind == "Deployment" then
               if not deployments[key] then
-                table.insert(unusedAutoscalers, hpa)
+                table.insert(unusedAutoscalers, {resource = hpa})
               end
             elseif hpa.spec.scaleTargetRef.kind == "StatefulSet" then
               if not statefulSets[key] then
-                table.insert(unusedAutoscalers, hpa)
+                table.insert(unusedAutoscalers, {resource = hpa})
               end
             end
         end

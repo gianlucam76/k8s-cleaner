@@ -24,7 +24,7 @@ import (
 )
 
 // Action specifies the action to take on matching resources
-// +kubebuilder:validation:Enum:=Delete;Transform
+// +kubebuilder:validation:Enum:=Delete;Transform;Scan
 type Action string
 
 const (
@@ -33,6 +33,9 @@ const (
 
 	// ActionTransform will update object
 	ActionTransform = Action("Transform")
+
+	// ActionScan will identify matching objects. No action is taken on those.
+	ActionScan = Action("Scan")
 )
 
 const (
@@ -63,8 +66,8 @@ type ResourceSelector struct {
 	// Evaluate contains a function "evaluate" in lua language.
 	// The function will be passed one of the object selected based on
 	// above criteria.
-	// Must return struct with field "matching"
-	// representing whether object is a match.
+	// Must return struct with field "matching" representing whether
+	// object is a match and an optional "message" field.
 	// +optional
 	Evaluate string `json:"evaluate,omitempty"`
 }

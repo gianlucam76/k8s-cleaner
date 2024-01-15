@@ -61,7 +61,7 @@ spec:
         for namespace, perNamespacePVCs in pairs(pvcs) do
           for _, pvc in ipairs(perNamespacePVCs) do
             if not isUsed(pvc, pods[namespace]) then
-              table.insert(unusedPVCs, pvc)
+              table.insert(unusedPVCs, {resource = pvc})
             end
           end
         end
@@ -71,3 +71,7 @@ spec:
         end
         return hs
       end
+
+
+
+      

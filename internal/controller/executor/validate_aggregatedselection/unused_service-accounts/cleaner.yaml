@@ -82,7 +82,7 @@ spec:
         for _,serviceAccount in ipars(serviceAccounts) do
           key = getKey(serviceAccount.metadata.namespace, serviceAccount.metadata.name)
           if not in usedServiceAccounts then
-            table.insert(unusedServiceAccounts, serviceAccount)
+            table.insert(unusedServiceAccounts, {resource = serviceAccount})
           end
         end
 
