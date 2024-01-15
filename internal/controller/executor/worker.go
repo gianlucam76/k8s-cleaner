@@ -191,7 +191,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	case appsv1alpha1.ActionTransform:
 		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
-		// Nothing to do do
+		processedResources = resources
 	}
 
 	sendErr := sendNotifications(ctx, processedResources, cleaner, logger)
