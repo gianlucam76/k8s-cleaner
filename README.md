@@ -38,8 +38,8 @@ Currently k8s-cleaner has rich set of working examples to identify and list unus
 
 There are also examples to identify unhealthy resources:
 
-- [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-expired-certificates): Detect pods that are not utilizing the most recent Secret data.
-- [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-outdated-secrets): Pinpoint pods that are operating with expired security certificates.
+- [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
+- [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/unhealthy-resources-examples/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
 
 # Contribute to Cleaner Examples
 
