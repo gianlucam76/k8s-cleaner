@@ -73,10 +73,21 @@ spec:
         return  timeDifference < 0
       end
 
+      function getPodTimestamp(pod)
+        if pod.status ~= nil and pod.status.conditions ~= nil then
+          for _,condition in ipairs(pod.status.conditions) do
+            if condition.type == "PodReadyToStartContainers" and condition.status == "True" then
+              return convertTimestampString(condition.lastTransitionTime)
+            end
+          end
+        end
+        return convertTimestampString(pod.metadata.creationTimestamp)
+      end
+
       -- secrets contains key:value where key identify a Secret with a Certificate and value
       -- if the time of latest update
       function hasOutdatedSecret(pod, secrets)
-        podTimestamp = convertTimestampString(pod.metadata.creationTimestamp)
+        podTimestamp = getPodTimestamp(pod)
 
         if pod.spec.volumes ~= nil then  
           for _, volume in ipairs(pod.spec.volumes) do
