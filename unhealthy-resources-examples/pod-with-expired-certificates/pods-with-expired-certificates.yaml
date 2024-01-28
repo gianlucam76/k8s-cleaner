@@ -10,6 +10,9 @@ metadata:
 spec:
   action: Scan 
   schedule: "0 * * * *"
+  notifications:
+  - name: report
+    type: CleanerReport
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod
