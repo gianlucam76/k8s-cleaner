@@ -1,0 +1,110 @@
+# Find all unhealthy Ingress instances. 
+# An Ingress instance is considered unhealthy if:
+# - default backend is defined but not existings
+# - at leat one of referenced services (via spec.rules) does not exist
+# 
+# This does not take into account resource (field Resource *v1.TypedLocalObjectReference)
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unhealthy-ingresses
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Ingress
+      group: "networking.k8s.io"
+      version: v1
+    - kind: Service
+      group: ""
+      version: v1
+    aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      -- check default backend: if default backend is configured, return true
+      -- if currently referenced service exists
+      function defaultBackendValid(ingress, services)
+        if ingress.spec.defaultBackend ~= nil then
+          if ingress.spec.defaultBackend.service ~= nil then
+            key = getKey(ingress.metadata.namespace, ingress.spec.defaultBackend.service.name)
+            if not services[key] then 
+              return false, "service " .. ingress.spec.defaultBackend.service.name .. " does not exist"
+            end
+          end
+        end
+        return true, ""
+      end
+
+      -- check if all referenced service (via rules) currently exists
+      -- returns false if at least one of the referenced services does not exit
+      function allReferencedServiceValid(ingress, services)
+        local message = ""
+        if ingress.spec.rules ~= nil then
+          for _,rule in ipairs(ingress.spec.rules) do
+            if rule.http ~= nil and rule.http.paths ~= nil then
+              for _,path in ipairs(rule.http.paths) do
+                if path.backend.service ~= nil then
+                  key = getKey(ingress.metadata.namespace, path.backend.service.name)
+                  if not services[key] then
+                    message = message .. "service " .. path.backend.service.name .. " does not exit.\n"
+                  end
+                end
+              end
+            end
+          end
+        end 
+        if message == "" then
+          return true, ""
+        end
+
+        return false, message
+      end
+
+
+      function evaluate()
+        local hs = {}
+        
+        local services = {}
+        local ingresses = {}
+        local unhealthyIngresses = {}
+
+        -- Separate ingresses and services from the resources
+        -- Store existing services in a map like struct
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Ingress" then
+            table.insert(ingresses, resource)
+          elseif kind == "Service" then
+            key = getKey(resource.metadata.namespace,resource.metadata.name)
+            print(key)
+            services[key] = true
+          end
+        end
+
+        for _,ingress in ipairs(ingresses) do
+          local used = false
+          key = getKey(ingress.metadata.namespace, ingress.metadata.name)
+          
+          healthy, message = defaultBackendValid(ingress, services)
+          if not healthy then
+            table.insert(unhealthyIngresses, {resource = ingress, message = message})
+          end
+
+          healthy, message = allReferencedServiceValid(ingress, services) 
+          if not ahealthy then
+            table.insert(unhealthyIngresses, {resource = ingress, message = message}) 
+          end
+
+        end
+
+        if #unhealthyIngresses > 0 then
+          hs.resources = unhealthyIngresses
+        end
+        return hs
+      end
