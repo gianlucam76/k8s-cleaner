@@ -21,4 +21,5 @@ var (
 	GetNextScheduleTime = getNextScheduleTime
 
 	AddFinalizer = (*CleanerReconciler).addFinalizer
+	RemoveReport = (*CleanerReconciler).removeReport
 )
