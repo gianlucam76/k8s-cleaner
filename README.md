@@ -10,7 +10,7 @@
 
 <img src="https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png" width="200">
 
-The Kubernetes controller __Cleaner__ proactively identifies, removes, or updates stale/orphaned resources to maintain a clean and efficient Kubernetes cluster. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
+The Kubernetes controller __Cleaner__ identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
 __Cleaner__ can also be used to identify unhealthy resources.
 
 k8s-cleaner keeps you in the loop with handy notifications through:
