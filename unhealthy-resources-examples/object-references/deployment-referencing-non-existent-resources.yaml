@@ -1,0 +1,167 @@
+# Find all unhealthy Deployments instances. 
+# A Deployment instance is considered unhealthy if it is referencing (mounting) a non existent
+# Secret or ConfigMap
+#
+# This does not take into account resource (field Resource *v1.TypedLocalObjectReference)
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: deployment-referencing-non-existent-resources
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Deployment
+      group: apps
+      version: v1
+    - kind: Service
+      group: ""
+      version: v1
+    - kind: ConfigMap
+      group: ""
+      version: v1
+    aggregatedSelection: |    
+      function getKey(kind,namespace, name)
+        return kind .. ":" .. namespace .. ":" .. name
+      end
+
+      function isDeploymentUnhealthy(deployment, references)
+        podSpec = deployment.spec.template.spec
+        local message = ""
+
+        if podSpec.containers ~= nil then
+          for _, container in ipairs(podSpec.containers) do
+
+            if container.env ~= nil then
+              for _, env in ipairs(container.env) do
+                if env.valueFrom ~= nil and env.valueFrom.secretKeyRef ~= nil then
+                  key = getKey("Secret", deployment.metadata.namespace, env.valueFrom.secretKeyRef.name)
+                  if not references[key] then
+                    message = message .. "Secret " .. deployment.metadata.namespace .. ":" .. env.valueFrom.secretKeyRef.name .. " does not exist\n"
+                  end
+                end
+                if env.valueFrom ~= nil and env.valueFrom.configMapKeyRef ~= nil then
+                  key = getKey("ConfigMap", deployment.metadata.namespace, env.valueFrom.configMapKeyRef.name)
+                  if not references[key] then
+                    message = message .. "ConfigMap " .. deployment.metadata.namespace .. ":" .. env.valueFrom.configMapKeyRef.name .. " does not exist\n"
+                  end
+                end
+              end
+            end  
+
+            if  container.envFrom ~= nil then
+              for _, envFrom in ipairs(container.envFrom) do
+                if envFrom.secretRef ~= nil then
+                  key = getKey("Secret", deployment.metadata.namespace, envFrom.secretRef.name)
+                  if not references[key] then
+                     message = message .. "Secret " .. deployment.metadata.namespace .. ":" .. envFrom.secretRef.name .. " does not exist\n"
+                  end
+                end
+                if envFrom.configMapRef ~= nil then
+                  key = getKey("ConfigMap", deployment.metadata.namespace, envFrom.configMapRef.name)
+                  if not references[key] then
+                     message = message .. "ConfigMap " .. deployment.metadata.namespace .. ":" .. envFrom.configMapRef.name .. " does not exist\n"
+                  end
+                end
+              end  
+            end
+          end
+        end
+
+        if podSpec.initContainers ~= nil then
+          for _, initContainer in ipairs(podSpec.initContainers) do
+            if initContainer.env ~= nil then
+              for _, env in ipairs(initContainer.env) do
+                if env.valueFrom ~= nil and env.valueFrom.secretKeyRef ~= nil then
+                  key = getKey("Secret", deployment.metadata.namespace, env.valueFrom.secretKeyRef.name)
+                  if not references[key] then
+                     message = message .. "Secret " .. deployment.metadata.namespace .. ":" .. env.valueFrom.secretKeyRef.name .. " does not exist\n"
+                  end
+                end
+                if env.valueFrom ~= nil and env.valueFrom.configMapKeyRef ~= nil then
+                  key = getKey("ConfigMap", deployment.metadata.namespace, env.valueFrom.configMapKeyRef.name)
+                  if not references[key] then
+                     message = message .. "ConfigMap " .. deployment.metadata.namespace .. ":" .. env.valueFrom.configMapKeyRef.name .. " does not exist\n"
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        if podSpec.volumes ~= nil then  
+          for _, volume in ipairs(podSpec.volumes) do
+            if volume.secret ~= nil then
+              key = getKey("Secret", deployment.metadata.namespace, volume.secret.secretName)
+              if not references[key] then
+                message = message .. "Secret " .. deployment.metadata.namespace .. ":" .. volume.secret.secretName .. " does not exist\n"
+              end
+            end
+            if volume.configMap ~= nil then
+              key = getKey("ConfigMap", deployment.metadata.namespace, volume.configMap.name)
+              if not references[key] then
+                message = message .. "ConfigMap " .. deployment.metadata.namespace .. ":" .. volume.configMap.name .. " does not exist\n"
+              end
+            end
+
+            if volume.projected ~= nil and volume.projected.sources ~= nil then
+              for _, projectedResource in ipairs(volume.projected.sources) do
+                if projectedResource.secret ~= nil then
+                  key = getKey("Secret", deployment.metadata.namespace, projectedResource.secret.name)
+                  if not references[key] then
+                    message = message .. "Secret " .. deployment.metadata.namespace .. ":" .. projectedResource.secret.name .. " does not exist\n"
+                  end
+                end
+                if projectedResource.configMap ~= nil then
+                  key = getKey("ConfigMap", deployment.metadata.namespace, projectedResource.configMap.name)
+                  if not references[key] then
+                    message = message .. "ConfigMap " .. deployment.metadata.namespace .. ":" .. projectedResource.configMap.name .. " does not exist\n"
+                  end
+                end
+              end
+            end
+          end
+        end
+        
+        if string.len(message)  == 0 then
+          return false, message
+        end
+
+        return true, message
+      end
+
+      function evaluate()
+        local hs = {}
+        
+        local deployments = {}
+        local references = {}
+        
+        -- Separate secrets/configmaps from deployments
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Deployment" then
+            table.insert(deployments, resource)
+          else
+            key = getKey(resource.kind, resource.metadata.namespace, resource.metadata.name)
+            references[key] = true
+          end
+        end
+
+        local unhealthyDeployments = {}
+
+        for _, deployment in ipairs(deployments) do
+          isUnhealthy, message = isDeploymentUnhealthy(deployment, references)
+          if isUnhealthy then
+            table.insert(unhealthyDeployments, {resource= deployment, message = message})
+          end
+        end
+
+        if #unhealthyDeployments > 0 then
+          hs.resources = unhealthyDeployments
+        end
+        return hs
+      end      
