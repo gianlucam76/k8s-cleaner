@@ -29,9 +29,11 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/klog/v2/textlogger"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller"
+	"gianlucam76/k8s-cleaner/pkg/scope"
 )
 
 var _ = Describe("CleanerClient", func() {
@@ -90,6 +92,57 @@ var _ = Describe("CleanerClient", func() {
 		nextSchedule, err := controller.GetNextScheduleTime(cleaner, now)
 		Expect(err).To(BeNil())
 		Expect(nextSchedule.Minute()).To(Equal(minute))
+	})
+
+	It("removeReport removes corresponding Report instance", func() {
+		cleaner := &appsv1alpha1.Cleaner{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+			},
+		}
+
+		report1 := appsv1alpha1.Report{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: cleaner.Name,
+			},
+			Spec: appsv1alpha1.ReportSpec{
+				Action:       appsv1alpha1.ActionScan,
+				ResourceInfo: []appsv1alpha1.ResourceInfo{{}},
+			},
+		}
+		Expect(k8sClient.Create(context.TODO(), &report1)).To(Succeed())
+
+		report2 := appsv1alpha1.Report{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+			},
+			Spec: appsv1alpha1.ReportSpec{
+				Action:       appsv1alpha1.ActionScan,
+				ResourceInfo: []appsv1alpha1.ResourceInfo{{}},
+			},
+		}
+		Expect(k8sClient.Create(context.TODO(), &report2)).To(Succeed())
+
+		reconciler := &controller.CleanerReconciler{
+			Client: k8sClient,
+			Scheme: testEnv.Scheme,
+		}
+
+		scope, err := scope.NewCleanerScope(scope.CleanerScopeParams{
+			Cleaner: cleaner,
+			Client:  k8sClient,
+		})
+		Expect(err).To(BeNil())
+		Expect(scope).ToNot(BeNil())
+
+		logger := textlogger.NewLogger(textlogger.NewConfig())
+		err = controller.RemoveReport(reconciler, context.TODO(), scope, logger)
+		// Expect err to not be nil cause Report was present before above call
+		Expect(err).ToNot(BeNil())
+
+		err = controller.RemoveReport(reconciler, context.TODO(), scope, logger)
+		// Expect err to be nil cause Report is not present anymore
+		Expect(err).To(BeNil())
 	})
 
 	It("addFinalizer adds finalizer", func() {

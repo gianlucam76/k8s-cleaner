@@ -95,23 +95,31 @@ func (r *CleanerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ 
 	logger = logger.WithValues("cleaner", cleaner.Name)
 
 	if !cleaner.DeletionTimestamp.IsZero() {
-		r.reconcileDelete(cleanerScope, logger)
-		return ctrl.Result{}, nil
+		return reconcile.Result{}, r.reconcileDelete(ctx, cleanerScope, logger)
 	}
 
 	return r.reconcileNormal(ctx, cleanerScope, logger)
 }
 
-func (r *CleanerReconciler) reconcileDelete(cleanerScope *scope.CleanerScope, logger logr.Logger) {
+func (r *CleanerReconciler) reconcileDelete(ctx context.Context,
+	cleanerScope *scope.CleanerScope, logger logr.Logger) error {
+
 	logger.Info("reconcileDelete")
 
 	removeQueuedJobs(cleanerScope)
+
+	err := r.removeReport(ctx, cleanerScope, logger)
+	if err != nil {
+		return err
+	}
 
 	if controllerutil.ContainsFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer) {
 		controllerutil.RemoveFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer)
 	}
 
 	logger.Info("reconcileDelete succeeded")
+
+	return nil
 }
 
 func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *scope.CleanerScope,
@@ -170,6 +178,30 @@ func (r *CleanerReconciler) addFinalizer(ctx context.Context, cleaner *appsv1alp
 		return err
 	}
 	return r.Get(ctx, types.NamespacedName{Name: cleaner.Name}, cleaner)
+}
+
+// removeReport deletes (if present) Report generated for this Cleaner
+// instance
+func (r *CleanerReconciler) removeReport(ctx context.Context,
+	cleanerScope *scope.CleanerScope, logger logr.Logger) error {
+
+	report := &appsv1alpha1.Report{}
+	err := r.Get(ctx, types.NamespacedName{Name: cleanerScope.Cleaner.GetName()}, report)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return nil
+		}
+
+		logger.Info(fmt.Sprintf("failed to get Report: %v", err))
+		return err
+	}
+
+	err = r.Delete(ctx, report)
+	if err != nil {
+		return err
+	}
+
+	return fmt.Errorf("report instance still present")
 }
 
 func schedule(ctx context.Context, cleanerScope *scope.CleanerScope, logger logr.Logger) (*time.Time, error) {
