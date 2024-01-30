@@ -461,7 +461,7 @@ It also accepts
 
 ## Notifications
 
-k8s-cleaner keeps you in the loop with handy notifications through Slack, , or reports. Choose what works best for you!
+k8s-cleaner keeps you in the loop with handy notifications through Slack, Webex, Discord, or reports. Choose what works best for you!
 
 ### Slack Notification
 
