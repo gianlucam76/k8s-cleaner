@@ -48,11 +48,6 @@ spec:
                 - Transform
                 - Scan
                 type: string
-              dryRun:
-                default: false
-                description: DryRun if set to true, will have controller delete/update
-                  no resource. All matching resources will be listed in logs
-                type: boolean
               notifications:
                 description: Notification is a list of source of events to evaluate.
                 items:
@@ -195,6 +190,10 @@ spec:
                   will be counted as failed ones.
                 format: int64
                 type: integer
+              storeResourcePath:
+                description: StoreResources will store full resources in this directory.
+                  Must be a volume where Cleaner can dump all matching resources.
+                type: string
               transform:
                 description: Transform contains a function "transform" in lua language.
                   When Action is set to *Transform*, this function will be invoked
@@ -274,6 +273,11 @@ spec:
                 description: Resources identify a set of Kubernetes resource
                 items:
                   properties:
+                    fullResource:
+                      description: FullResource contains full resources before before
+                        Cleaner took an action on it
+                      format: byte
+                      type: string
                     message:
                       description: Message is an optional field.
                       type: string

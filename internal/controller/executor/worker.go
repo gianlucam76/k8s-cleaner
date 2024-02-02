@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
@@ -78,6 +79,7 @@ type responseParams struct {
 var (
 	k8sClient client.Client
 	config    *rest.Config
+	scheme    *runtime.Scheme
 )
 
 const (
@@ -178,12 +180,6 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		}
 	}
 
-	if cleaner.Spec.DryRun {
-		// Print all matching resources
-		printMatchingResources(resources, logger)
-		return sendNotifications(ctx, resources, cleaner, logger)
-	}
-
 	var processedResources []ResourceResult
 	switch cleaner.Spec.Action {
 	case appsv1alpha1.ActionDelete:
@@ -191,12 +187,20 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	case appsv1alpha1.ActionTransform:
 		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
+		printMatchingResources(resources, logger)
 		processedResources = resources
 	}
 
+	// Send notification irrespective of err
 	sendErr := sendNotifications(ctx, processedResources, cleaner, logger)
 	if sendErr != nil {
 		return sendErr
+	}
+
+	// Store resources before any action was taken irrespective of err
+	storeErr := storeResources(processedResources, scheme, cleaner, logger)
+	if storeErr != nil {
+		return storeErr
 	}
 
 	return err

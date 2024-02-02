@@ -8,7 +8,6 @@ metadata:
   name: stale-pod-disruption-budgets
 spec:
   schedule: "* 0 * * *"
-  dryRun: false
   action: Delete
   resourcePolicySet:
     resourceSelectors:

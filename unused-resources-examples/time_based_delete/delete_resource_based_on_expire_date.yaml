@@ -35,7 +35,6 @@ metadata:
   name: expire-date-based-cleaner
 spec:
   schedule: "0 * * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment

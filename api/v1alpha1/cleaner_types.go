@@ -140,12 +140,6 @@ type CleanerSpec struct {
 	// +optional
 	Transform string `json:"transform,omitempty"`
 
-	// DryRun if set to true, will have controller delete/update no resource.
-	// All matching resources will be listed in logs
-	// +kubebuilder:default:=false
-	// +optional
-	DryRun bool `json:"dryRun,omitempty"`
-
 	// Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 	Schedule string `json:"schedule"`
 
@@ -159,6 +153,11 @@ type CleanerSpec struct {
 	// +patchStrategy=merge,retainKeys
 	// +optional
 	Notifications []Notification `json:"notifications,omitempty"`
+
+	// StoreResources will store full resources in this directory.
+	// Must be a volume where Cleaner can dump all matching resources.
+	// +optional
+	StoreResourcePath string `json:"storeResourcePath,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner

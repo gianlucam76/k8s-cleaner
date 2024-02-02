@@ -17,6 +17,8 @@ nodes:
       containerPath: /var/run/docker.sock
     - hostPath: /usr/share/zoneinfo
       containerPath: /usr/share/zoneinfo
+    - hostPath: /tmp/k8s-pruner
+      containerPath: /collection
 - role: worker
   image: kindest/node:K8S_VERSION
   extraMounts:
@@ -24,3 +26,5 @@ nodes:
       containerPath: /var/run/docker.sock
     - hostPath: /usr/share/zoneinfo
       containerPath: /usr/share/zoneinfo
+    - hostPath: /tmp/k8s-pruner
+      containerPath: /collection

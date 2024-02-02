@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -98,10 +97,6 @@ func generateReportSpec(resources []ResourceResult, cleaner *appsv1alpha1.Cleane
 	reportSpec := appsv1alpha1.ReportSpec{}
 	reportSpec.Action = cleaner.Spec.Action
 	message := fmt.Sprintf(". time: %v", time.Now())
-	if cleaner.Spec.DryRun {
-		message += fmt.Sprintf(" . Cleaner is set in DryRun mode so no resource was actually %s",
-			strings.ToLower(string(cleaner.Spec.Action)))
-	}
 
 	reportSpec.ResourceInfo = make([]appsv1alpha1.ResourceInfo, len(resources))
 	for i := range resources {

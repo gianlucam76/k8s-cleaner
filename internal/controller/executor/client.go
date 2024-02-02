@@ -24,6 +24,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -72,6 +73,7 @@ type Manager struct {
 	log logr.Logger
 	client.Client
 	config *rest.Config
+	scheme *runtime.Scheme
 
 	mu *sync.Mutex
 
@@ -92,7 +94,7 @@ type Manager struct {
 
 // InitializeClient initializes a client
 func InitializeClient(ctx context.Context, l logr.Logger, config *rest.Config,
-	c client.Client, numOfWorker int) {
+	c client.Client, scheme *runtime.Scheme, numOfWorker int) {
 
 	if managerInstance == nil {
 		getClientLock.Lock()
@@ -124,6 +126,7 @@ func (m *Manager) startWorkloadWorkers(ctx context.Context, numOfWorker int, log
 	m.results = make(map[string]error)
 	k8sClient = m.Client
 	config = m.config
+	scheme = m.scheme
 
 	for i := 0; i < numOfWorker; i++ {
 		go processRequests(ctx, i, logger.WithValues("worker", fmt.Sprintf("%d", i)))

@@ -25,6 +25,11 @@ type ResourceInfo struct {
 	// Resource identify a Kubernetes resource
 	Resource corev1.ObjectReference `json:"resource,omitempty"`
 
+	// FullResource contains full resources before
+	// before Cleaner took an action on it
+	// +optional
+	FullResource []byte `json:"fullResource,omitempty"`
+
 	// Message is an optional field.
 	// +optional
 	Message string `json:"message,omitempty"`
