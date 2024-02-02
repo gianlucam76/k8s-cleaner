@@ -6,7 +6,6 @@ metadata:
   name: completed-pods
 spec:
   schedule: "* 0 * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod

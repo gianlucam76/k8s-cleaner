@@ -53,7 +53,7 @@ To add an example, simply create a new file in the example directory with a desc
 
 1️⃣ **Schedule**: Specify the frequency at which the Cleaner should scan the cluster and identify stale resources. Utilize the Cron syntax to define recurring schedules.
 
-2️⃣ **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied.
+2️⃣ **DryRun**: Enable safe testing of the Cleaner's filtering logic without affecting actual resource configurations. Resources matching the criteria will be identified, but no changes will be applied. Set Action to __Scan__.
 
 3️⃣ **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
@@ -175,7 +175,6 @@ metadata:
   name: completed-pods
 spec:
   schedule: "* 0 * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod
@@ -283,7 +282,6 @@ metadata:
   name: pods-from-job
 spec:
   schedule: "* 0 * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod
@@ -420,7 +418,7 @@ YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/un
 
 ## DryRun 
 
-To preview which resources match the __Cleaner__'s criteria, set the __DryRun__ flag to true. The Cleaner will still execute its logic but will not actually delete or update any resources. To identify matching resources, search the controller logs for the message "resource is a match for cleaner".
+To preview which resources match the __Cleaner__'s criteria, set the __Action__ field to _Scan_. The Cleaner will still execute its logic but will not actually delete or update any resources. To identify matching resources, search the controller logs for the message "resource is a match for cleaner".
 
 ```yaml
 apiVersion: apps.projectsveltos.io/v1alpha1
@@ -429,7 +427,6 @@ metadata:
   name: cleaner-sample1
 spec:
   schedule: "* 0 * * *" # Runs every day at midnight
-  dryRun: true  # Set to true to preview matching resources
   resourcePolicySet:
     resourceSelectors:
     - namespace: test
@@ -443,10 +440,10 @@ spec:
       - key: environment
         operation: Different
         value: prouction # Match deployments with the "environment" label different from "production"
-  action: Delete
+  action: Scan
 ```
 
-By setting DryRun to true, you can safely test the Cleaner's filtering logic without affecting your actual deployment configurations. Once you're confident in the filtering criteria, you can set DryRun back to false to enable automatic resource deletion.
+By setting __Action__ to _Scan_, you can safely test the Cleaner's filtering logic without affecting your actual deployment configurations. Once you're confident in the filtering criteria, you can set _Action_ to delete or modify.
 
 ## Schedule
 
@@ -616,6 +613,19 @@ spec:
     kind: Deployment
     name: my-nginx-deployment
     namespace: test
+```
+
+### Store Resource YAML
+
+Sometimes it is convenient to store resources before Cleaner deletes/modifies those.
+
+Cleaner has an optional field __StoreResourcePath__. When set, Cleaner will dump all matching resources before any modification
+(delete or updated) was done. 
+
+Matching resources will be stored
+
+```
+/<__StoreResourcePath__ value>/<Cleaner name>/<resourceNamespace>/<resource Kind>/<resource Name>.yaml
 ```
 
 ## Validate Your Cleaner Configuration 

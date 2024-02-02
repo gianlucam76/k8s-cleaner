@@ -122,7 +122,7 @@ func verifyCleanerResourceSelector(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, nil, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 
@@ -200,7 +200,7 @@ func verifyCleanerTransform(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, nil, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 
@@ -273,7 +273,7 @@ func verifyCleanerAggregatedSelection(dirName string) {
 	}
 
 	c := fake.NewClientBuilder().WithScheme(scheme).Build()
-	executor.InitializeClient(context.TODO(), logger, nil, c, 10)
+	executor.InitializeClient(context.TODO(), logger, nil, c, nil, 10)
 	client := executor.GetClient()
 	Expect(client).ToNot(BeNil())
 

@@ -9,7 +9,7 @@ spec:
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment
-      group: ""
+      group: "apps"
       version: v1
       evaluate: |
         function evaluate()

@@ -46,7 +46,6 @@ metadata:
   name: ttl-based-cleaner
 spec:
   schedule: "0 * * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment

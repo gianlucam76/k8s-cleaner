@@ -7,7 +7,6 @@ metadata:
   name: pods-from-job
 spec:
   schedule: "* 0 * * *"
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod

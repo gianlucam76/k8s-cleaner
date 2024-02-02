@@ -9,7 +9,6 @@ metadata:
 spec:
   schedule: "* 0 * * *"
   action: Delete
-  dryRun: false
   resourcePolicySet:
     resourceSelectors:
     - kind: Role
