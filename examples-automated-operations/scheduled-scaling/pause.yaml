@@ -1,0 +1,74 @@
+# This cleaner:
+# - runs at 8PM every day
+# - finds all Deployments/StatefulSet/DaemonSet with
+# annotation "pause-resume"
+#
+# For any such resource: 
+# - store current replicas in the annotation "previous-replicas"
+# - set their replicas to zero (scale down and pause)
+#
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: scale-down-deployment-statefulset-daemonset
+spec:
+  schedule: "* 20 * * *"
+  action: Transform
+  transform: |
+    -- Set replicas to 0
+    function transform()
+      hs = {}
+
+      if obj.metadata.annotations == nil then
+        obj.metadata.annotations = {}
+      end
+      -- store in the annotation current replicas value
+      obj.metadata.annotations["previous-replicas"] = tostring(obj.spec.replicas)
+      
+      -- reset replicas to 0
+      obj.spec.replicas = 0
+      
+      hs.resource = obj
+      return hs
+    end  
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Deployment
+      group: apps
+      version: v1
+    - kind: StatefulSet
+      group: "apps"
+      version: v1
+    - kind: DaemonSet
+      group: "apps"
+      version: v1
+    aggregatedSelection: |
+      function evaluate()
+        local hs = {}
+
+        -- returns true if object has annotaiton "pause-resume" 
+        function hasPauseAnnotation(obj)
+          if obj.metadata.annotations ~= nil then
+            if obj.metadata.annotations["pause-resume"] then
+              return true
+            end
+
+            return false
+          end
+
+          return
+        end
+
+        local resourceToPause = {}
+
+        for _, resource in ipairs(resources) do
+          if hasPauseAnnotation(resource) then
+            table.insert(resourceToPause, {resource = resource})
+          end
+        end
+
+        if #resourceToPause > 0 then
+          hs.resources = resourceToPause
+        end
+        return hs
+      end   
