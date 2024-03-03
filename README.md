@@ -45,7 +45,7 @@ There are also examples to identify unhealthy resources:
 
 K8s-cleaner doesn't just help you identify unused or unhealthy resources; it can also automate various operations to enhance your cluster's efficiency and management. The examples-operations directory showcases practical scripts and configurations covering key tasks:
 
-### Scaling Deployments/DaemonSets/StatefulSets with Nightly Downtime:
+#### Scaling Deployments/DaemonSets/StatefulSets with Nightly Downtime:
 
 This [example](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-automated-operations/scheduled-scaling) demonstrates how to automatically scale down Deployments, DaemonSets, and StatefulSets with a specified annotation at a desired time (e.g., 8 PM nightly).
 Before scaling down, the replica count is stored in another annotation for later retrieval.
