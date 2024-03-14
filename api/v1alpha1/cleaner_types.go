@@ -50,6 +50,10 @@ type ResourceSelector struct {
 	// +optional
 	Namespace string `json:"namespace,omitempty"`
 
+	// NamespaceSelector is a label selector for namespaces
+	// +optional
+	NamespaceSelector string `json:"namespaceSelector,omitempty"`
+
 	// Group of the resource deployed in the Cluster.
 	Group string `json:"group"`
 

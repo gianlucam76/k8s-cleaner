@@ -3,13 +3,13 @@ module github.com/projectsveltos/addon-controller/hack/tools
 go 1.21
 
 require (
-	github.com/a8m/envsubst v1.1.0
-	github.com/onsi/ginkgo/v2 v2.15.0
-	golang.org/x/oauth2 v0.14.0
+	github.com/a8m/envsubst v1.4.2
+	github.com/onsi/ginkgo/v2 v2.16.0
+	golang.org/x/oauth2 v0.18.0
 	k8s.io/client-go v0.29.1
 	sigs.k8s.io/controller-runtime/tools/setup-envtest v0.0.0-20240215124517-56159419231e
 	sigs.k8s.io/controller-tools v0.14.0
-	sigs.k8s.io/kind v0.21.0
+	sigs.k8s.io/kind v0.22.0
 )
 
 require (
@@ -44,12 +44,12 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/term v0.15.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.16.1 // indirect
+	golang.org/x/tools v0.17.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect

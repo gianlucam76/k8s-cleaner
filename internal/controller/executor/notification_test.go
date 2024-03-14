@@ -23,8 +23,6 @@ import (
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller/executor"
@@ -36,10 +34,20 @@ var _ = Describe("Notification", func() {
 	It("getWebexInfo get webex information from Secret", func() {
 		webexRoomID := randomString()
 		webexToken := randomString()
+
+		secretNamespace := randomString()
+		secretNs := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: secretNamespace,
+			},
+		}
+		Expect(k8sClient.Create(context.TODO(), secretNs)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secretNs)).To(Succeed())
+
 		secret := &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      randomString(),
-				Namespace: randomString(),
+				Namespace: secretNamespace,
 			},
 			Data: map[string][]byte{
 				libsveltosv1alpha1.WebexRoomID: []byte(webexRoomID),
@@ -58,13 +66,9 @@ var _ = Describe("Notification", func() {
 			},
 		}
 
-		initObjects := []client.Object{
-			secret,
-		}
+		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secret)).To(Succeed())
 
-		c := fake.NewClientBuilder().WithScheme(scheme).WithStatusSubresource(initObjects...).
-			WithObjects(initObjects...).Build()
-		executor.SetK8sClient(c)
 		webexInfo, err := executor.GetWebexInfo(context.TODO(), notification)
 		Expect(err).To(BeNil())
 		Expect(webexInfo).ToNot(BeNil())
@@ -97,13 +101,17 @@ var _ = Describe("Notification", func() {
 			},
 		}
 
-		initObjects := []client.Object{
-			secret,
+		secretNs := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: secret.Namespace,
+			},
 		}
+		Expect(k8sClient.Create(context.TODO(), secretNs)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secretNs)).To(Succeed())
 
-		c := fake.NewClientBuilder().WithScheme(scheme).WithStatusSubresource(initObjects...).
-			WithObjects(initObjects...).Build()
-		executor.SetK8sClient(c)
+		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secret)).To(Succeed())
+
 		slackInfo, err := executor.GetSlackInfo(context.TODO(), notification)
 		Expect(err).To(BeNil())
 		Expect(slackInfo).ToNot(BeNil())

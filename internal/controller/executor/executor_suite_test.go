@@ -23,12 +23,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-logr/zapr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/zap"
 
+	"github.com/go-logr/zapr"
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/cluster-api/util"
@@ -41,6 +44,15 @@ var (
 	config    *rest.Config
 	k8sClient client.Client
 	scheme    *runtime.Scheme
+)
+
+var (
+	cacheSyncBackoff = wait.Backoff{
+		Duration: 100 * time.Millisecond,
+		Factor:   1.5,
+		Steps:    8,
+		Jitter:   0.4,
+	}
 )
 
 func TestExecutor(t *testing.T) {
@@ -94,4 +106,25 @@ func setupScheme() (*runtime.Scheme, error) {
 func randomString() string {
 	const length = 10
 	return util.RandomString(length)
+}
+
+// waitForObject waits for the cache to be updated helps in preventing test flakes due to the cache sync delays.
+func waitForObject(ctx context.Context, c client.Client, obj client.Object) error {
+	// Makes sure the cache is updated with the new object
+	objCopy := obj.DeepCopyObject().(client.Object)
+	key := client.ObjectKeyFromObject(obj)
+	if err := wait.ExponentialBackoff(
+		cacheSyncBackoff,
+		func() (done bool, err error) {
+			if err := c.Get(ctx, key, objCopy); err != nil {
+				if apierrors.IsNotFound(err) {
+					return false, nil
+				}
+				return false, err
+			}
+			return true, nil
+		}); err != nil {
+		return errors.Wrapf(err, "object %s, %s is not being added to the testenv client cache", obj.GetObjectKind().GroupVersionKind().String(), key)
+	}
+	return nil
 }

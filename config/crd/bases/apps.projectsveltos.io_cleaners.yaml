@@ -181,6 +181,9 @@ spec:
                             Namespace of the resource deployed in the  Cluster.
                             Empty for resources scoped at cluster level.
                           type: string
+                        namespaceSelector:
+                          description: NamespaceSelector is a label selector for namespaces
+                          type: string
                         version:
                           description: Version of the resource deployed in the Cluster.
                           type: string

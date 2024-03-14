@@ -139,6 +139,26 @@ spec:
 
 By utilizing label filters, you can refine the scope of resource management, ensuring that only specific resources are targeted for removal or update. This targeted approach helps maintain a clean and organized Kubernetes environment without affecting unintended resources.
 
+## NamespaceSelector
+
+__Cleaner__ can select resources based on namespaces matching a label selector. For instance, to eliminate Deployments in the all namespaces with labels `env`:`qa`, follow this YAML configuration:
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-sample1
+spec:
+  schedule: "* 0 * * *" # Executes every day at midnight
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Deployment
+      group: "apps"
+      version: v1
+      namespaceSelector: "env=qa" 
+  action: Delete # Deletes matching Deployments
+```
+
 ## Using Lua for Advanced Selection
 
 __Cleaner__ extends its capabilities by enabling the use of __Lua__ scripts for defining advanced selection criteria. These Lua functions, named __evaluate__, receive the resource object as __obj__ and allow for complex and dynamic filtering rules.
