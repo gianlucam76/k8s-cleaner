@@ -16,8 +16,6 @@ limitations under the License.
 
 package executor
 
-import "sigs.k8s.io/controller-runtime/pkg/client"
-
 var (
 	FetchResources          = fetchResources
 	GetMatchingResources    = getMatchingResources
@@ -25,16 +23,13 @@ var (
 	IsMatch                 = isMatch
 	Transform               = transform
 	AggregatedSelection     = aggregatedSelection
+	GetNamespaces           = getNamespaces
 )
 
 var (
 	GetWebexInfo = getWebexInfo
 	GetSlackInfo = getSlackInfo
 )
-
-func SetK8sClient(c client.Client) {
-	k8sClient = c
-}
 
 func (m *Manager) ClearInternalStruct() {
 	m.dirty = make([]string, 0)

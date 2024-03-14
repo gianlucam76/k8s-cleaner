@@ -108,6 +108,7 @@ func InitializeClient(ctx context.Context, l logr.Logger, config *rest.Config,
 
 			l.V(logs.LogInfo).Info(fmt.Sprintf("Creating instance now. Number of workers: %d", numOfWorker))
 			managerInstance = &Manager{log: l, Client: c, config: config}
+			managerInstance.scheme = scheme
 			managerInstance.log = zapr.NewLogger(logger)
 			managerInstance.startWorkloadWorkers(ctx, numOfWorker, l)
 		}

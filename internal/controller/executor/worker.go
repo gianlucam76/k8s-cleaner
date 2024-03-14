@@ -24,10 +24,12 @@ import (
 
 	"github.com/go-logr/logr"
 	lua "github.com/yuin/gopher-lua"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
@@ -209,7 +211,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,
 ) ([]ResourceResult, error) {
 
-	resources, err := fetchResources(ctx, sr)
+	resources, err := fetchResources(ctx, sr, logger)
 	if err != nil {
 		logger.Info(fmt.Sprintf("failed to fetch resources: %v", err))
 		return nil, err
@@ -220,8 +222,8 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 	}
 
 	results := make([]ResourceResult, 0)
-	for i := range resources.Items {
-		resource := &resources.Items[i]
+	for i := range resources {
+		resource := &resources[i]
 		if !resource.GetDeletionTimestamp().IsZero() {
 			continue
 		}
@@ -296,7 +298,7 @@ func updateMatchingResources(ctx context.Context, resources []ResourceResult,
 }
 
 func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.ResourceSelector,
-) (*unstructured.UnstructuredList, error) {
+	logger logr.Logger) ([]unstructured.Unstructured, error) {
 
 	gvk := schema.GroupVersionKind{
 		Group:   resourceSelector.Group,
@@ -344,18 +346,108 @@ func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.Resource
 		options.LabelSelector = labelFilter
 	}
 
-	if resourceSelector.Namespace != "" {
-		options.FieldSelector += fmt.Sprintf("metadata.namespace=%s", resourceSelector.Namespace)
-	}
-
-	d := dynamic.NewForConfigOrDie(config)
-	var list *unstructured.UnstructuredList
-	list, err = d.Resource(resourceId).List(ctx, options)
+	var namespaces []string
+	namespaces, err = getNamespaces(ctx, resourceSelector, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	return list, nil
+	var result []unstructured.Unstructured
+	if len(namespaces) > 0 {
+		result, err = collectFromNamespaces(ctx, config, namespaces, &resourceId, &options)
+	} else {
+		result, err = collectWithOptions(ctx, config, &resourceId, &options)
+	}
+
+	return result, err
+}
+
+func collectFromNamespaces(ctx context.Context, config *rest.Config, namespaces []string,
+	resourceId *schema.GroupVersionResource, options *metav1.ListOptions) ([]unstructured.Unstructured, error) {
+
+	result := make([]unstructured.Unstructured, 0)
+	for i := range namespaces {
+		tmpOptions := *options
+		tmpOptions.FieldSelector += fmt.Sprintf("metadata.namespace=%s", namespaces[i])
+		tmpResult, err := collectWithOptions(ctx, config, resourceId, &tmpOptions)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, tmpResult...)
+	}
+
+	return result, nil
+}
+
+func collectWithOptions(ctx context.Context, config *rest.Config,
+	resourceId *schema.GroupVersionResource, options *metav1.ListOptions) ([]unstructured.Unstructured, error) {
+
+	d := dynamic.NewForConfigOrDie(config)
+	list, err := d.Resource(*resourceId).List(ctx, *options)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]unstructured.Unstructured, len(list.Items))
+
+	copy(result, list.Items)
+
+	return result, nil
+}
+
+// getNamespaces returns all namespaces to consider:
+// - if resourceSelector.Namespace is defined, such namespace is considered
+// - if resourceSelector.NamespaceSelector is defined, all matching namespaces are also considered
+func getNamespaces(ctx context.Context, resourceSelector *appsv1alpha1.ResourceSelector,
+	logger logr.Logger) ([]string, error) {
+
+	matchingNamespaces := make([]string, 0)
+
+	addedNamespace := make(map[string]bool)
+	if resourceSelector.NamespaceSelector != "" {
+		parsedSelector, err := labels.Parse(resourceSelector.NamespaceSelector)
+		if err != nil {
+			logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to parse NamespaceSelector: %v", err))
+			return nil, err
+		}
+
+		namespaces := &corev1.NamespaceList{}
+		err = k8sClient.List(ctx, namespaces)
+		if err != nil {
+			logger.Error(err, "failed to list all namespaces")
+			return nil, err
+		}
+
+		for i := range namespaces.Items {
+			ns := &namespaces.Items[i]
+
+			logger.V(logs.LogInfo).Info(fmt.Sprintf("MGIANLUC namespace %s", ns.Name))
+			if !ns.DeletionTimestamp.IsZero() {
+				// Only existing namespaces can match
+				continue
+			}
+
+			err = addTypeInformationToObject(scheme, ns)
+			if err != nil {
+				return nil, err
+			}
+			if parsedSelector.Matches(labels.Set(ns.Labels)) {
+				matchingNamespaces = append(matchingNamespaces, ns.Name)
+				addedNamespace[ns.Name] = true
+			}
+		}
+	}
+
+	if resourceSelector.Namespace != "" {
+		// if resourceSelector.Namespace was already a match for resourceSelector.NamespaceSelector
+		// do not add it again
+		if isPresent := addedNamespace[resourceSelector.Namespace]; !isPresent {
+			matchingNamespaces = append(matchingNamespaces, resourceSelector.Namespace)
+		}
+	}
+
+	return matchingNamespaces, nil
 }
 
 func isMatch(resource *unstructured.Unstructured, script string, logger logr.Logger,

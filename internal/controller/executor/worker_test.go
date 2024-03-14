@@ -18,7 +18,9 @@ package executor_test
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -66,14 +68,99 @@ var _ = Describe("Worker", func() {
 
 		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
 		matchingResources := &appsv1alpha1.ResourceSelector{
-			Kind:    "Secret",
-			Group:   "",
-			Version: "v1",
+			Kind:      "Secret",
+			Group:     "",
+			Version:   "v1",
+			Namespace: secret.Namespace,
 		}
 
-		list, err := executor.FetchResources(context.TODO(), matchingResources)
+		list, err := executor.FetchResources(context.TODO(), matchingResources, logr.Logger{})
 		Expect(err).To(BeNil())
-		Expect(len(list.Items)).To(Equal(1))
+		Expect(len(list)).To(Equal(1))
+	})
+
+	It("fetchResources gets resources considering all namespaces matching NamespaceSelector", func() {
+		key := randomString()
+		value := randomString()
+
+		ns1 := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key:            value,
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), ns1)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, ns1)).To(Succeed())
+
+		secret1 := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns1.Name,
+				Name:      randomString(),
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), secret1)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secret1)).To(Succeed())
+
+		ns2 := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key:            value,
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), ns2)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, ns2)).To(Succeed())
+
+		secret2 := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns2.Name,
+				Name:      randomString(),
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), secret2)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secret2)).To(Succeed())
+
+		ns3 := &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), ns3)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, ns3)).To(Succeed())
+
+		secret3 := &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: ns3.Name,
+				Name:      randomString(),
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), secret3)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, secret3)).To(Succeed())
+
+		matchingResources := &appsv1alpha1.ResourceSelector{
+			Kind:              "Secret",
+			Group:             "",
+			Version:           "v1",
+			NamespaceSelector: fmt.Sprintf("%s=%s", key, value),
+		}
+
+		list, err := executor.FetchResources(context.TODO(), matchingResources, logr.Logger{})
+		Expect(err).To(BeNil())
+		Expect(len(list)).To(Equal(2)) // Contains secret1 and secret2 but not secret3
 	})
 
 	It("fetchResources gets all resources with proper labels", func() {
@@ -114,10 +201,104 @@ var _ = Describe("Worker", func() {
 			},
 		}
 
-		list, err := executor.FetchResources(context.TODO(), matchingResources)
+		list, err := executor.FetchResources(context.TODO(), matchingResources, logr.Logger{})
 		Expect(err).To(BeNil())
-		Expect(len(list.Items)).To(Equal(1))
-		Expect(list.Items[0].GetName()).To(Equal(secret2.Name))
+		Expect(len(list)).To(Equal(1))
+		Expect(list[0].GetName()).To(Equal(secret2.Name))
+	})
+
+	It("getNamespaces gets all namespaces matching namespaceSelector", func() {
+		key := randomString()
+		value := randomString()
+
+		ns1 := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key:            value,
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		ns2 := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key:            value,
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		ns3 := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		ns4 := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key: randomString(),
+				},
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), &ns1)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, &ns1)).To(Succeed())
+		Expect(k8sClient.Create(context.TODO(), &ns2)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, &ns2)).To(Succeed())
+		Expect(k8sClient.Create(context.TODO(), &ns3)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, &ns3)).To(Succeed())
+		Expect(k8sClient.Create(context.TODO(), &ns4)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, &ns4)).To(Succeed())
+
+		resourceSelector := &appsv1alpha1.ResourceSelector{
+			NamespaceSelector: fmt.Sprintf("%s=%s", key, value),
+		}
+
+		namespaces, err := executor.GetNamespaces(context.TODO(), resourceSelector, logr.Logger{})
+		Expect(err).To(BeNil())
+		Expect(len(namespaces)).To(Equal(2))
+		Expect(namespaces).To(ContainElement(ns1.Name))
+		Expect(namespaces).To(ContainElement(ns2.Name))
+	})
+
+	It("getNamespaces adds namespace only once", func() {
+		// If resourceSelector.Namespace is defined and the same namespace
+		// is also a match for resourceSelector.NamespaceSelector, namespace is present
+		// only once
+		key := randomString()
+		value := randomString()
+
+		ns1 := corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: randomString(),
+				Labels: map[string]string{
+					key:            value,
+					randomString(): randomString(),
+				},
+			},
+		}
+
+		Expect(k8sClient.Create(context.TODO(), &ns1)).To(Succeed())
+		Expect(waitForObject(context.TODO(), k8sClient, &ns1)).To(Succeed())
+
+		// ns matches NamespaceSelector and it is also selected by Namespace
+		resourceSelector := &appsv1alpha1.ResourceSelector{
+			Namespace:         ns1.Name,
+			NamespaceSelector: fmt.Sprintf("%s=%s", key, value),
+		}
+		By("MGIANLUC 1")
+		namespaces, err := executor.GetNamespaces(context.TODO(), resourceSelector, logr.Logger{})
+		Expect(err).To(BeNil())
+		Expect(len(namespaces)).To(Equal(1))
+		Expect(namespaces).To(ContainElement(ns1.Name))
 	})
 
 	It("getMatchingResources gets stale resources", func() {
