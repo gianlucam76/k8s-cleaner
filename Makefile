@@ -25,7 +25,7 @@ ARCH ?= amd64
 OS ?= $(shell uname -s | tr A-Z a-z)
 K8S_LATEST_VER ?= $(shell curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 export CONTROLLER_IMG ?= $(REGISTRY)/$(IMAGE_NAME)
-TAG ?= main
+TAG ?= v0.2.0
 
 .PHONY: all
 all: build
