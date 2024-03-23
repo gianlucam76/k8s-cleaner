@@ -24,6 +24,8 @@ import (
 	"os"
 	"time"
 
+	goteamsnotify "github.com/atc0005/go-teams-notify/v2"
+	"github.com/atc0005/go-teams-notify/v2/adaptivecard"
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-logr/logr"
 	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
@@ -53,6 +55,10 @@ type discordInfo struct {
 	serverID string
 }
 
+type teamsInfo struct {
+	webhookUrl string
+}
+
 // sendNotification delivers notification
 func sendNotifications(ctx context.Context, resources []ResourceResult,
 	cleaner *appsv1alpha1.Cleaner, logger logr.Logger) error {
@@ -79,6 +85,8 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 			err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
 		case appsv1alpha1.NotificationTypeDiscord:
 			err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeTeams:
+			err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
 		default:
 			logger.V(logs.LogInfo).Info("no handler registered for notification")
 			panic(1)
@@ -170,6 +178,46 @@ func sendSlackNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 	return nil
 }
 
+func sendTeamsNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
+	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+
+	info, err := getTeamsInfo(ctx, notification)
+	if err != nil {
+		return err
+	}
+
+	l := logger.WithValues("webhookUrl", info.webhookUrl)
+	l.V(logs.LogInfo).Info("send teams message")
+
+	teamsClient := goteamsnotify.NewTeamsClient()
+
+	// Validate Teams Webhook expected format
+	if teamsClient.ValidateWebhook(info.webhookUrl) != nil {
+		l.V(logs.LogInfo).Info("failed to validate Teams webhook URL: %v", err)
+		return err
+	}
+
+	resourceSpecData, err := json.Marshal(*reportSpec)
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
+		return err
+	}
+
+	teamsMessage, err := adaptivecard.NewSimpleMessage(string(resourceSpecData), message, true)
+	if err != nil {
+		l.V(logs.LogInfo).Info("failed to create Teams message: %v", err)
+		return err
+	}
+
+	// Send the meesage with the user provided webhook URL
+	if teamsClient.Send(info.webhookUrl, teamsMessage) != nil {
+		l.V(logs.LogInfo).Info("failed to send Teams message: %v", err)
+		return err
+	}
+
+	return nil
+}
+
 func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
 	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
 
@@ -220,7 +268,7 @@ func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.Repor
 		var fileContentReader *os.File
 		fileContentReader, err = os.Open(tmpFile.Name())
 		if err != nil {
-			return nil, fmt.Errorf("Error opening file: %w", err)
+			return nil, fmt.Errorf("error opening file: %w", err)
 		}
 
 		return fileContentReader, nil
@@ -351,6 +399,20 @@ func getSlackInfo(ctx context.Context, notification *appsv1alpha1.Notification) 
 	}
 
 	return &slackInfo{token: string(authToken), channelID: string(channelID)}, nil
+}
+
+func getTeamsInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*teamsInfo, error) {
+	secret, err := getSecret(ctx, notification)
+	if err != nil {
+		return nil, err
+	}
+
+	webhookUrl, ok := secret.Data[libsveltosv1alpha1.TeamsWebhookURL]
+	if !ok {
+		return nil, fmt.Errorf("secret does not contain webhook URL")
+	}
+
+	return &teamsInfo{webhookUrl: string(webhookUrl)}, nil
 }
 
 func getDiscordInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*discordInfo, error) {

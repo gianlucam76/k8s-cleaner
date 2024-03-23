@@ -18,6 +18,7 @@ k8s-cleaner keeps you in the loop with handy notifications through:
 1. <img src="assets/slack_logo.png" alt="Slack" width="30" />  [__Slack__](#slack-notification)
 2. <img src="assets/webex_logo.png" alt="Webex" width="30" />  [__Webex__](#webex-notifications)
 3. <img src="assets/discord_logo.png" alt="Discord" width="30" />  [__Discord__](#discord-notifications)
+3. <img src="assets/teams_logo.svg" alt="Teams" width="30" />  [__Teams__](#teams-notifications)
 4.  [__reports__](#cleaner-report)
   
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
@@ -69,7 +70,7 @@ To add an example, simply create a new file in the example directory with a desc
 
 4️⃣ **Lua-based Selection Criteria**: Leverage Lua scripting to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
-5️⃣ **Notifications**: Stay informed! k8s-cleaner keeps you in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord or reports.
+5️⃣ **Notifications**: Stay informed! k8s-cleaner keeps you in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams or reports.
 
 ## Maintaining a Clean and Efficient Cluster:
 
@@ -488,7 +489,7 @@ It also accepts
 
 ## Notifications
 
-k8s-cleaner keeps you in the loop with handy notifications through Slack, Webex, Discord, or reports. Choose what works best for you!
+k8s-cleaner keeps you in the loop with handy notifications through Slack, Webex, Discord, Teams or reports. Choose what works best for you!
 
 ### Slack Notification
 
@@ -499,7 +500,7 @@ Your app needs permission to:
 
 Create a Kubernetes Secret:
 
-```
+```bash
 kubectl create secret generic slack --from-literal=SLACK_TOKEN=<YOUR TOKEN> --from-literal=SLACK_CHANNEL_ID=<YOUR CHANNEL ID>                           
 ```
 
@@ -533,7 +534,7 @@ Anytime this Cleaner instance is processed, a Slack message is sent containing a
 
 ### Webex Notifications
 
-```
+```bash
  kubectl create secret generic webex --from-literal=WEBEX_TOKEN=<YOUR TOKEN> --from-literal=WEBEX_ROOM_ID=<YOUR WEBEX CHANNEL ID>
  ```
 
@@ -565,7 +566,7 @@ spec:
 
 ### Discord Notifications
 
-```
+```bash
  kubectl create secret generic discord --from-literal=DISCORD_TOKEN=<YOUR TOKEN> --from-literal=DISCORD_CHANNEL_ID=<YOUR DISCORD CHANNEL ID>
  ```
 
@@ -593,6 +594,38 @@ spec:
      kind: Secret
      name: discord
      namespace: default
+```
+
+### Teams Notifications
+
+```bash
+ kubectl create secret generic teams --from-literal=TEAMS_WEBHOOK_URL="<your URL>"
+```
+
+Set then the notifications field of a Cleaner instance
+
+```yaml
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: cleaner-with-teams-notifications
+spec:
+  schedule: "0 * * * *"
+  action: Delete # Delete matching resources
+  resourcePolicySet:
+    resourceSelectors:
+    - namespace: test
+      kind: Deployment
+      group: "apps"
+      version: v1
+  notifications:
+  - name: teams
+    type: Teams
+    notificationRef:
+      apiVersion: v1
+      kind: Secret
+      name: teams
+      namespace: default
 ```
 
 ### Cleaner Report

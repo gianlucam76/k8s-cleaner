@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/TwiN/go-color v1.4.1
+	github.com/atc0005/go-teams-notify/v2 v2.10.0
 	github.com/bwmarrin/discordgo v0.27.1
 	github.com/go-logr/logr v1.4.1
 	github.com/go-logr/zapr v1.3.0
