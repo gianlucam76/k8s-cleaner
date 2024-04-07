@@ -5,14 +5,14 @@ go 1.21
 require (
 	github.com/TwiN/go-color v1.4.1
 	github.com/atc0005/go-teams-notify/v2 v2.10.0
-	github.com/bwmarrin/discordgo v0.27.1
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/go-logr/logr v1.4.1
 	github.com/go-logr/zapr v1.3.0
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
-	github.com/onsi/ginkgo/v2 v2.17.0
+	github.com/onsi/ginkgo/v2 v2.17.1
 	github.com/onsi/gomega v1.32.0
 	github.com/pkg/errors v0.9.1
-	github.com/projectsveltos/libsveltos v0.26.0
+	github.com/projectsveltos/libsveltos v0.27.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/slack-go/slack v0.12.5
 	github.com/spf13/pflag v1.0.5
@@ -86,9 +86,9 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.29.1 // indirect
+	k8s.io/apiextensions-apiserver v0.29.3 // indirect
 	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
-	k8s.io/kubectl v0.29.1 // indirect
+	k8s.io/kubectl v0.29.3 // indirect
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
