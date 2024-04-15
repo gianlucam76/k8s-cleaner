@@ -66,6 +66,7 @@ GINKGO := $(TOOLS_BIN_DIR)/ginkgo
 SETUP_ENVTEST := $(TOOLS_BIN_DIR)/setup_envs
 KIND := $(TOOLS_BIN_DIR)/kind
 KUBECTL := $(TOOLS_BIN_DIR)/kubectl
+CT := $(TOOLS_BIN_DIR)/ct
 
 GOLANGCI_LINT_VERSION := "v1.55.2"
 
@@ -105,6 +106,9 @@ $(GINKGO): $(TOOLS_DIR)/go.mod
 
 $(KIND): $(TOOLS_DIR)/go.mod
 	cd $(TOOLS_DIR) && $(GOBUILD) -tags tools -o $(subst $(TOOLS_DIR)/hack/tools/,,$@) sigs.k8s.io/kind
+
+$(CT): $(TOOLS_DIR)/go.mod
+	cd $(TOOLS_DIR) && $(GOBUILD) -tags tools -o $(subst $(TOOLS_DIR)/hack/tools/,,$@) github.com/helm/chart-testing/v3/ct
 
 $(KUBECTL):
 	curl -L https://storage.googleapis.com/kubernetes-release/release/$(K8S_LATEST_VER)/bin/$(OS)/$(ARCH)/kubectl -o $@
@@ -214,6 +218,24 @@ set-manifest-image:
 set-manifest-pull-policy:
 	$(info Updating kustomize pull policy file for manager resource)
 	sed -i'' -e 's@imagePullPolicy: .*@imagePullPolicy: '"$(PULL_POLICY)"'@' ./config/default/manager_pull_policy.yaml
+
+SRC_ROOT = $(shell git rev-parse --show-toplevel)
+
+helm-docs: HELMDOCS_VERSION := v1.11.0
+helm-docs:
+	@docker run -v "$(SRC_ROOT):/helm-docs" jnorwood/helm-docs:$(HELMDOCS_VERSION) --chart-search-root /helm-docs
+
+helm-lint: $(CT)
+	@$(CT) lint --config $(SRC_ROOT)/.github/config/ct.yaml --lint-conf ./.github/config/lintconf.yaml --all --debug
+
+helm-test: KIND_CLUSTER ?= k8s-cleaner-chart
+helm-test: $(KIND)
+	@$(KIND) create cluster --wait=60s --name $(KIND_CLUSTER)
+	@make helm-install
+	@$(KIND) delete cluster --name $(KIND_CLUSTER)
+
+helm-install:
+	@$(CT) install --config $(SRC_ROOT)/.github/config/ct.yaml --all --debug
 
 ##@ Build
 

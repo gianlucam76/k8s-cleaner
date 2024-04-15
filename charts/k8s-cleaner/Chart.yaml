@@ -1,0 +1,19 @@
+apiVersion: v2
+name: k8s-cleaner
+description: "Cleaner identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster"
+type: application
+# Note: The version is overwritten by the release workflow.
+version: 1.0.0
+# Note: The version is overwritten by the release workflow.
+appVersion: 1.0.0
+home: https://github.com/gianlucam76/k8s-cleaner
+icon: https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png
+keywords:
+- kubernetes
+- operator
+- garbage-collection
+- gc
+- cleaner
+maintainers:
+  - name: gianlucam76
+  - name: oliverbaehler

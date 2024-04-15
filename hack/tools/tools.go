@@ -23,6 +23,7 @@ package tools
 
 import (
 	_ "github.com/a8m/envsubst"
+	_ "github.com/helm/chart-testing/v3/ct"
 	_ "github.com/onsi/ginkgo/v2/ginkgo"
 	_ "golang.org/x/oauth2/google"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"

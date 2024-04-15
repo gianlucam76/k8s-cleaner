@@ -1,0 +1,193 @@
+# Default values for k8s-cleaner.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- Partial name overwrite
+nameOverride: ""
+# -- Full name overwrite
+fullnameOverride: ""
+
+# Manage CRD Lifecycle
+crds:
+  # -- Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations)
+  install: true
+  # -- Keep the CustomResourceDefinitions (when the chart is deleted)
+  keep: true
+
+# Manage RBAC
+rbac:
+  # -- Create RBAC resources
+  create: true
+
+controller:
+  image:
+    # -- Controller Image Registry
+    registry: docker.io
+    # -- Controller Image Repository
+    repository: projectsveltos/k8s-cleaner
+    # -- ControllerImage Tag
+    tag: "main"
+    # -- Controller Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Controller ARguments
+  args: {}
+  # -- Controller SecurityCOntext
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    runAsNonRoot: true
+  # -- Controller LivenessProbe  
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthz
+      port: 8081
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  # -- Controller ReadinessProbe
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /readyz
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  # -- Controller Resources  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+  # -- Controller VolumeMounts
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+  
+proxy:
+  image:
+    # -- Proxy Image Registry
+    registry: gcr.io
+    # -- Proxy Image Repository
+    repository: kubebuilder/kube-rbac-proxy
+    # -- Proxy Image Tag
+    tag: "v0.14.1"
+    # -- Proxy Image pull policy
+    pullPolicy: IfNotPresent
+  # -- Proxy arguments
+  args:
+    v: 1
+  # -- Proxy SecurityCOntext
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+      - ALL
+    runAsNonRoot: true
+  # -- Proxy LivenessProbe  
+  livenessProbe:
+    enabled: true
+    httpGet:
+      path: /healthz
+      port: 8081
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  # -- Proxy ReadinessProbe
+  readinessProbe:
+    enabled: true
+    httpGet:
+      path: /readyz
+      port: 8081
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  # -- Proxy Resources  
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 5m
+      memory: 64Mi
+  # -- Proxy VolumeMounts
+  volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+# -- Amount of replicas
+replicaCount: 1
+
+# -- ImagePullSecrets
+imagePullSecrets: []
+
+# -- Pod Annotations
+podAnnotations: {}
+
+# -- Pod Labels
+podLabels: {}
+
+# -- Pod Security Context
+podSecurityContext:
+  enabled: true
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+# -- Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# -- NodeSelector
+nodeSelector: {}
+
+# -- Tolerations
+tolerations: []
+
+# -- Affinity
+affinity: {}
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# ServiceMonitor
+serviceMonitor:
+  # -- Enable ServiceMonitor
+  enabled: false
+  # -- Install the ServiceMonitor into a different Namespace, as the monitoring stack one (default: the release one)
+  namespace: ''
+  # -- Assign additional labels according to Prometheus' serviceMonitorSelector matching labels
+  labels: {}
+  # -- Assign additional Annotations
+  annotations: {}
+  # -- Change matching labels
+  matchLabels: {}
+  # -- Set targetLabels for the serviceMonitor
+  targetLabels: []
+  # -- Set JobLabel for the serviceMonitor
+  jobLabel: "app.kubernetes.io/name"
+  endpoint:
+    # -- Set the scrape interval for the endpoint of the serviceMonitor
+    interval: "15s"
+    # -- Set the scrape timeout for the endpoint of the serviceMonitor
+    scrapeTimeout: ""
+    # -- Set metricRelabelings for the endpoint of the serviceMonitor
+    metricRelabelings: []
+    # -- Set relabelings for the endpoint of the serviceMonitor
+    relabelings: []
