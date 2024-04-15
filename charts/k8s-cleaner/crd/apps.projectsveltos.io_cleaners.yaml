@@ -1,0 +1,248 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: cleaners.apps.projectsveltos.io
+spec:
+  group: apps.projectsveltos.io
+  names:
+    kind: Cleaner
+    listKind: CleanerList
+    plural: cleaners
+    singular: cleaner
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: Cleaner is the Schema for the cleaners API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: CleanerSpec defines the desired state of Cleaner
+            properties:
+              action:
+                default: Delete
+                description: |-
+                  Action indicates the action to take on selected object. Default action
+                  is to delete object. If set to transform, the transform function
+                  will be invoked and then object will be updated.
+                enum:
+                - Delete
+                - Transform
+                - Scan
+                type: string
+              notifications:
+                description: Notification is a list of source of events to evaluate.
+                items:
+                  properties:
+                    name:
+                      description: |-
+                        Name of the notification check.
+                        Must be a DNS_LABEL and unique within the Cleaner.
+                      type: string
+                    notificationRef:
+                      description: |-
+                        NotificationRef is a reference to a notification-specific resource that holds
+                        the details for the notification.
+                      properties:
+                        apiVersion:
+                          description: API version of the referent.
+                          type: string
+                        fieldPath:
+                          description: |-
+                            If referring to a piece of an object instead of an entire object, this string
+                            should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                            For example, if the object reference is to a container within a pod, this would take on a value like:
+                            "spec.containers{name}" (where "name" refers to the name of the container that triggered
+                            the event) or if no container name is specified "spec.containers[2]" (container with
+                            index 2 in this pod). This syntax is chosen only to have some well-defined way of
+                            referencing a part of an object.
+                            TODO: this design is not final and this field is subject to change in the future.
+                          type: string
+                        kind:
+                          description: |-
+                            Kind of the referent.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+                          type: string
+                        name:
+                          description: |-
+                            Name of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                          type: string
+                        namespace:
+                          description: |-
+                            Namespace of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+                          type: string
+                        resourceVersion:
+                          description: |-
+                            Specific resourceVersion to which this reference is made, if any.
+                            More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
+                          type: string
+                        uid:
+                          description: |-
+                            UID of the referent.
+                            More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type:
+                      description: NotificationType specifies the type of notification
+                      enum:
+                      - CleanerReport
+                      - Slack
+                      - Webex
+                      - Discord
+                      - Teams
+                      type: string
+                  required:
+                  - name
+                  - type
+                  type: object
+                type: array
+              resourcePolicySet:
+                description: ResourcePolicySet identifies a group of resources
+                properties:
+                  aggregatedSelection:
+                    description: |-
+                      This field is optional and can be used to specify a Lua function
+                      that will be used to further select a subset of the resources that
+                      have already been selected using the ResourceSelector field.
+                      The function will receive the array of resources selected by ResourceSelectors.
+                      If this field is not specified, all resources selected by the ResourceSelector
+                      field will be considered.
+                      This field allows to perform more complex filtering or selection operations
+                      on the resources, looking at all resources together.
+                      This can be useful for more sophisticated tasks, such as identifying resources
+                      that are related to each other or that have similar properties.
+                    type: string
+                  resourceSelectors:
+                    description: ResourceSelectors identifies what resources to select
+                    items:
+                      properties:
+                        evaluate:
+                          description: |-
+                            Evaluate contains a function "evaluate" in lua language.
+                            The function will be passed one of the object selected based on
+                            above criteria.
+                            Must return struct with field "matching" representing whether
+                            object is a match and an optional "message" field.
+                          type: string
+                        group:
+                          description: Group of the resource deployed in the Cluster.
+                          type: string
+                        kind:
+                          description: Kind of the resource deployed in the Cluster.
+                          minLength: 1
+                          type: string
+                        labelFilters:
+                          description: LabelFilters allows to filter resources based
+                            on current labels.
+                          items:
+                            properties:
+                              key:
+                                description: Key is the label key
+                                type: string
+                              operation:
+                                description: Operation is the comparison operation
+                                enum:
+                                - Equal
+                                - Different
+                                type: string
+                              value:
+                                description: Value is the label value
+                                type: string
+                            required:
+                            - key
+                            - operation
+                            - value
+                            type: object
+                          type: array
+                        namespace:
+                          description: |-
+                            Namespace of the resource deployed in the  Cluster.
+                            Empty for resources scoped at cluster level.
+                          type: string
+                        namespaceSelector:
+                          description: NamespaceSelector is a label selector for namespaces
+                          type: string
+                        version:
+                          description: Version of the resource deployed in the Cluster.
+                          type: string
+                      required:
+                      - group
+                      - kind
+                      - version
+                      type: object
+                    type: array
+                required:
+                - resourceSelectors
+                type: object
+              schedule:
+                description: Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+                type: string
+              startingDeadlineSeconds:
+                description: |-
+                  Optional deadline in seconds for starting the job if it misses scheduled
+                  time for any reason.  Missed jobs executions will be counted as failed ones.
+                format: int64
+                type: integer
+              storeResourcePath:
+                description: |-
+                  StoreResources will store full resources in this directory.
+                  Must be a volume where Cleaner can dump all matching resources.
+                type: string
+              transform:
+                description: |-
+                  Transform contains a function "transform" in lua language.
+                  When Action is set to *Transform*, this function will be invoked
+                  and be passed one of the object selected based on
+                  above criteria.
+                  Must the new object that will be applied
+                type: string
+            required:
+            - resourcePolicySet
+            - schedule
+            type: object
+          status:
+            description: CleanerStatus defines the observed state of Cleaner
+            properties:
+              failureMessage:
+                description: |-
+                  FailureMessage provides more information about the error, if
+                  any occurred
+                type: string
+              lastRunTime:
+                description: Information when was the last time a snapshot was successfully
+                  scheduled.
+                format: date-time
+                type: string
+              nextScheduleTime:
+                description: Information when next snapshot is scheduled
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

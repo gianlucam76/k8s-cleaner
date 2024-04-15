@@ -1,0 +1,57 @@
+name: Publish Helm
+permissions: read-all
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-helm-oci:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+    outputs:
+      chart-digest: ${{ steps.helm_publish.outputs.digest }}
+    steps:
+      - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+      - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c5c7c23ae71eb4 # v3.4.0
+      - name: "Extract Version"
+        id: extract_version
+        run: |
+          GIT_TAG=${GITHUB_REF##*/}
+          VERSION=${GIT_TAG##*v}
+          echo "version=$(echo $VERSION)" >> $GITHUB_OUTPUT
+      - name: Helm | Publish
+        id: helm_publish
+        uses: peak-scale/github-actions/helm-oci-chart@38322faabccd75abfa581c435e367d446b6d2c3b # v0.1.0
+        with:
+          registry: ghcr.io
+          repository: ${{ github.repository_owner }}/charts
+          name: "k8s-cleaner"
+          version: ${{ steps.extract_version.outputs.version }}
+          # Uncomment this once you release docker image with workflow
+          #app-version: ${{ steps.extract_version.outputs.version }}
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          update-dependencies: 'true' # Defaults to false
+          sign-image: 'true'
+          signature-repository: ghcr.io/${{ github.repository_owner }}/signatures
+  helm-provenance:
+    needs: publish-helm-oci
+    permissions:
+      id-token: write   # To sign the provenance.
+      packages: write   # To upload assets to release.
+      actions: read     # To read the workflow path.
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_container_slsa3.yml@v1.10.0
+    with:
+      image: ghcr.io/${{ github.repository_owner }}/charts/capsule
+      digest: "${{ needs.publish-helm-oci.outputs.chart-digest }}"
+      registry-username: ${{ github.actor }}
+    secrets:
+      registry-password: ${{ secrets.GITHUB_TOKEN }}

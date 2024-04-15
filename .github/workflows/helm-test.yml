@@ -1,0 +1,39 @@
+name: Test Chart
+permissions: {}
+on:
+  pull_request:
+    branches: [ "*" ]
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
+      - name: Setup Chart Linting
+        id: lint
+        uses: helm/chart-testing-action@e6669bcd63d7cb57cb4380c33043eebe5d111992
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --config ./.github/config/ct.yaml)
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          fi
+      - name: Run chart-testing (lint)
+        run: make helm-lint    
+      - name: Run docs-testing (helm-docs)
+        id: helm-docs
+        run: |
+          make helm-docs
+          if [[ $(git diff --stat) != '' ]]; then
+            echo -e '\033[0;31mDocumentation outdated! (Run make helm-docs locally and commit)\033[0m ❌'
+            git diff --color
+            exit 1
+          else
+            echo -e '\033[0;32mDocumentation up to date\033[0m ✔'
+          fi
+      - name: Run chart-testing (install)
+        run: make helm-test
+        if: steps.list-changed.outputs.changed == 'true'

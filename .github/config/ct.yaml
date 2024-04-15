@@ -1,0 +1,7 @@
+remote: origin
+target-branch: main
+chart-dirs:
+  - charts
+validate-chart-schema: false
+validate-maintainers: true
+validate-yaml: false

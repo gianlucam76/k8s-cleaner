@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s-cleaner.fullname" . }}
+  labels:
+    {{- include "k8s-cleaner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "k8s-cleaner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: controller
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "k8s-cleaner.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: {{ include "k8s-cleaner.serviceAccountName" . }}
+      {{- if .Values.podSecurityContext.enabled }}
+      securityContext:
+        {{- toYaml (omit .Values.podSecurityContext "enabled") | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: controller
+          {{- if .Values.controller.securityContext.enabled }}
+          securityContext:
+            {{- toYaml (omit .Values.controller.securityContext "enabled") | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.controller.image.registry | trimSuffix "/" }}/{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
+          args:
+          - --health-probe-bind-address=:8081
+          - --metrics-bind-address=127.0.0.1:8080
+        {{- range $key, $value := .Values.controller.args }}
+             {{- if not (kindIs "invalid" $value) }}
+          - -{{ $key | mustRegexFind "^[^_]+" }}={{ include "k8s-cleaner.template" (dict "tpl" $value "ctx" $.ctx) }}
+            {{- else }}
+          - -{{ $key | mustRegexFind "^[^_]+" }}
+            {{- end }}
+        {{- end }}
+          env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          command:
+          - /manager
+          ports:
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          {{- if .Values.controller.livenessProbe.enabled }}
+          livenessProbe:
+            {{- toYaml (omit .Values.controller.livenessProbe "enabled") | nindent 12 }}
+          {{- end }}
+          {{- if .Values.controller.readinessProbe.enabled }}
+          readinessProbe:
+            {{- toYaml (omit .Values.controller.readinessProbe "enabled") | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.controller.resources | nindent 12 }}
+          {{- with .Values.controller.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        - name: kube-rbac-proxy
+          args:
+          - --secure-listen-address=0.0.0.0:8443
+          - --upstream=http://127.0.0.1:8080/
+          - --logtostderr=true
+        {{- range $key, $value := .Values.proxy.args }}
+             {{- if not (kindIs "invalid" $value) }}
+          - -{{ $key | mustRegexFind "^[^_]+" }}={{ $value }}
+            {{- else }}
+          - -{{ $key | mustRegexFind "^[^_]+" }}
+            {{- end }}
+        {{- end }}
+          image: "{{ .Values.proxy.image.registry | trimSuffix "/" }}/{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+          ports:
+          - containerPort: 8443
+            name: https
+            protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+              - ALL
+          {{- if .Values.proxy.livenessProbe.enabled }}
+          livenessProbe:
+            {{- toYaml (omit .Values.proxy.livenessProbe "enabled") | nindent 12 }}
+          {{- end }}
+          {{- if .Values.proxy.readinessProbe.enabled }}
+          readinessProbe:
+            {{- toYaml (omit .Values.proxy.readinessProbe "enabled") | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.proxy.resources | nindent 12 }}
+          {{- with .Values.proxy.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
