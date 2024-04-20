@@ -1,13 +1,13 @@
 module github.com/projectsveltos/addon-controller/hack/tools
 
-go 1.21
+go 1.22.0
 
 require (
 	github.com/a8m/envsubst v1.4.2
 	github.com/helm/chart-testing/v3 v3.10.1
 	github.com/onsi/ginkgo/v2 v2.17.1
 	golang.org/x/oauth2 v0.19.0
-	k8s.io/client-go v0.29.3
+	k8s.io/client-go v0.29.4
 	sigs.k8s.io/controller-tools v0.14.0
 	sigs.k8s.io/kind v0.22.0
 )
@@ -21,7 +21,7 @@ require (
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/evanphx/json-patch/v5 v5.8.0 // indirect
+	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
@@ -62,7 +62,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
@@ -72,9 +72,9 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.29.3 // indirect
+	k8s.io/api v0.29.4 // indirect
 	k8s.io/apiextensions-apiserver v0.29.0 // indirect
-	k8s.io/apimachinery v0.29.3 // indirect
+	k8s.io/apimachinery v0.29.4 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
