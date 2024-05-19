@@ -5,11 +5,11 @@ go 1.22.0
 require (
 	github.com/a8m/envsubst v1.4.2
 	github.com/helm/chart-testing/v3 v3.11.0
-	github.com/onsi/ginkgo/v2 v2.17.2
+	github.com/onsi/ginkgo/v2 v2.17.3
 	golang.org/x/oauth2 v0.20.0
 	k8s.io/client-go v0.30.0
 	sigs.k8s.io/controller-tools v0.15.0
-	sigs.k8s.io/kind v0.22.0
+	sigs.k8s.io/kind v0.23.0
 )
 
 require (
