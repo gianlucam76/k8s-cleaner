@@ -25,7 +25,7 @@ Each notification contains list of all resources successfully deleted (or modifi
 
 - 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
-- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resource) section.
+- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources) section.
 
 Currently k8s-cleaner has rich set of working examples to identify and list unused:
 
