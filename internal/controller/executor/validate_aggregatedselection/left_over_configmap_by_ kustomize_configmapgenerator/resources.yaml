@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-config-properties-1
+  namespace: test
+  creationTimestamp: "2024-05-11T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-config-properties-2
+  namespace: test
+  creationTimestamp: "2024-05-12T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-config-properties-3
+  namespace: test
+  creationTimestamp: "2024-05-13T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-config-properties-4
+  namespace: test
+  creationTimestamp: "2024-05-10T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dynamic-config-properties-5
+  namespace: test
+  creationTimestamp: "2024-05-18T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: random-name
+  namespace: test
+  creationTimestamp: "2024-05-11T12:44:17Z"
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
