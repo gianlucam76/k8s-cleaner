@@ -422,7 +422,6 @@ func getNamespaces(ctx context.Context, resourceSelector *appsv1alpha1.ResourceS
 		for i := range namespaces.Items {
 			ns := &namespaces.Items[i]
 
-			logger.V(logs.LogInfo).Info(fmt.Sprintf("MGIANLUC namespace %s", ns.Name))
 			if !ns.DeletionTimestamp.IsZero() {
 				// Only existing namespaces can match
 				continue

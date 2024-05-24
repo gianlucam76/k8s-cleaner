@@ -294,7 +294,7 @@ var _ = Describe("Worker", func() {
 			Namespace:         ns1.Name,
 			NamespaceSelector: fmt.Sprintf("%s=%s", key, value),
 		}
-		By("MGIANLUC 1")
+
 		namespaces, err := executor.GetNamespaces(context.TODO(), resourceSelector, logr.Logger{})
 		Expect(err).To(BeNil())
 		Expect(len(namespaces)).To(Equal(1))
