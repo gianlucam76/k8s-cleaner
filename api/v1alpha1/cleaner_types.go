@@ -158,8 +158,10 @@ type CleanerSpec struct {
 	// Notification is a list of source of events to evaluate.
 	// +patchMergeKey=name
 	// +patchStrategy=merge,retainKeys
+	// +listType=map
+	// +listMapKey=name
 	// +optional
-	Notifications []Notification `json:"notifications,omitempty"`
+	Notifications []Notification `json:"notifications,omitempty" patchStrategy:"merge" patchMergeKey:"name"`
 
 	// StoreResources will store full resources in this directory.
 	// Must be a volume where Cleaner can dump all matching resources.
