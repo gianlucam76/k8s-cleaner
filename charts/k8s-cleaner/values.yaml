@@ -26,7 +26,7 @@ controller:
     # -- Controller Image Repository
     repository: projectsveltos/k8s-cleaner
     # -- ControllerImage Tag
-    tag: "main"
+    tag: "v0.4.0"
     # -- Controller Image pull policy
     pullPolicy: IfNotPresent
   # -- Controller ARguments
