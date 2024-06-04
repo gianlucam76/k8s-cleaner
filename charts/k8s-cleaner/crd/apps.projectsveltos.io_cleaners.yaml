@@ -119,6 +119,9 @@ spec:
                   - type
                   type: object
                 type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
               resourcePolicySet:
                 description: ResourcePolicySet identifies a group of resources
                 properties:
