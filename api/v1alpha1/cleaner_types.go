@@ -41,7 +41,7 @@ const (
 const (
 	// CleanerFinalizer allows Reconciler to clean up resources associated with
 	// Cleaner instance before removing it from the apiserver.
-	CleanerFinalizer = "cleanerfinalizer.projectsveltos.io"
+	CleanerFinalizer = "projectsveltos.io/cleaner-finalizer"
 )
 
 type ResourceSelector struct {

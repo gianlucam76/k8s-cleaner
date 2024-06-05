@@ -165,7 +165,6 @@ func initFlags(fs *pflag.FlagSet) {
 			defaultSyncPeriod))
 }
 
-//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=reports,verbs=*
 //+kubebuilder:rbac:groups=*,resources=*,verbs=get;list;watch;delete
 
 func initScheme() (*runtime.Scheme, error) {
