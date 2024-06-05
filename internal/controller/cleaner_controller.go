@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
@@ -166,6 +167,7 @@ func (r *CleanerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manag
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&appsv1alpha1.Cleaner{}).
+		WithEventFilter(predicate.GenerationChangedPredicate{}).
 		WithOptions(controller.Options{
 			MaxConcurrentReconciles: r.ConcurrentReconciles,
 		}).
