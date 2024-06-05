@@ -128,7 +128,12 @@ func (r *CleanerReconciler) reconcileDelete(ctx context.Context,
 func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *scope.CleanerScope,
 	logger logr.Logger) (reconcile.Result, error) {
 
-	logger.Info("reconcileSnapshotNormal")
+	logger.Info("reconcile Cleaner instance")
+
+	// old finalizer (cleanerfinalizer.projectsveltos.io) caused an warning message.
+	// Since we switched to new one, remove old one if ever set.
+	r.removeOldFinalizer(cleanerScope)
+
 	if err := r.addFinalizer(ctx, cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer); err != nil {
 		logger.Info(fmt.Sprintf("failed to add finalizer: %s", err))
 		return reconcile.Result{}, err
@@ -154,7 +159,7 @@ func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *s
 		return ctrl.Result{}, err
 	}
 
-	logger.Info("reconcile snapshot succeeded")
+	logger.Info("reconcile Cleaner succeeded")
 	scheduledResult := ctrl.Result{RequeueAfter: nextRun.Sub(now)}
 	return scheduledResult, nil
 }
@@ -253,7 +258,7 @@ func getNextScheduleTime(cleaner *appsv1alpha1.Cleaner, now time.Time) (*time.Ti
 	if cleaner.Status.LastRunTime != nil {
 		earliestTime = cleaner.Status.LastRunTime.Time
 	} else {
-		// If none found, then this is a recently created snapshot
+		// If none found, then this is a recently created cleaner
 		earliestTime = cleaner.CreationTimestamp.Time
 	}
 	if cleaner.Spec.StartingDeadlineSeconds != nil {
@@ -306,4 +311,11 @@ func shouldSchedule(cleaner *appsv1alpha1.Cleaner, logger logr.Logger) bool {
 func removeQueuedJobs(cleanerScope *scope.CleanerScope) {
 	executorClient := executor.GetClient()
 	executorClient.RemoveEntries(cleanerScope.Cleaner.Name)
+}
+
+func (r *CleanerReconciler) removeOldFinalizer(cleanerScope *scope.CleanerScope) {
+	oldFinalizer := "cleanerfinalizer.projectsveltos.io"
+	if controllerutil.ContainsFinalizer(cleanerScope.Cleaner, oldFinalizer) {
+		controllerutil.RemoveFinalizer(cleanerScope.Cleaner, oldFinalizer)
+	}
 }

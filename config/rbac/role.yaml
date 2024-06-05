@@ -36,9 +36,3 @@ rules:
   - get
   - patch
   - update
-- apiGroups:
-  - apps.projectsveltos.io
-  resources:
-  - reports
-  verbs:
-  - '*'
