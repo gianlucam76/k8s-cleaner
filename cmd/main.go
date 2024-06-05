@@ -46,14 +46,15 @@ import (
 )
 
 var (
-	setupLog        = ctrl.Log.WithName("setup")
-	metricsAddr     string
-	probeAddr       string
-	workers         int
-	restConfigQPS   float32
-	restConfigBurst int
-	webhookPort     int
-	syncPeriod      time.Duration
+	setupLog             = ctrl.Log.WithName("setup")
+	metricsAddr          string
+	probeAddr            string
+	workers              int
+	restConfigQPS        float32
+	restConfigBurst      int
+	webhookPort          int
+	concurrentReconciles int
+	syncPeriod           time.Duration
 )
 
 func main() {
@@ -104,8 +105,9 @@ func main() {
 	}
 
 	if err = (&controller.CleanerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
+		Client:               mgr.GetClient(),
+		Scheme:               mgr.GetScheme(),
+		ConcurrentReconciles: concurrentReconciles,
 	}).SetupWithManager(ctx, mgr, workers, ctrl.Log.WithName("worker")); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Cleaner")
 		os.Exit(1)
@@ -138,6 +140,10 @@ func initFlags(fs *pflag.FlagSet) {
 	const defaultWorkers = 5
 	fs.IntVar(&workers, "worker-number", defaultWorkers,
 		"Number of worker. Workers are used to process cleaner instances in backgroun")
+
+	const defaultReconcilers = 10
+	fs.IntVar(&concurrentReconciles, "concurrent-reconciles", defaultReconcilers,
+		"concurrent reconciles is the maximum number of concurrent Reconciles which can be run. Defaults to 10")
 
 	const defautlRestConfigQPS = 40
 	fs.Float32Var(&restConfigQPS, "kube-api-qps", defautlRestConfigQPS,
