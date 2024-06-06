@@ -48,7 +48,7 @@ type CleanerReconciler struct {
 	ConcurrentReconciles int
 }
 
-//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners,verbs=get;list;watch
+//+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners,verbs=get;list;watch;patch
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/finalizers,verbs=update
 //+kubebuilder:rbac:groups="*",resources="*",verbs="*"
