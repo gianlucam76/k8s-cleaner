@@ -281,15 +281,25 @@ func verifyCleanerAggregatedSelection(dirName string) {
 	cleaner := getCleaner(dirName)
 	Expect(cleaner).ToNot(BeNil())
 
+	var result []executor.ResourceResult
 	resources := getResources(dirName, allResourceFileName)
 	matchingResources := getResources(dirName, matchingFileName)
 	if resources == nil {
 		By(fmt.Sprintf("%s file not present", matchingFileName))
 	} else {
-		result, err := executor.AggregatedSelection(cleaner.Spec.ResourcePolicySet.AggregatedSelection,
+		result, err = executor.AggregatedSelection(cleaner.Spec.ResourcePolicySet.AggregatedSelection,
 			resources, logger)
 		Expect(err).To(BeNil())
 		verifyMatchingResources(result, matchingResources)
+	}
+
+	Expect(len(matchingResources) < len(resources))
+	for i := range resources {
+		if !isPresent(resources[i], matchingResources) {
+			// resource is supposed to be non matching. Verify it is not present
+			// in the cleaner result
+			Expect(isPresent(resources[i], result)).To(BeFalse())
+		}
 	}
 }
 
@@ -372,4 +382,14 @@ func verifyMatchingResources(result, matchingResources []executor.ResourceResult
 			Expect(key).To(BeEmpty())
 		}
 	}
+}
+
+func isPresent(r executor.ResourceResult, resources []executor.ResourceResult) bool {
+	for i := range resources {
+		if r.Resource == resources[i].Resource {
+			return true
+		}
+	}
+
+	return false
 }
