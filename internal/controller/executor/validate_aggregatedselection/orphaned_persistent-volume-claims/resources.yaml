@@ -42,4 +42,245 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 3Gi          
+      storage: 3Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-06-08T11:18:51Z"
+  generateName: web-
+  labels:
+    app: nginx
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: web-7757fc6447
+    statefulset.kubernetes.io/pod-name: web-0
+  name: web-0
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: web
+    uid: ff448875-3b60-4fa7-a533-40f23e1318c6
+  resourceVersion: "3548"
+  uid: 66ec4dde-e9fa-42b9-af59-e9627923a367
+spec:
+  containers:
+  - image: registry.k8s.io/nginx-slim:0.24
+    imagePullPolicy: IfNotPresent
+    name: nginx
+    ports:
+    - containerPort: 80
+      name: web
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /usr/share/nginx/html
+      name: www
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-5hlq7
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: web-0
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  subdomain: nginx
+  terminationGracePeriodSeconds: 10
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 420
+      name: postgres13-exporter-cm
+      optional: true
+    name: prom-config
+  - configMap:
+      defaultMode: 420
+      name: postgres-filebeat
+    name: filebeat-config
+  - emptyDir: {}
+    name: filebeat-data
+  - name: postgres-storage
+    persistentVolumeClaim:
+      claimName: grafana-db1
+  - emptyDir:
+      medium: Memory
+    name: postgres-shm
+  - name: kube-api-access-5hlq7
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  creationTimestamp: "2024-06-08T11:18:51Z"
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app: nginx
+  name: grafana-db1
+  namespace: monitoring
+  resourceVersion: "3542"
+  uid: 3f84c6b1-6a16-4768-b1e7-837530d42567
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: my-storage-class
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2024-06-08T12:39:55Z"
+  generateName: postgres-statefulset-
+  labels:
+    app: postgres
+    apps.kubernetes.io/pod-index: "0"
+    controller-revision-hash: postgres-statefulset-7965794bb7
+    statefulset.kubernetes.io/pod-name: postgres-statefulset-0
+  name: postgres-statefulset-0
+  namespace: test
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: StatefulSet
+    name: postgres-statefulset
+    uid: 356f9b6a-0039-4d2c-b911-b2e27f2b9a7b
+  resourceVersion: "2161"
+  uid: 2590a175-09d4-42a7-a4eb-837b11029af4
+spec:
+  containers:
+  - envFrom:
+    - configMapRef:
+        name: postgres-configuration
+    image: postgres:12
+    imagePullPolicy: IfNotPresent
+    name: postgres
+    ports:
+    - containerPort: 5432
+      name: postgresdb
+      protocol: TCP
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/lib/postgresql/data
+      name: pv-data
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-rh9m4
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  hostname: postgres-statefulset-0
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  subdomain: postgres
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: pv-data
+    persistentVolumeClaim:
+      claimName: postgres-pv-claim
+  - name: kube-api-access-rh9m4
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2024-06-08T12:39:55Z"
+    message: '0/2 nodes are available: pod has unbound immediate PersistentVolumeClaims.
+      preemption: 0/2 nodes are available: 2 Preemption is not helpful for scheduling.'
+    reason: Unschedulable
+    status: "False"
+    type: PodScheduled
+  phase: Pending
+  qosClass: BestEffort
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"PersistentVolumeClaim","metadata":{"annotations":{},"labels":{"app":"postgres"},"name":"postgres-pv-claim","namespace":"test"},"spec":{"accessModes":["ReadWriteOnce"],"resources":{"requests":{"storage":"5Gi"}},"storageClassName":"microk8s-hostpath"}}
+  creationTimestamp: "2024-06-08T12:40:10Z"
+  finalizers:
+  - kubernetes.io/pvc-protection
+  labels:
+    app: postgres
+  name: postgres-pv-claim
+  namespace: test
+  resourceVersion: "2159"
+  uid: 996c09ee-07db-4e48-adf3-d3ea282a72c1
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: microk8s-hostpath
+  volumeMode: Filesystem
+status:
+  phase: Pending
