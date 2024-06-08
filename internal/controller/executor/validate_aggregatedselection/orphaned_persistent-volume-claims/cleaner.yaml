@@ -9,7 +9,7 @@ spec:
   action: Delete # Delete matching resources
   resourcePolicySet:
     resourceSelectors:
-    - kind: Pods
+    - kind: Pod
       group: ""
       version: v1
     - kind: PersistentVolumeClaim
