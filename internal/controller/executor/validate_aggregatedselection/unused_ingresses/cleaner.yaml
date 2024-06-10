@@ -76,7 +76,6 @@ spec:
             table.insert(ingresses, resource)
           elseif kind == "Service" then
             key = getKey(resource.metadata.namespace,resource.metadata.name)
-            print(key)
             services[key] = true
           end
         end

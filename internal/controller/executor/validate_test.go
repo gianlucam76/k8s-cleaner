@@ -207,7 +207,6 @@ func verifyCleanerTransform(dirName string) {
 	By(fmt.Sprintf("Validating cleaner in dir: %s", dirName))
 	cleaner := getCleaner(dirName)
 	Expect(cleaner).ToNot(BeNil())
-
 	matchingResource := getResource(dirName, matchingFileName)
 	if matchingResource == nil {
 		By(fmt.Sprintf("%s file not present", matchingFileName))
