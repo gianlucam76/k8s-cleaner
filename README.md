@@ -442,10 +442,10 @@ spec:
 ## Delete Kubernetes resources on a configured time to live or expiration date
 
 Finds resources that have the __cleaner/ttl__ annotation, which specifies their maximum lifespan. Deletes resources that have lived longer than their specified TTL.
-YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples-unused-resource/time_based_delete/delete_resource_based_on_ttl_annotation.yaml).
+YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples-unused-resources/time_based_delete/delete_resource_based_on_ttl_annotation.yaml).
 
 Find resources that have the __cleaner_expires__ annotation, which specifies their expiration date. Deletes resources that have that have surpassed their expiration date.
-YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples-unused-resource/time_based_delete/delete_resource_based_on_expire_date.yaml).
+YAML can be found [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/examples-unused-resources/time_based_delete/delete_resource_based_on_expire_date.yaml).
 
 ## DryRun 
 
