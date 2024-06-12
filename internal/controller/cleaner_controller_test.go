@@ -64,12 +64,14 @@ var _ = Describe("CleanerClient", func() {
 		logger, err := zap.NewDevelopment()
 		Expect(err).To(BeNil())
 
-		Expect(controller.ShouldSchedule(cleaner, zapr.NewLogger(logger))).To(BeTrue())
+		jitterWindowInSeconds := 15
+
+		Expect(controller.ShouldSchedule(cleaner, jitterWindowInSeconds, zapr.NewLogger(logger))).To(BeTrue())
 
 		after := now.Add(time.Second * 30)
 		cleaner.Status.NextScheduleTime = &metav1.Time{Time: after}
 
-		Expect(controller.ShouldSchedule(cleaner, zapr.NewLogger(logger))).To(BeFalse())
+		Expect(controller.ShouldSchedule(cleaner, jitterWindowInSeconds, zapr.NewLogger(logger))).To(BeFalse())
 	})
 
 	It("getNextScheduleTime returns the next time cleaner should be scheduled", func() {
