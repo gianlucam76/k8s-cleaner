@@ -44,8 +44,9 @@ import (
 // CleanerReconciler reconciles a Cleaner object
 type CleanerReconciler struct {
 	client.Client
-	Scheme               *runtime.Scheme
-	ConcurrentReconciles int
+	Scheme                *runtime.Scheme
+	ConcurrentReconciles  int
+	JitterWindowInSeconds int
 }
 
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners,verbs=get;list;watch;patch
@@ -151,7 +152,7 @@ func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *s
 	}
 
 	now := time.Now()
-	nextRun, err := schedule(ctx, cleanerScope, logger)
+	nextRun, err := schedule(ctx, cleanerScope, r.JitterWindowInSeconds, logger)
 	if err != nil {
 		logger.Info("failed to get next run. Err: %v", err)
 		msg := err.Error()
@@ -216,7 +217,9 @@ func (r *CleanerReconciler) removeReport(ctx context.Context,
 	return fmt.Errorf("report instance still present")
 }
 
-func schedule(ctx context.Context, cleanerScope *scope.CleanerScope, logger logr.Logger) (*time.Time, error) {
+func schedule(ctx context.Context, cleanerScope *scope.CleanerScope, jitterWindowInSeconds int,
+	logger logr.Logger) (*time.Time, error) {
+
 	newLastRunTime := cleanerScope.Cleaner.Status.LastRunTime
 
 	now := time.Now()
@@ -231,7 +234,7 @@ func schedule(ctx context.Context, cleanerScope *scope.CleanerScope, logger logr
 		logger.Info("set NextScheduleTime")
 		newNextScheduleTime = &metav1.Time{Time: *nextRun}
 	} else {
-		if shouldSchedule(cleanerScope.Cleaner, logger) {
+		if shouldSchedule(cleanerScope.Cleaner, jitterWindowInSeconds, logger) {
 			logger.Info("queuing job")
 			executorClient := executor.GetClient()
 			executorClient.Process(ctx, cleanerScope.Cleaner.Name)
@@ -285,8 +288,9 @@ func getNextScheduleTime(cleaner *appsv1alpha1.Cleaner, now time.Time) (*time.Ti
 	return &next, nil
 }
 
-func shouldSchedule(cleaner *appsv1alpha1.Cleaner, logger logr.Logger) bool {
-	now := time.Now()
+func shouldSchedule(cleaner *appsv1alpha1.Cleaner, jitterWindowInSeconds int, logger logr.Logger) bool {
+	// if reconciliation is happening within jitterWindowInSeconds from scheduled time still process it
+	now := time.Now().Add(time.Duration(jitterWindowInSeconds) * time.Second)
 	logger.Info(fmt.Sprintf("currently next schedule is %s", cleaner.Status.NextScheduleTime.Time))
 
 	if now.Before(cleaner.Status.NextScheduleTime.Time) {
