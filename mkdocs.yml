@@ -19,7 +19,7 @@ markdown_extensions:
     emoji_index: !!python/name:materialx.emoji.twemoji
     emoji_generator: !!python/name:materialx.emoji.to_svg
 nav:
-- What is k8s-cleaner?: 'what_is_k8s_cleaner.md'
+- What is k8s-cleaner?: 'index.md'
 - Getting Started:
   - Installation:
     - Install: 'getting_started/install/install.md'
@@ -34,14 +34,14 @@ theme:
   logo: assets/logo.png
   palette:
   - scheme: default
-    primary: light-blue
+    primary: white
     accent: blue
     toggle:
       icon: material/toggle-switch
       name: Switch to dark mode
   # Palette toggle for dark mode
   - scheme: slate
-    primary: light-blue
+    primary: white
     accent: blue
     toggle:
       icon: material/toggle-switch-off-outline
