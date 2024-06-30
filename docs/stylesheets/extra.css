@@ -9,3 +9,9 @@
   .heart {
     animation: heart 1000ms infinite;
   }
+
+  /* Update the logo size on the banner */
+  .md-logo img {
+    height: 50px !important;
+    width: auto !important;
+  }

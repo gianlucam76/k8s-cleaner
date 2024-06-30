@@ -24,6 +24,9 @@ nav:
   - Installation:
     - Install: 'getting_started/install/install.md'
 theme:
+  icon:
+    previous: fontawesome/solid/angle-left
+    next: fontawesome/solid/angle-right
   features:
   - content.code.copy
   - search.share
