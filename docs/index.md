@@ -47,6 +47,12 @@ It is designed to handle any Kubernetes resource types (including custom Kuberne
 
 By combining the **flexibility** of **scheduling**, the **accuracy** of **label filtering**, the **power** of **Lua-based criteria**, and the ability to **remove** or **update** stale resources, the k8s-cleaner empowers users to effectively manage Kubernetes environments and optimise resource usage.
 
+## Contribute
+
+We encourage everyone to contribute to the example directory by adding new Cleaner configurations 💡. This will help the community benefit from different expertise and build a stronger knowledge base of the Cleaner use cases.
+
+🤝 Together we can expand the range of Cleaner applications and make it an even more valuable tool for managing Kubernetes resources efficiently.
+
 ## Support us
 
 !!! tip ""

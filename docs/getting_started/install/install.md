@@ -27,7 +27,7 @@ To work with the k8s-cleaner, ensure you have the below points covered.
 
 ## Installation
 
-The k8s-cleaner can be installed in any Kubernetes cluster independent if it is in an on-prem or in a Cloud environment. The installation is pretty simple.
+The k8s-cleaner can be installed in any Kubernetes cluster independent if it is in an on-prem or in a Cloud environment. The k8s-cleaner can be deployed down the clusters with your favourite Continious Deployment tool! The installation is pretty simple.
 
 ```bash
 $ export KUBECONFIG=<directory to the kubeconfig file>
@@ -36,3 +36,7 @@ $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/mai
 
 !!! note
     The above command will create a new namespace with the name `projectsveltos` and install the Kubernetes cleaner controller there.
+
+## Sveltos - k8s-cleaner Installation
+
+We will demonstarte how easy it is to use [Sveltos](https://projectsveltos.github.io/sveltos/) to deploy the k8s-cleaner to a cluster. If you are not familiar with Sveltos, Sveltos is a set of Kubernetes controllers deployed in the management cluster. From the management cluster, it can manage add-ons and applications to multiple clusters.
