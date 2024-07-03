@@ -32,6 +32,7 @@ The example below demonstrates how to automatically scale down Deployments, Daem
     # - stores current replicas in the annotation "previous-replicas"
     # - sets their replicas to zero (scale down and pause)
     #
+    ---
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
@@ -115,6 +116,7 @@ As we defined the pause action for specific resources, during peak times, we wou
     # - gets the old replicas in the annotation "previous-replicas"
     # - sets the replicas to such value found above (scale deployment/statefulset/daemonset up)
     #
+    ---
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
