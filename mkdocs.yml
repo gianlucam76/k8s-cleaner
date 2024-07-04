@@ -27,6 +27,9 @@ nav:
     - Unused Resources: 'getting_started/examples/unused_resources/example1.md'
     - Unhealthy Resources: 'getting_started/examples/unhealthy_resources/example1.md'
     - Automated Operations: 'getting_started/examples/automated_operations/scale_up_down_resources.md'
+- Reports: 'reports/k8s-cleaner_reports.md'
+- Notifications: 'notifications/notifications.md'
+- Blogs and videos: 'resources/blogs.md'
 theme:
   icon:
     previous: fontawesome/solid/angle-left

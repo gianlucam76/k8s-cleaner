@@ -1,6 +1,6 @@
 ---
 title: k8s-cleaner - Kubernetes Controller that identifies, removes, or updates stale/orphaned or unhealthy resources
-description: Scale up and down Kubernetes Resources
+description: Scale up and down Kubernetes Resources with k8s-cleaner
 tags:
     - Kubernetes
     - Controller
