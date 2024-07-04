@@ -233,7 +233,7 @@ helm-test: $(KIND)
 	@make helm-install
 	@$(KIND) delete cluster --name $(KIND_CLUSTER)
 
-helm-install:
+helm-install: $(CT)
 	@$(CT) install --config $(SRC_ROOT)/.github/config/ct.yaml --all --debug
 
 ##@ Build
