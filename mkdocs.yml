@@ -16,8 +16,8 @@ markdown_extensions:
 - pymdownx.inlinehilite
 - pymdownx.snippets
 - pymdownx.emoji:
-    emoji_index: !!python/name:materialx.emoji.twemoji
-    emoji_generator: !!python/name:materialx.emoji.to_svg
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
 nav:
 - What is k8s-cleaner?: 'index.md'
 - Getting Started:
@@ -26,6 +26,7 @@ nav:
   - Examples:
     - Unused Resources:
       - Example - ConfigMap: 'getting_started/examples/unused_resources/configmap.md'
+      - Example - Secret: 'getting_started/examples/unused_resources/secret.md'
       - Example - PersistentVolume: 'getting_started/examples/unused_resources/persistent_volume.md'
       - Example - PersistentVolumeClaim: 'getting_started/examples/unused_resources/persistent_volume_claims.md'
       - Example - Jobs: 'getting_started/examples/unused_resources/jobs.md'

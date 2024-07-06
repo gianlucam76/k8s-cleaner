@@ -12,6 +12,8 @@ authors:
     - Eleni Grosdouli
 ---
 
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
 <a class="github-button" href="https://github.com/gianlucam76/k8s-cleaner" data-icon="icon-park:star" target="_blank" data-show-count="true" aria-label="Star k8s-cleaner on GitHub">Star</a>
 
 [<img src="assets/logo.png" width="200" alt="k8s-cleaner logo">](https://github.com/gianlucam76/k8s-cleaner "k8s-cleaner")
