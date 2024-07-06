@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
       # Change the value of image field below to your controller image URL
-      - image: projectsveltos/k8s-cleaner:v0.5.0
+      - image: projectsveltos/k8s-cleaner:main
         name: controller
