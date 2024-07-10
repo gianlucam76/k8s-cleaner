@@ -21,11 +21,11 @@ SHELL = /usr/bin/env bash -o pipefail
 # Define Docker related variables.
 REGISTRY ?= projectsveltos
 IMAGE_NAME ?= k8s-cleaner
-ARCH ?= amd64
+ARCH ?= $(shell go env GOARCH)
 OS ?= $(shell uname -s | tr A-Z a-z)
 K8S_LATEST_VER ?= $(shell curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)
 export CONTROLLER_IMG ?= $(REGISTRY)/$(IMAGE_NAME)
-TAG ?= v0.5.0
+TAG ?= main
 
 .PHONY: all
 all: build
@@ -70,10 +70,10 @@ CT := $(TOOLS_BIN_DIR)/ct
 
 GOLANGCI_LINT_VERSION := "v1.57.2"
 
-KUSTOMIZE_VER := v4.5.2
+KUSTOMIZE_VER := v5.3.0
 KUSTOMIZE_BIN := kustomize
 KUSTOMIZE := $(abspath $(TOOLS_BIN_DIR)/$(KUSTOMIZE_BIN)-$(KUSTOMIZE_VER))
-KUSTOMIZE_PKG := sigs.k8s.io/kustomize/kustomize/v4
+KUSTOMIZE_PKG := sigs.k8s.io/kustomize/kustomize/v5
 $(KUSTOMIZE): # Build kustomize from tools folder.
 	CGO_ENABLED=0 GOBIN=$(TOOLS_BIN_DIR) $(GO_INSTALL) $(KUSTOMIZE_PKG) $(KUSTOMIZE_BIN) $(KUSTOMIZE_VER)
 
@@ -233,7 +233,7 @@ helm-test: $(KIND)
 	@make helm-install
 	@$(KIND) delete cluster --name $(KIND_CLUSTER)
 
-helm-install:
+helm-install: $(CT)
 	@$(CT) install --config $(SRC_ROOT)/.github/config/ct.yaml --all --debug
 
 ##@ Build
