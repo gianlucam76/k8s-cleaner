@@ -2,7 +2,7 @@ name: ci
 on:
   push:
     branches:
-      - feat/mkdocs
+      - main
   pull_request:
     types: [opened, edited, synchronize, reopened]
 permissions:
