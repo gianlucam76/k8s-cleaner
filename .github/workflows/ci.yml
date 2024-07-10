@@ -2,7 +2,7 @@ name: ci
 on:
   push:
     branches:
-      - feat/mkdocs
+      - main
 permissions:
   contents: write
 jobs:
