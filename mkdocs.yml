@@ -1,0 +1,88 @@
+site_name: k8s-cleaner
+copyright: Copyright © 2022 projectsveltos. All Rights Reserved.
+site_description: 'The k8s-cleaner (Kubernetes Conrtoller Cleaner) identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster'
+markdown_extensions:
+- admonition
+- pymdownx.details
+- pymdownx.superfences
+- attr_list
+- md_in_html
+- footnotes
+- pymdownx.critic
+- pymdownx.highlight:
+    anchor_linenums: true
+    line_spans: __span
+    pygments_lang_class: true
+- pymdownx.inlinehilite
+- pymdownx.snippets
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
+nav:
+- What is k8s-cleaner?: 'index.md'
+- Getting Started:
+  - Installation:
+    - Install: 'getting_started/install/install.md'
+  - Examples:
+    - Unused Resources:
+      - Example - ConfigMap: 'getting_started/examples/unused_resources/configmap.md'
+      - Example - Secret: 'getting_started/examples/unused_resources/secret.md'
+      - Example - PersistentVolume: 'getting_started/examples/unused_resources/persistent_volume.md'
+      - Example - PersistentVolumeClaim: 'getting_started/examples/unused_resources/persistent_volume_claims.md'
+      - Example - Jobs: 'getting_started/examples/unused_resources/jobs.md'
+      - More Examples: 'getting_started/examples/unused_resources/more_examples.md'
+    - Unhealthy Resources:
+      - Example - Unhealthy Deployments: 'getting_started/examples/unhealthy_resources/deployment.md'
+      - Example - Outdated Secret Data: 'getting_started/examples/unhealthy_resources/outdated_secret_data.md'
+      - Example - Pod with Expired Certificates: 'getting_started/examples/unhealthy_resources/pod_expired_certs.md'
+      - More Examples: 'getting_started/examples/unhealthy_resources/more_examples.md'
+    - Automated Operations: 'getting_started/examples/automated_operations/scale_up_down_resources.md'
+- Reports: 'reports/k8s-cleaner_reports.md'
+- Notifications: 'notifications/notifications.md'
+- Blogs and videos: 'resources/blogs.md'
+theme:
+  icon:
+    previous: fontawesome/solid/angle-left
+    next: fontawesome/solid/angle-right
+  features:
+  - content.code.copy
+  - search.share
+  - navigation.footer
+  - navigation.instant.progress
+  - content.code.annotate
+  name: material
+  logo: assets/logo.png
+  palette:
+  - scheme: default
+    primary: white
+    accent: blue
+    toggle:
+      icon: material/toggle-switch
+      name: Switch to dark mode
+  # Palette toggle for dark mode
+  - scheme: slate
+    primary: white
+    accent: blue
+    toggle:
+      icon: material/toggle-switch-off-outline
+      name: Switch to light mode
+repo_url: https://github.com/gianlucam76/k8s-cleaner
+repo_name: k8s-cleaner
+extra:
+  social:
+  - icon: fontawesome/brands/twitter
+    link: https://twitter.com/projectsveltos
+    name: squidfunk on Twitter
+    link: https://join.slack.com/t/projectsveltos/shared_invite/zt-1hraownbr-W8NTs6LTimxLPB8Erj8Q6Q
+  - icon: fontawesome/brands/github
+    link: https://github.com/projectsveltos
+  - icon: fontawesome/brands/medium
+    link: https://medium.com/@gianluca.mardente
+  - icon: fontawesome/brands/product-hunt
+    link: https://www.producthunt.com/products/projectsveltos
+extra_css:
+- stylesheets/extra.css
+plugins:
+- search
+extra_javascript:
+- javascripts/extra.js
