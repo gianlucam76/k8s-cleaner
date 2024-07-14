@@ -29,29 +29,29 @@ The Cleaner instance definition will find any `Jobs` with the below specificatio
 
     ```yaml
     ---
-    apiVersion: apps.projectsveltos.io/v1alpha1
-    kind: Cleaner
-    metadata:
-    name: completed-jobs
-    spec:
-    schedule: "* 0 * * *"
-    resourcePolicySet:
-        resourceSelectors:
-        - kind: Job
-        group: "batch"
-        version: v1
-        evaluate: |
-            function evaluate()
-            hs = {}
-            hs.matching = false
-            if obj.status ~= nil then
-                if obj.status.completionTime ~= nil and obj.status.succeeded > 0 and obj.status.active == 0 then
-                hs.matching = true
-                end
-            end
-            return hs
-            end
-    action: Delete
+	apiVersion: apps.projectsveltos.io/v1alpha1
+	kind: Cleaner
+	metadata:
+	  name: completed-jobs
+	spec:
+	  schedule: "* 0 * * *"
+	  resourcePolicySet:
+		resourceSelectors:
+		- kind: Job
+		  group: "batch"
+		  version: v1
+		  evaluate: |
+			function evaluate()
+			  hs = {}
+			  hs.matching = false
+			  if obj.status ~= nil then
+				if obj.status.completionTime ~= nil and obj.status.succeeded > 0 and obj.status.active == 0 then
+				  hs.matching = true
+				end
+			  end
+			  return hs
+			end
+	  action: Delete
     ```
 
 ## Example - Long Running Pods
