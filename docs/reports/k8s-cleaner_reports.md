@@ -27,18 +27,18 @@ The k8s-cleaner will create a Report instance based on the name of the Report na
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
-    name: cleaner-with-report
+      name: cleaner-with-report
     spec:
-    schedule: "0 * * * *"
-    action: Delete # Delete matching resources
-    resourcePolicySet:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
         resourceSelectors:
         - namespace: test
-        kind: Deployment
-        group: "apps"
-        version: v1
-    notifications:
-    - name: report
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: report
         type: CleanerReport
     ```
 

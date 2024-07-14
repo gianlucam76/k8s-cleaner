@@ -40,24 +40,24 @@ $ kubectl create secret generic slack --from-literal=SLACK_TOKEN=<YOUR TOKEN> --
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
-    name: cleaner-with-slack-notifications
+      name: cleaner-with-slack-notifications
     spec:
-    schedule: "0 * * * *"
-    action: Delete # Delete matching resources
-    resourcePolicySet:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
         resourceSelectors:
         - namespace: test
-        kind: Deployment
-        group: "apps"
-        version: v1
-    notifications:
-    - name: slack
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: slack
         type: Slack
         notificationRef:
-        apiVersion: v1
-        kind: Secret
-        name: slack
-        namespace: default
+          apiVersion: v1
+          kind: Secret
+          name: slack
+          namespace: default
     ```
 
 Anytime this Cleaner instance is processed, a Slack message is sent containing all the resources that were deleted by k8s-cleaner.
@@ -80,24 +80,24 @@ $ kubectl create secret generic webex --from-literal=WEBEX_TOKEN=<YOUR TOKEN> --
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
-    name: cleaner-with-webex-notifications
+      name: cleaner-with-webex-notifications
     spec:
-    schedule: "0 * * * *"
-    action: Delete # Delete matching resources
-    resourcePolicySet:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
         resourceSelectors:
         - namespace: test
-        kind: Deployment
-        group: "apps"
-        version: v1
-    notifications:
-    - name: webex
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: webex
         type: Webex
         notificationRef:
-        apiVersion: v1
-        kind: Secret
-        name: webex
-        namespace: default
+          apiVersion: v1
+          kind: Secret
+          name: webex
+          namespace: default
     ```
 
 ## Discord Notifications Example
@@ -118,24 +118,24 @@ $ kubectl create secret generic discord --from-literal=DISCORD_TOKEN=<YOUR TOKEN
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
-    name: cleaner-with-discord-notifications
+      name: cleaner-with-discord-notifications
     spec:
-    schedule: "0 * * * *"
-    action: Delete # Delete matching resources
-    resourcePolicySet:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
         resourceSelectors:
         - namespace: test
-        kind: Deployment
-        group: "apps"
-        version: v1
-    notifications:
-    - name: discord
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: discord
         type: Discord
         notificationRef:
-        apiVersion: v1
-        kind: Secret
-        name: discord
-        namespace: default
+          apiVersion: v1
+          kind: Secret
+          name: discord
+          namespace: default
     ```
 
 ## Teams Notifications Example
@@ -156,22 +156,22 @@ $ kubectl create secret generic teams --from-literal=TEAMS_WEBHOOK_URL="<your UR
     apiVersion: apps.projectsveltos.io/v1alpha1
     kind: Cleaner
     metadata:
-    name: cleaner-with-teams-notifications
+      name: cleaner-with-teams-notifications
     spec:
-    schedule: "0 * * * *"
-    action: Delete # Delete matching resources
-    resourcePolicySet:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
         resourceSelectors:
         - namespace: test
-        kind: Deployment
-        group: "apps"
-        version: v1
-    notifications:
-    - name: teams
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: teams
         type: Teams
         notificationRef:
-        apiVersion: v1
-        kind: Secret
-        name: teams
-        namespace: default
+          apiVersion: v1
+          kind: Secret
+          name: teams
+          namespace: default
     ```
