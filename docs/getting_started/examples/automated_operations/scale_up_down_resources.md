@@ -33,71 +33,71 @@ The example below demonstrates how to automatically scale down Deployments, Daem
     # - sets their replicas to zero (scale down and pause)
     #
     ---
-    apiVersion: apps.projectsveltos.io/v1alpha1
-    kind: Cleaner
-    metadata:
-    name: scale-down-deployment-statefulset-daemonset
-    spec:
-    schedule: "* 20 * * *"
-    action: Transform
-    transform: |
-        -- Set replicas to 0
-        function transform()
-        hs = {}
+    	apiVersion: apps.projectsveltos.io/v1alpha1
+	kind: Cleaner
+	metadata:
+	  name: scale-down-deployment-statefulset-daemonset
+	spec:
+	  schedule: "* 20 * * *"
+	  action: Transform
+	  transform: |
+		-- Set replicas to 0
+		function transform()
+		  hs = {}
 
-        if obj.metadata.annotations == nil then
-            obj.metadata.annotations = {}
-        end
-        -- store in the annotation current replicas value
-        obj.metadata.annotations["previous-replicas"] = tostring(obj.spec.replicas)
-        
-        -- reset replicas to 0
-        obj.spec.replicas = 0
-        
-        hs.resource = obj
-        return hs
-        end  
-    resourcePolicySet:
-        resourceSelectors:
-        - kind: Deployment
-        group: apps
-        version: v1
-        - kind: StatefulSet
-        group: "apps"
-        version: v1
-        - kind: DaemonSet
-        group: "apps"
-        version: v1
-        aggregatedSelection: |
-        function evaluate()
-            local hs = {}
+		  if obj.metadata.annotations == nil then
+			obj.metadata.annotations = {}
+		  end
+		  -- store in the annotation current replicas value
+		  obj.metadata.annotations["previous-replicas"] = tostring(obj.spec.replicas)
+		  
+		  -- reset replicas to 0
+		  obj.spec.replicas = 0
+		  
+		  hs.resource = obj
+		  return hs
+		end  
+	  resourcePolicySet:
+		resourceSelectors:
+		- kind: Deployment
+		  group: apps
+		  version: v1
+		- kind: StatefulSet
+		  group: "apps"
+		  version: v1
+		- kind: DaemonSet
+		  group: "apps"
+		  version: v1
+		aggregatedSelection: |
+		  function evaluate()
+			local hs = {}
 
-            -- returns true if object has annotaiton "pause-resume" 
-            function hasPauseAnnotation(obj)
-            if obj.metadata.annotations ~= nil then
-                if obj.metadata.annotations["pause-resume"] then
-                return true
-                end
+			-- returns true if object has annotaiton "pause-resume" 
+			function hasPauseAnnotation(obj)
+			  if obj.metadata.annotations ~= nil then
+				if obj.metadata.annotations["pause-resume"] then
+				  return true
+				end
 
-                return false
-            end
+				return false
+			  end
 
-            return
-            end
+			  return
+			end
 
-            local resourceToPause = {}
+			local resourceToPause = {}
 
-            for _, resource in ipairs(resources) do
-            if hasPauseAnnotation(resource) then
-                table.insert(resourceToPause, {resource = resource})
-            end
-            end
+			for _, resource in ipairs(resources) do
+			  if hasPauseAnnotation(resource) then
+				table.insert(resourceToPause, {resource = resource})
+			  end
+			end
 
-            if #resourceToPause > 0 then
-            hs.resources = resourceToPause
-            end
-            return hs
-        end   
+			if #resourceToPause > 0 then
+			  hs.resources = resourceToPause
+			end
+			return hs
+		  end   
     ```
 
 ### Resume YAML Definition
@@ -117,67 +117,67 @@ As we defined the pause action for specific resources, during peak times, we wou
     # - sets the replicas to such value found above (scale deployment/statefulset/daemonset up)
     #
     ---
-    apiVersion: apps.projectsveltos.io/v1alpha1
-    kind: Cleaner
-    metadata:
-    name: scale-up-deployment-statefulset-daemonset
-    spec:
-    schedule: "* 8 * * *"
-    action: Transform
-    transform: |
-        -- Set replicas to 0
-        function transform()
-        hs = {}
-        if obj.metadata.annotations == nil then
-            return
-        end
-        if not obj.metadata.annotations["previous-replicas"] then
-            return
-        end
-        -- reset replicas
-        obj.spec.replicas = tonumber(obj.metadata.annotations["previous-replicas"])
-        hs.resource = obj
-        return hs
-        end  
-    resourcePolicySet:
-        resourceSelectors:
-        - kind: Deployment
-        group: apps
-        version: v1
-        - kind: StatefulSet
-        group: "apps"
-        version: v1
-        - kind: DaemonSet
-        group: "apps"
-        version: v1
-        aggregatedSelection: |
-        function evaluate()
-            local hs = {}
+	apiVersion: apps.projectsveltos.io/v1alpha1
+	kind: Cleaner
+	metadata:
+	  name: scale-up-deployment-statefulset-daemonset
+	spec:
+	  schedule: "* 8 * * *"
+	  action: Transform
+	  transform: |
+	    -- Set replicas to 0
+	    function transform()
+	      hs = {}
+	      if obj.metadata.annotations == nil then
+		return
+	      end
+	      if not obj.metadata.annotations["previous-replicas"] then
+		return
+	      end
+	      -- reset replicas
+	      obj.spec.replicas = tonumber(obj.metadata.annotations["previous-replicas"])
+	      hs.resource = obj
+	      return hs
+	    end  
+	  resourcePolicySet:
+	    resourceSelectors:
+	    - kind: Deployment
+	      group: apps
+	      version: v1
+	    - kind: StatefulSet
+	      group: "apps"
+	      version: v1
+	    - kind: DaemonSet
+	      group: "apps"
+	      version: v1
+	    aggregatedSelection: |
+	      function evaluate()
+		local hs = {}
 
-            -- returns true if object has annotaiton "pause-resume" 
-            function hasPauseAnnotation(obj)
-            if obj.metadata.annotations ~= nil then
-                if obj.metadata.annotations["pause-resume"] then
-                return true
-                end
+		-- returns true if object has annotaiton "pause-resume" 
+		function hasPauseAnnotation(obj)
+		  if obj.metadata.annotations ~= nil then
+		    if obj.metadata.annotations["pause-resume"] then
+		      return true
+		    end
 
-                return false
-            end
+		    return false
+		  end
 
-            return false
-            end
+		  return false
+		end
 
-            local resourceToUnPause = {}
+		local resourceToUnPause = {}
 
-            for _, resource in ipairs(resources) do
-            if hasPauseAnnotation(resource) then
-                table.insert(resourceToUnPause, {resource = resource})
-            end
-            end
+		for _, resource in ipairs(resources) do
+		  if hasPauseAnnotation(resource) then
+		    table.insert(resourceToUnPause, {resource = resource})
+		  end
+		end
 
-            if #resourceToUnPause > 0 then
-            hs.resources = resourceToUnPause
-            end
-            return hs
-        end
+		if #resourceToUnPause > 0 then
+		  hs.resources = resourceToUnPause
+		end
+		return hs
+	      end   
     ```
