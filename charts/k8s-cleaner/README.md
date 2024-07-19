@@ -35,7 +35,7 @@ Major Changes to functions are documented with the version affected. **Before up
 | controller.image.tag | string | `"v0.5.0"` | ControllerImage Tag |
 | controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe   |
 | controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
-| controller.resources | object | `{"limits":{"cpu":"500m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"64Mi"}}` | Controller Resources   |
+| controller.resources | object | `{"limits":{"cpu":"500m","memory":"512Mi"},"requests":{"cpu":"10m","memory":"64Mi"}}` | Controller Resources   |
 | controller.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"runAsNonRoot":true}` | Controller SecurityCOntext |
 | controller.volumeMounts | list | `[]` | Controller VolumeMounts |
 | crds.install | bool | `true` | Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations) |
