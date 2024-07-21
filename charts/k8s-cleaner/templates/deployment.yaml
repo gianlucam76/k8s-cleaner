@@ -41,8 +41,7 @@ spec:
           image: "{{ .Values.controller.image.registry | trimSuffix "/" }}/{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
           args:
-          - --health-probe-bind-address=:8081
-          - --metrics-bind-address=127.0.0.1:8080
+          - --diagnostics-address=:8443
         {{- range $key, $value := .Values.controller.args }}
              {{- if not (kindIs "invalid" $value) }}
           - -{{ $key | mustRegexFind "^[^_]+" }}={{ include "k8s-cleaner.template" (dict "tpl" $value "ctx" $.ctx) }}
@@ -58,8 +57,11 @@ spec:
           command:
           - /manager
           ports:
-            - name: metrics
-              containerPort: 8080
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
+            - containerPort: 9440
+              name: healthz
               protocol: TCP
           {{- if .Values.controller.livenessProbe.enabled }}
           livenessProbe:
