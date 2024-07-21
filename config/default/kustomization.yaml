@@ -30,7 +30,6 @@ patches:
 # Protect the /metrics endpoint by putting it behind auth.
 # If you want your controller-manager to expose the /metrics
 # endpoint w/o any authn/z, please comment the following line.
-- path: manager_auth_proxy_patch.yaml
 - path: manager_image_patch.yaml
 - path: manager_pull_policy.yaml
 
