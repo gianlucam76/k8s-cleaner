@@ -26,11 +26,18 @@ controller:
     # -- Controller Image Repository
     repository: projectsveltos/k8s-cleaner
     # -- ControllerImage Tag
-    tag: "v0.5.0"
+    tag: "v0.6.0"
     # -- Controller Image pull policy
     pullPolicy: IfNotPresent
   # -- Controller ARguments
   args: {}
+  ports:
+  - containerPort: 8443
+    name: metrics
+    protocol: TCP
+  - containerPort: 9440
+    name: healthz
+    protocol: TCP  
   # -- Controller SecurityCOntext
   securityContext:
     enabled: true
@@ -44,7 +51,8 @@ controller:
     enabled: true
     httpGet:
       path: /healthz
-      port: 8081
+      port: healthz
+      scheme: HTTP
     initialDelaySeconds: 15
     periodSeconds: 20
   # -- Controller ReadinessProbe
@@ -52,7 +60,8 @@ controller:
     enabled: true
     httpGet:
       path: /readyz
-      port: 8081
+      port: healthz
+      scheme: HTTP
     initialDelaySeconds: 5
     periodSeconds: 10
   # -- Controller VolumeMounts
