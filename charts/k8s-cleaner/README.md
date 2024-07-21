@@ -32,9 +32,15 @@ Major Changes to functions are documented with the version affected. **Before up
 | controller.image.pullPolicy | string | `"IfNotPresent"` | Controller Image pull policy |
 | controller.image.registry | string | `"docker.io"` | Controller Image Registry |
 | controller.image.repository | string | `"projectsveltos/k8s-cleaner"` | Controller Image Repository |
-| controller.image.tag | string | `"v0.5.0"` | ControllerImage Tag |
-| controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe   |
-| controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
+| controller.image.tag | string | `"v0.6.0"` | ControllerImage Tag |
+| controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe   |
+| controller.ports[0].containerPort | int | `8443` |  |
+| controller.ports[0].name | string | `"metrics"` |  |
+| controller.ports[0].protocol | string | `"TCP"` |  |
+| controller.ports[1].containerPort | int | `9440` |  |
+| controller.ports[1].name | string | `"healthz"` |  |
+| controller.ports[1].protocol | string | `"TCP"` |  |
+| controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
 | controller.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"runAsNonRoot":true}` | Controller SecurityCOntext |
 | controller.volumeMounts | list | `[]` | Controller VolumeMounts |
 | crds.install | bool | `true` | Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations) |

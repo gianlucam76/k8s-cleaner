@@ -478,7 +478,9 @@ spec:
         control-plane: k8s-cleaner
     spec:
       containers:
-      - command:
+      - args:
+        - --diagnostics-address=:8443
+        command:
         - /manager
         image: docker.io/projectsveltos/k8s-cleaner:main
         livenessProbe:
