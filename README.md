@@ -32,7 +32,7 @@ Currently k8s-cleaner has rich set of working examples to identify and list unus
 - [ConfigMaps](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/configmaps)/[Secrets](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/secrets)
 - [ClusterRoles](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/clusterroles)/[Roles](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/roles)
 - [ServiceAccounts](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/service-accounts)
-- [PersistentVolumes](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/presistent-volumes)/[PersistentVolumeClaims](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/persistent-volume-claims)
+- [PersistentVolumes](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/persistent-volumes)/[PersistentVolumeClaims](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/persistent-volume-claims)
 - [Deployments](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/deployments)/[StatefulSets](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/stateful-sets)
 - [Identify resources based on annotation indicating the maximum lifespan or the expiration date](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/time_based_delete)
 - many more 
