@@ -79,3 +79,6 @@ deployment.apps/k8s-cleaner   1/1     1            1           43s
 NAME                                     DESIRED   CURRENT   READY   AGE
 replicaset.apps/k8s-cleaner-78b9d794c5   1         1         1       43s
 ```
+
+!!! note
+    Before starting with the k8s-cleaner, have a look at the [store resource](../examples/store_resource/store_resource_yaml.md) and the [schedule](../examples/schedule/schedule.md) sections. Use the examples provided and familiarize with the syntax and the capabilities provided

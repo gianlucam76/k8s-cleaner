@@ -24,6 +24,8 @@ nav:
   - Installation:
     - Install: 'getting_started/install/install.md'
   - Examples:
+    - Store Resource Yaml: 'getting_started/examples/store_resource/store_resource_yaml.md'
+    - Schedule: 'getting_started/examples/schedule/schedule.md'
     - Unused Resources:
       - Example - ConfigMap: 'getting_started/examples/unused_resources/configmap.md'
       - Example - Secret: 'getting_started/examples/unused_resources/secret.md'
