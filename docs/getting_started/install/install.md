@@ -80,5 +80,5 @@ NAME                                     DESIRED   CURRENT   READY   AGE
 replicaset.apps/k8s-cleaner-78b9d794c5   1         1         1       43s
 ```
 
-!!! note
-    Before starting with the k8s-cleaner, have a look at the [store resource](../examples/store_resource/store_resource_yaml.md) and the [schedule](../examples/schedule/schedule.md) sections. Use the examples provided and familiarize with the syntax and the capabilities provided
+!!! tip
+    Before getting started with the k8s-cleaner, have a look at the **Features** section. Familiarise with the [label filters](../features/label_filters/label_filters.md), [store resource](../features/store_resources/store_resource_yaml.md), [update resources](../features/update_resources/update_resources.md), [resource selector](../features/resourceselector/resourceselector.md), and [schedule](../features/schedule/schedule.md) sections. Use the examples provided and familiarise with the syntax and the capabilities provided
