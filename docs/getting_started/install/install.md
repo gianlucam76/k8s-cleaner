@@ -79,3 +79,6 @@ deployment.apps/k8s-cleaner   1/1     1            1           43s
 NAME                                     DESIRED   CURRENT   READY   AGE
 replicaset.apps/k8s-cleaner-78b9d794c5   1         1         1       43s
 ```
+
+!!! note
+    Before you start working with the k8s-cleaner, if Kubernetes resources need to be stored as a back-up, have a look at the [Store Resource Yaml](../examples/store_resource/store_resource_yaml.md) section.
