@@ -212,7 +212,7 @@ deploy-cleaner: $(KUSTOMIZE)
 
 set-manifest-image:
 	$(info Updating kustomize image patch file for manager resource)
-	sed -i'' -e 's@image: .*@image: '"${MANIFEST_IMG}:$(MANIFEST_TAG)"'@' ./config/default/manager_image_patch.yaml
+	sed -i'' -e 's@image: .*@image: '"docker.io/${MANIFEST_IMG}:$(MANIFEST_TAG)"'@' ./config/default/manager_image_patch.yaml
 
 set-manifest-pull-policy:
 	$(info Updating kustomize pull policy file for manager resource)
@@ -262,7 +262,7 @@ docker-buildx: ## docker build for multiple arch and push to docker hub
 
 .PHONY: load-image
 load-image: docker-build $(KIND)
-	$(KIND) load docker-image $(CONTROLLER_IMG):$(TAG) --name $(CONTROL_CLUSTER_NAME)
+	$(KIND) load docker-image docker.io/$(CONTROLLER_IMG):$(TAG) --name $(CONTROL_CLUSTER_NAME)
 
 ##@ Deployment
 

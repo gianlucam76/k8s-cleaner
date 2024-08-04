@@ -25,7 +25,7 @@ The k8s-cleaner is able to delete unsused `PersistentVolumes`. The below Cleaner
 	apiVersion: apps.projectsveltos.io/v1alpha1
 	kind: Cleaner
 	metadata:
-	  name: unbound-peristent-volumes
+	  name: unbound-persistent-volumes
 	spec:
 	  schedule: "* 0 * * *"
 	  resourcePolicySet:

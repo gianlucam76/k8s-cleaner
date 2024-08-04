@@ -61,34 +61,35 @@ spec:
       - command:
         - /manager
         args:
-        - --leader-elect
         image: controller:latest
         name: controller
+        ports:
+         - containerPort: 8443
+           name: metrics
+           protocol: TCP
+         - containerPort: 9440
+           name: healthz
+           protocol: TCP        
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
             drop:
               - "ALL"
         livenessProbe:
+          failureThreshold: 3
           httpGet:
             path: /healthz
-            port: 8081
+            port: healthz
+            scheme: HTTP
           initialDelaySeconds: 15
           periodSeconds: 20
         readinessProbe:
+          failureThreshold: 3
           httpGet:
             path: /readyz
-            port: 8081
+            port: healthz
+            scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 10
-        # TODO(user): Configure the resources accordingly based on the project requirements.
-        # More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
-        resources:
-          limits:
-            cpu: 500m
-            memory: 128Mi
-          requests:
-            cpu: 10m
-            memory: 64Mi
       serviceAccountName: controller
       terminationGracePeriodSeconds: 10

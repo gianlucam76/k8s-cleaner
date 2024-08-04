@@ -32,10 +32,15 @@ Major Changes to functions are documented with the version affected. **Before up
 | controller.image.pullPolicy | string | `"IfNotPresent"` | Controller Image pull policy |
 | controller.image.registry | string | `"docker.io"` | Controller Image Registry |
 | controller.image.repository | string | `"projectsveltos/k8s-cleaner"` | Controller Image Repository |
-| controller.image.tag | string | `"v0.5.0"` | ControllerImage Tag |
-| controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe   |
-| controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
-| controller.resources | object | `{"limits":{"cpu":"500m","memory":"128Mi"},"requests":{"cpu":"10m","memory":"64Mi"}}` | Controller Resources   |
+| controller.image.tag | string | `"v0.6.0"` | ControllerImage Tag |
+| controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe   |
+| controller.ports[0].containerPort | int | `8443` |  |
+| controller.ports[0].name | string | `"metrics"` |  |
+| controller.ports[0].protocol | string | `"TCP"` |  |
+| controller.ports[1].containerPort | int | `9440` |  |
+| controller.ports[1].name | string | `"healthz"` |  |
+| controller.ports[1].protocol | string | `"TCP"` |  |
+| controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
 | controller.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"runAsNonRoot":true}` | Controller SecurityCOntext |
 | controller.volumeMounts | list | `[]` | Controller VolumeMounts |
 | crds.install | bool | `true` | Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations) |
@@ -47,16 +52,6 @@ Major Changes to functions are documented with the version affected. **Before up
 | podAnnotations | object | `{}` | Pod Annotations |
 | podLabels | object | `{}` | Pod Labels |
 | podSecurityContext | object | `{"enabled":true,"runAsNonRoot":true,"seccompProfile":{"type":"RuntimeDefault"}}` | Pod Security Context |
-| proxy.args | object | `{"v":1}` | Proxy arguments |
-| proxy.image.pullPolicy | string | `"IfNotPresent"` | Proxy Image pull policy |
-| proxy.image.registry | string | `"gcr.io"` | Proxy Image Registry |
-| proxy.image.repository | string | `"kubebuilder/kube-rbac-proxy"` | Proxy Image Repository |
-| proxy.image.tag | string | `"v0.14.1"` | Proxy Image Tag |
-| proxy.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":8081},"initialDelaySeconds":15,"periodSeconds":20}` | Proxy LivenessProbe   |
-| proxy.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":8081},"initialDelaySeconds":5,"periodSeconds":10}` | Proxy ReadinessProbe |
-| proxy.resources | object | `{"limits":{"cpu":"500m","memory":"128Mi"},"requests":{"cpu":"5m","memory":"64Mi"}}` | Proxy Resources   |
-| proxy.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"runAsNonRoot":true}` | Proxy SecurityCOntext |
-| proxy.volumeMounts | list | `[]` | Proxy VolumeMounts |
 | rbac.create | bool | `true` | Create RBAC resources |
 | replicaCount | int | `1` | Amount of replicas |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |

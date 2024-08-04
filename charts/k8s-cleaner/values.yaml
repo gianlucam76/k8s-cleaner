@@ -26,11 +26,18 @@ controller:
     # -- Controller Image Repository
     repository: projectsveltos/k8s-cleaner
     # -- ControllerImage Tag
-    tag: "v0.5.0"
+    tag: "v0.6.0"
     # -- Controller Image pull policy
     pullPolicy: IfNotPresent
   # -- Controller ARguments
   args: {}
+  ports:
+  - containerPort: 8443
+    name: metrics
+    protocol: TCP
+  - containerPort: 9440
+    name: healthz
+    protocol: TCP  
   # -- Controller SecurityCOntext
   securityContext:
     enabled: true
@@ -44,7 +51,8 @@ controller:
     enabled: true
     httpGet:
       path: /healthz
-      port: 8081
+      port: healthz
+      scheme: HTTP
     initialDelaySeconds: 15
     periodSeconds: 20
   # -- Controller ReadinessProbe
@@ -52,69 +60,11 @@ controller:
     enabled: true
     httpGet:
       path: /readyz
-      port: 8081
+      port: healthz
+      scheme: HTTP
     initialDelaySeconds: 5
     periodSeconds: 10
-  # -- Controller Resources  
-  resources:
-    limits:
-      cpu: 500m
-      memory: 128Mi
-    requests:
-      cpu: 10m
-      memory: 64Mi
   # -- Controller VolumeMounts
-  volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
-  
-proxy:
-  image:
-    # -- Proxy Image Registry
-    registry: gcr.io
-    # -- Proxy Image Repository
-    repository: kubebuilder/kube-rbac-proxy
-    # -- Proxy Image Tag
-    tag: "v0.14.1"
-    # -- Proxy Image pull policy
-    pullPolicy: IfNotPresent
-  # -- Proxy arguments
-  args:
-    v: 1
-  # -- Proxy SecurityCOntext
-  securityContext:
-    enabled: true
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-      - ALL
-    runAsNonRoot: true
-  # -- Proxy LivenessProbe  
-  livenessProbe:
-    enabled: true
-    httpGet:
-      path: /healthz
-      port: 8081
-    initialDelaySeconds: 15
-    periodSeconds: 20
-  # -- Proxy ReadinessProbe
-  readinessProbe:
-    enabled: true
-    httpGet:
-      path: /readyz
-      port: 8081
-    initialDelaySeconds: 5
-    periodSeconds: 10
-  # -- Proxy Resources  
-  resources:
-    limits:
-      cpu: 500m
-      memory: 128Mi
-    requests:
-      cpu: 5m
-      memory: 64Mi
-  # -- Proxy VolumeMounts
   volumeMounts: []
   # - name: foo
   #   mountPath: "/etc/foo"
