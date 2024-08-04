@@ -16,7 +16,7 @@ authors:
 
 To preview which resources match the Cleaner's criteria, set the **Action** field to **Scan**. The k8s-cleaner will still execute its logic but will **not** delete and/or update any resources.
 
-To identify matching resources, search the controller logs for the message `resource is a match for cleaner`.
+To identify matching resources, you can then either ask k8s-cleaner to generate a [Report](../../../reports/k8s-cleaner_reports.md) or search the controller logs for the message `resource is a match for cleaner`.
 
 
 ## Example - Dry Run
