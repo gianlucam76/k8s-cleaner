@@ -24,6 +24,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "egrosdou01",
+      "name": "Eleni Grosdouli",
+      "avatar_url": "https://avatars.githubusercontent.com/u/147995681?v=4",
+      "profile": "https://github.com/egrosdou01",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
