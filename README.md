@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](LICENSE)
 [![Twitter Follow](https://img.shields.io/twitter/follow/projectsveltos?style=social)](https://twitter.com/projectsveltos)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <img src="https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png" width="200">
@@ -713,6 +713,7 @@ By participating, you are expected to honor this code.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://projectsveltos.github.io/sveltos/"><img src="https://avatars.githubusercontent.com/u/52940363?v=4?s=100" width="100px;" alt="Gianluca Mardente"/><br /><sub><b>Gianluca Mardente</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=gianlucam76" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://keybase.io/oliverbaehler"><img src="https://avatars.githubusercontent.com/u/26610571?v=4?s=100" width="100px;" alt="Oliver Bähler"/><br /><sub><b>Oliver Bähler</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=oliverbaehler" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/egrosdou01"><img src="https://avatars.githubusercontent.com/u/147995681?v=4?s=100" width="100px;" alt="Eleni Grosdouli"/><br /><sub><b>Eleni Grosdouli</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=egrosdou01" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>
