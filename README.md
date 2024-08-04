@@ -10,7 +10,7 @@
 
 <img src="https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png" width="200">
 
-The Kubernetes controller __Cleaner__ identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster. It's designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
+The Kubernetes controller __Cleaner__ identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster. It is designed to handle any Kubernetes resource types (including your own custom resources) and provides sophisticated filtering capabilities, including label-based selection and custom Lua-based criteria.
 __Cleaner__ can also be used to identify unhealthy resources.
 
 k8s-cleaner keeps you in the loop with handy notifications through:
@@ -23,11 +23,7 @@ k8s-cleaner keeps you in the loop with handy notifications through:
   
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
-- 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
-- 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
-- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources) section.
-
-Currently k8s-cleaner has rich set of working examples to identify and list unused:
+Currently k8s-cleaner has rich set of working examples to **identify** and **list** **unused**:
 
 - [ConfigMaps](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/configmaps)/[Secrets](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/secrets)
 - [ClusterRoles](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/clusterroles)/[Roles](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources/roles)
@@ -39,8 +35,8 @@ Currently k8s-cleaner has rich set of working examples to identify and list unus
 
 There are also examples to identify unhealthy resources:
 
-- [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
-- [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
+  - [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
+  - [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
 
 ## Features and Capabilities
 
@@ -50,9 +46,11 @@ There are also examples to identify unhealthy resources:
 
 3️⃣ **Label Filtering**: Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
-4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org/) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
+4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org/) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources. To validate the Cleaner configuration, have a look [here](#validate-the-cleaner-configuration).
 
 5️⃣ **Notifications**: Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams or reports.
+
+For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun/).
 
 ## Benefits
 
@@ -64,8 +62,20 @@ There are also examples to identify unhealthy resources:
 
 By combining the **flexibility** of **scheduling**, the **accuracy** of **label filtering**, the **power** of **Lua-based criteria**, and the ability to **remove** or **update** stale resources, the k8s-cleaner empowers users to effectively manage Kubernetes environments and optimise resource usage.
 
-## Getting Started
+## How to work with us
+
+- 👉 For feature requests and bugs, file an [issue](https://github.com/gianlucam76/k8s-cleaner/issues).
+- 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
+- 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources) section.
+
+## Getting Started Guide
 - [Complete Documentation](http://k8scleaner.projectsveltos.io/)
+
+## Validate Cleaner Configuration 
+
+To verify the correctness of the __Cleaner__ configuration, follow the comprehensive instructions provided in the documentation: [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md) and [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md).
+
+In essence, the Cleaner YAML file alongside the YAML files representing matching and non-matching resources need to get provided, and then by executing the simple ```make ut``` command the resutls will appear. This will validate whether your configuration correctly identifies and manages the desired resources.
 
 ## Contribute
 
