@@ -41,11 +41,13 @@ Major Changes to functions are documented with the version affected. **Before up
 | controller.ports[1].name | string | `"healthz"` |  |
 | controller.ports[1].protocol | string | `"TCP"` |  |
 | controller.readinessProbe | object | `{"enabled":true,"httpGet":{"path":"/readyz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":5,"periodSeconds":10}` | Controller ReadinessProbe |
+| controller.resources | object | `{}` | Resource limits and requests for the controller |
 | controller.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"enabled":true,"runAsNonRoot":true}` | Controller SecurityCOntext |
 | controller.volumeMounts | list | `[]` | Controller VolumeMounts |
 | crds.install | bool | `true` | Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations) |
 | crds.keep | bool | `true` | Keep the CustomResourceDefinitions (when the chart is deleted) |
 | fullnameOverride | string | `""` | Full name overwrite |
+| historyLimit | int | `3` | The number of old ReplicaSets to retain for a Deployment (default=10) |
 | imagePullSecrets | list | `[]` | ImagePullSecrets |
 | nameOverride | string | `""` | Partial name overwrite |
 | nodeSelector | object | `{}` | NodeSelector |
