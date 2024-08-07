@@ -64,14 +64,22 @@ controller:
       scheme: HTTP
     initialDelaySeconds: 5
     periodSeconds: 10
-  # -- Controller VolumeMounts
+  # -- Resource limits and requests for the controller
+  resources: {}
+    # requests:
+    #   cpu: 50m
+    #   memory: 100Mi
+    # limits:
+    #   memory: 100Mi
+# -- Controller VolumeMounts
   volumeMounts: []
   # - name: foo
   #   mountPath: "/etc/foo"
   #   readOnly: true
-
 # -- Amount of replicas
 replicaCount: 1
+# -- The number of old ReplicaSets to retain for a Deployment (default=10)
+historyLimit: 3
 
 # -- ImagePullSecrets
 imagePullSecrets: []
