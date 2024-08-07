@@ -6,6 +6,7 @@ metadata:
     {{- include "k8s-cleaner.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.historyLimit }}
   selector:
     matchLabels:
       {{- include "k8s-cleaner.selectorLabels" . | nindent 6 }}
