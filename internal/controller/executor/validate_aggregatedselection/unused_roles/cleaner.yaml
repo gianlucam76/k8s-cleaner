@@ -14,7 +14,7 @@ spec:
     - kind: Role
       group: "rbac.authorization.k8s.io"
       version: v1
-    - kind: RoleBindings
+    - kind: RoleBinding
       group: "rbac.authorization.k8s.io"
       version: v1
     aggregatedSelection: |

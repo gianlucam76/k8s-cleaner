@@ -13,10 +13,10 @@ spec:
     - kind: ClusterRole
       group: "rbac.authorization.k8s.io"
       version: v1
-    - kind: ClusterRoleBindings
+    - kind: ClusterRoleBinding
       group: "rbac.authorization.k8s.io"
       version: v1      
-    - kind: RoleBindings
+    - kind: RoleBinding
       group: "rbac.authorization.k8s.io"
       version: v1
     aggregatedSelection: |
