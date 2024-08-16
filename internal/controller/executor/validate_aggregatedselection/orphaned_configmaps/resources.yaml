@@ -89,3 +89,12 @@ metadata:
 data:
   SPECIAL_LEVEL: very
   SPECIAL_TYPE: charm
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: not-matching
+  namespace: kube-system
+data:
+  SPECIAL_LEVEL: very
+  SPECIAL_TYPE: charm
