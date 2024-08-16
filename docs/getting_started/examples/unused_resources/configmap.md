@@ -16,7 +16,7 @@ authors:
 
 There are many Kubernetes installations either as a manifest or a Helm chart that after undeployment leave `ConfigMap` behind.
 
-The below Cleaner instance finds all the `ConfigMaps` instances in **all** the namespaces which are **orphaned**.
+The below Cleaner instance finds all the `ConfigMaps` instances in **all** the namespaces which are **orphaned** (namespaces starting with ```kube``` are excluded)
 
 ### Orphaned ConfigMap
 
@@ -46,6 +46,10 @@ By orphaned we refer to a ConfigMap that is not used by:
 		  group: ""
 		  version: v1   
 		aggregatedSelection: |
+          function skipNamespace(namespace)
+            return string.match(namespace, '^kube')
+          end
+
 		  function getKey(namespace, name)
 			return namespace .. ":" .. name
 		  end 
@@ -134,7 +138,7 @@ By orphaned we refer to a ConfigMap that is not used by:
 			-- Separate configMaps and podsfrom the resources
 			for _, resource in ipairs(resources) do
 				local kind = resource.kind
-				if kind == "ConfigMap" then
+				if kind == "ConfigMap" and not skipNamespace(resource.metadata.namespace) then
 				  table.insert(configMaps, resource)
 				elseif kind == "Pod" then
 				  table.insert(pods, resource)

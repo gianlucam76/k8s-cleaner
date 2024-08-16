@@ -18,6 +18,10 @@ spec:
       group: ""
       version: v1   
     aggregatedSelection: |
+      function skipNamespace(namespace)
+        return string.match(namespace, '^kube')
+      end
+
       function getKey(namespace, name)
         return namespace .. ":" .. name
       end 
@@ -106,7 +110,7 @@ spec:
         -- Separate configMaps and podsfrom the resources
         for _, resource in ipairs(resources) do
             local kind = resource.kind
-            if kind == "ConfigMap" then
+            if kind == "ConfigMap" and not skipNamespace(resource.metadata.namespace) then
               table.insert(configMaps, resource)
             elseif kind == "Pod" then
               table.insert(pods, resource)
