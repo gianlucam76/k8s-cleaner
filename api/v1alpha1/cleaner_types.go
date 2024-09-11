@@ -20,7 +20,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
+	libsveltosv1beta1 "github.com/projectsveltos/libsveltos/api/v1beta1"
 )
 
 // Action specifies the action to take on matching resources
@@ -65,7 +65,7 @@ type ResourceSelector struct {
 	Kind string `json:"kind"`
 
 	// LabelFilters allows to filter resources based on current labels.
-	LabelFilters []libsveltosv1alpha1.LabelFilter `json:"labelFilters,omitempty"`
+	LabelFilters []libsveltosv1beta1.LabelFilter `json:"labelFilters,omitempty"`
 
 	// Evaluate contains a function "evaluate" in lua language.
 	// The function will be passed one of the object selected based on
@@ -94,7 +94,7 @@ type ResourcePolicySet struct {
 }
 
 // NotificationType specifies different type of notifications
-// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex;Discord;Teams
+// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex;Discord;Teams;SMTP
 type NotificationType string
 
 const (
