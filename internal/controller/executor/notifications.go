@@ -305,6 +305,7 @@ func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.Repor
 
 func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
 	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+
 	sveltosNotification := &libsveltosv1beta1.Notification{
 		Name:            notification.Name,
 		Type:            libsveltosv1beta1.NotificationTypeSMTP,
