@@ -41,7 +41,7 @@ import (
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 
-	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
+	libsveltosv1beta1 "github.com/projectsveltos/libsveltos/api/v1beta1"
 	logs "github.com/projectsveltos/libsveltos/lib/logsettings"
 )
 
@@ -336,7 +336,7 @@ func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.Resource
 				labelFilter += ","
 			}
 			f := resourceSelector.LabelFilters[i]
-			if f.Operation == libsveltosv1alpha1.OperationEqual {
+			if f.Operation == libsveltosv1beta1.OperationEqual {
 				labelFilter += fmt.Sprintf("%s=%s", f.Key, f.Value)
 			} else {
 				labelFilter += fmt.Sprintf("%s!=%s", f.Key, f.Value)
