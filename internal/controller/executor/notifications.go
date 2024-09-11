@@ -37,7 +37,9 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 
 	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
+	libsveltosv1beta1 "github.com/projectsveltos/libsveltos/api/v1beta1"
 	logs "github.com/projectsveltos/libsveltos/lib/logsettings"
+	sveltosnotifications "github.com/projectsveltos/libsveltos/lib/notifications"
 )
 
 type slackInfo struct {
@@ -76,20 +78,27 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 		logger.V(logs.LogDebug).Info("deliver notification")
 
 		var err error
-		switch notification.Type {
-		case appsv1alpha1.NotificationTypeCleanerReport:
-			err = createReportInstance(ctx, cleaner, reportSpec, logger)
-		case appsv1alpha1.NotificationTypeSlack:
-			err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
-		case appsv1alpha1.NotificationTypeWebex:
-			err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
-		case appsv1alpha1.NotificationTypeDiscord:
-			err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
-		case appsv1alpha1.NotificationTypeTeams:
-			err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
-		default:
-			logger.V(logs.LogInfo).Info("no handler registered for notification")
-			panic(1)
+
+		// temporary conditional while implementing smtp notifications
+		// type mismatch in the switch statement prevents this from being a case
+		if string(notification.Type) == string(libsveltosv1beta1.NotificationTypeSMTP) {
+			err = sendSmtpNotification(ctx, reportSpec, message, notification, logger)
+		} else {
+			switch notification.Type {
+			case appsv1alpha1.NotificationTypeCleanerReport:
+				err = createReportInstance(ctx, cleaner, reportSpec, logger)
+			case appsv1alpha1.NotificationTypeSlack:
+				err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
+			case appsv1alpha1.NotificationTypeWebex:
+				err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
+			case appsv1alpha1.NotificationTypeDiscord:
+				err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
+			case appsv1alpha1.NotificationTypeTeams:
+				err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
+			default:
+				logger.V(logs.LogInfo).Info("no handler registered for notification")
+				panic(1)
+			}
 		}
 
 		if err != nil {
@@ -292,6 +301,29 @@ func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.Repor
 	})
 
 	return err
+}
+
+func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
+	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+	sveltosNotification := &libsveltosv1beta1.Notification{
+		Name:            notification.Name,
+		Type:            libsveltosv1beta1.NotificationTypeSMTP,
+		NotificationRef: notification.NotificationRef,
+	}
+
+	mailer, err := sveltosnotifications.NewMailer(ctx, k8sClient, sveltosNotification)
+	if err != nil {
+		return err
+	}
+
+	l := logger.WithValues("notification", fmt.Sprintf("%s:%s", notification.Type, notification.Name))
+	l.V(logs.LogInfo).Info("send smtp message")
+
+	resourceSpecData, err := json.Marshal(*reportSpec)
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
+	}
+	return mailer.SendMail(message, string(resourceSpecData), false)
 }
 
 func sendWebexNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
