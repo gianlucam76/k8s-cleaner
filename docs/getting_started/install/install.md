@@ -48,7 +48,7 @@ There is the option to install the k8s-cleaner with a Helm chart. To do so, simp
 !!! example ""
     ```bash
     $ helm install k8s-cleaner oci://ghcr.io/gianlucam76/charts/k8s-cleaner \
-        --version 0.5.0 \
+        --version 0.7.0 \
         --namespace k8s-cleaner \
         --create-namespace #(1)
     ```
