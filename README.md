@@ -70,7 +70,8 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 
 ## Getting Started Guide
 
-📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
+- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/) 
+- 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
 
 ## Validate Cleaner Configuration 
 
