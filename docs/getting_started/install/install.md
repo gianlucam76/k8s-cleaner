@@ -22,8 +22,8 @@ It is designed to handle any Kubernetes resource types (including custom Kuberne
 To work with the k8s-cleaner, ensure you have the below points covered.
 
 1. A Kubernetes cluster
-1. kubectl CLI installed
-1. kubeconfig for authentication
+1. [kubectl CLI](https://kubernetes.io/releases/download/) installed
+1. [kubeconfig](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) for authentication
 
 ## Installation
 
