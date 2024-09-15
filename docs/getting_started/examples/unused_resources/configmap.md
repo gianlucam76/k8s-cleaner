@@ -21,6 +21,7 @@ The below Cleaner instance finds all the `ConfigMaps` instances in **all** the n
 ### Orphaned ConfigMap
 
 By orphaned we refer to a ConfigMap that is not used by:
+
 - Pod through volumes (pod.spec.volumes)
 - Pod through environment variables (pod.spec.containers.env and pod.spec.containers.envFrom)
 
