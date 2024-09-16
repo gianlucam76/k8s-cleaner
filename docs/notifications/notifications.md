@@ -21,6 +21,7 @@ The below notifications are available.
 - **Webex**
 - **Discord**
 - **Teams**
+- **SMTP**
 
 ## Slack Notifications Example
 
@@ -173,5 +174,50 @@ $ kubectl create secret generic teams --from-literal=TEAMS_WEBHOOK_URL="<your UR
           apiVersion: v1
           kind: Secret
           name: teams
+          namespace: default
+    ```
+
+## SMTP Notifications Example
+
+### Kubernetes Secret
+
+To allow the k8s-cleaner to send an SMTP email, we need to create a Kubernetes secret:
+
+```bash
+$ kubectl create secret generic smtp \
+  --from-literal=SMTP_RECIPIENTS=<COMMA-SEPARATED EMAIL ADDRESSES> \
+  --from-literal=SMTP_BCC=<OPTIONAL, COMMA-SEPARATED EMAIL ADDRESSES> \
+  --from-literal=SMTP_IDENTITY=<OPTIONAL, IDENTITY/USERNAME OF THE SENDER> \
+  --from-literal=SMTP_SENDER=<EMAIL ADDRESS> \
+  --from-literal=SMTP_PASSWORD=<OPTIONAL, SMTP PASSWORD FOR EMAIL ADDRESS IF APPLICABLE> \
+  --from-literal=SMTP_HOST=<SMTP SERVER HOSTNAME> \
+  --from-literal=SMTP_PORT=<OPTIONAL, SMTP SERVER PORT, DEFAULTS TO "587">
+```
+
+
+!!! example "SMTP Notifications Definition"
+
+    ```yaml
+    ---
+    apiVersion: apps.projectsveltos.io/v1alpha1
+    kind: Cleaner
+    metadata:
+      name: cleaner-with-smtp-notifications
+    spec:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
+        resourceSelectors:
+        - namespace: test
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: smtp
+        type: SMTP
+        notificationRef:
+          apiVersion: v1
+          kind: Secret
+          name: smtp
           namespace: default
     ```
