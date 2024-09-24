@@ -52,7 +52,7 @@ The k8s-cleaner is able to accept the below schedule formats.
                 hs = {}
                 hs.matching = false
                 if obj.status ~= nil then
-                  if obj.status.completionTime ~= nil and obj.status.succeeded > 0 and obj.status.active == 0 then
+                  if obj.status.completionTime ~= nil and obj.status.succeeded > 0 then
                     hs.matching = true
                   end
                 end
@@ -77,7 +77,7 @@ kind: Cleaner
 metadata:
   annotations:
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps.projectsveltos.io/v1alpha1","kind":"Cleaner","metadata":{"annotations":{},"name":"completed-jobs"},"spec":{"action":"Delete","resourcePolicySet":{"resourceSelectors":[{"evaluate":"function evaluate()\n  hs = {}\n  hs.matching = false\n  if obj.status ~= nil then\n    if obj.status.completionTime ~= nil and obj.status.succeeded \u003e 0 and obj.status.active == 0 then\n      hs.matching = true\n    end\n  end\n  return hs\nend\n","group":"batch","kind":"Job","version":"v1"}]},"schedule":"@every 1h30m"}}
+      {"apiVersion":"apps.projectsveltos.io/v1alpha1","kind":"Cleaner","metadata":{"annotations":{},"name":"completed-jobs"},"spec":{"action":"Delete","resourcePolicySet":{"resourceSelectors":[{"evaluate":"function evaluate()\n  hs = {}\n  hs.matching = false\n  if obj.status ~= nil then\n    if obj.status.completionTime ~= nil and obj.status.succeeded \u003e 0 then\n      hs.matching = true\n    end\n  end\n  return hs\nend\n","group":"batch","kind":"Job","version":"v1"}]},"schedule":"@every 1h30m"}}
   creationTimestamp: "2024-08-03T14:09:49Z"
   finalizers:
   - projectsveltos.io/cleaner-finalizer
@@ -94,7 +94,7 @@ spec:
           hs = {}
           hs.matching = false
           if obj.status ~= nil then
-            if obj.status.completionTime ~= nil and obj.status.succeeded > 0 and obj.status.active == 0 then
+            if obj.status.completionTime ~= nil and obj.status.succeeded > 0 then
               hs.matching = true
             end
           end
