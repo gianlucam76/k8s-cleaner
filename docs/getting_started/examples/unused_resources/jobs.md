@@ -45,7 +45,7 @@ The Cleaner instance definition will find any `Jobs` with the below specificatio
 			  hs = {}
 			  hs.matching = false
 			  if obj.status ~= nil then
-				if obj.status.completionTime ~= nil and obj.status.succeeded > 0 and obj.status.active == 0 then
+				if obj.status.completionTime ~= nil and obj.status.succeeded > 0 then
 				  hs.matching = true
 				end
 			  end
