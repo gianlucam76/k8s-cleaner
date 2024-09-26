@@ -79,26 +79,22 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 
 		var err error
 
-		// temporary conditional while implementing smtp notifications
-		// type mismatch in the switch statement prevents this from being a case
-		if string(notification.Type) == string(libsveltosv1beta1.NotificationTypeSMTP) {
+		switch notification.Type {
+		case appsv1alpha1.NotificationTypeCleanerReport:
+			err = createReportInstance(ctx, cleaner, reportSpec, logger)
+		case appsv1alpha1.NotificationTypeSlack:
+			err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeWebex:
+			err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeDiscord:
+			err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeTeams:
+			err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeSMTP:
 			err = sendSmtpNotification(ctx, reportSpec, message, notification, logger)
-		} else {
-			switch notification.Type {
-			case appsv1alpha1.NotificationTypeCleanerReport:
-				err = createReportInstance(ctx, cleaner, reportSpec, logger)
-			case appsv1alpha1.NotificationTypeSlack:
-				err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
-			case appsv1alpha1.NotificationTypeWebex:
-				err = sendWebexNotification(ctx, reportSpec, message, notification, logger)
-			case appsv1alpha1.NotificationTypeDiscord:
-				err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
-			case appsv1alpha1.NotificationTypeTeams:
-				err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
-			default:
-				logger.V(logs.LogInfo).Info("no handler registered for notification")
-				panic(1)
-			}
+		default:
+			logger.V(logs.LogInfo).Info("no handler registered for notification")
+			panic(1)
 		}
 
 		if err != nil {

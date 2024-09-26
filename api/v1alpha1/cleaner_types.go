@@ -112,6 +112,9 @@ const (
 
 	// NotificationTypeTeams refers to generating a Teams message
 	NotificationTypeTeams = NotificationType("Teams")
+
+	// NotificationTypeSMTP refers to sending an email
+	NotificationTypeSMTP = NotificationType("SMTP")
 )
 
 type Notification struct {
