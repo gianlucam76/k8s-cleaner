@@ -44,6 +44,28 @@ const (
 	CleanerFinalizer = "projectsveltos.io/cleaner-finalizer"
 )
 
+// DeleteOptions contains options for delete requests. It's generally a subset
+// of metav1.DeleteOptions.
+type DeleteOptions struct {
+	// GracePeriodSeconds is the duration in seconds before the object should be
+	// deleted. Value must be non-negative integer. The value zero indicates
+	// delete immediately. If this value is nil, the default grace period for the
+	// specified type will be used.
+	// +optional
+	GracePeriodSeconds *int64 `json:"gracePeriodSeconds,omitempty"`
+
+	// PropagationPolicy determined whether and how garbage collection will be
+	// performed. Either this field or OrphanDependents may be set, but not both.
+	// The default policy is decided by the existing finalizer set in the
+	// metadata.finalizers and the resource-specific default policy.
+	// Acceptable values are: 'Orphan' - orphan the dependents; 'Background' -
+	// allow the garbage collector to delete the dependents in the background;
+	// 'Foreground' - a cascading policy that deletes all dependents in the
+	// foreground.
+	// +optional
+	PropagationPolicy *metav1.DeletionPropagation `json:"propagationPolicy,omitempty"`
+}
+
 type ResourceSelector struct {
 	// Namespace of the resource deployed in the  Cluster.
 	// Empty for resources scoped at cluster level.
@@ -146,6 +168,10 @@ type CleanerSpec struct {
 	// will be invoked and then object will be updated.
 	// +kubebuilder:default:=Delete
 	Action Action `json:"action,omitempty"`
+
+	// DeleteOption is some configuration that modifies options for a delete request.
+	// This will be used only when action is delete
+	DeleteOptions *DeleteOptions `json:"deleteOptions,omitempty"`
 
 	// Transform contains a function "transform" in lua language.
 	// When Action is set to *Transform*, this function will be invoked
