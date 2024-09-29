@@ -185,7 +185,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	var processedResources []ResourceResult
 	switch cleaner.Spec.Action {
 	case appsv1alpha1.ActionDelete:
-		processedResources, err = deleteMatchingResources(ctx, resources, logger)
+		processedResources, err = deleteMatchingResources(ctx, resources, cleaner.Spec.DeleteOptions, logger)
 	case appsv1alpha1.ActionTransform:
 		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
@@ -249,7 +249,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 }
 
 func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
-	logger logr.Logger) ([]ResourceResult, error) {
+	deleteOptions *appsv1alpha1.DeleteOptions, logger logr.Logger) ([]ResourceResult, error) {
 
 	processedResources := make([]ResourceResult, 0)
 
@@ -260,7 +260,14 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 			resource.Resource.GetNamespace(),
 			resource.Resource.GetName()))
 		l.Info("deleting resource")
-		if err := k8sClient.Delete(ctx, resource.Resource); err != nil {
+
+		options := &client.DeleteOptions{}
+		if deleteOptions != nil {
+			options.GracePeriodSeconds = deleteOptions.GracePeriodSeconds
+			options.PropagationPolicy = deleteOptions.PropagationPolicy
+		}
+
+		if err := k8sClient.Delete(ctx, resource.Resource, options); err != nil {
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
 			return processedResources, err
 		}
