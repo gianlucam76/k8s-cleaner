@@ -1,7 +1,7 @@
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: completed-pods
+  name: terminating-pods
 spec:
   schedule: "*/5 * * * *"
   resourcePolicySet:
@@ -23,4 +23,7 @@ spec:
 
           return hs
         end
-  action: Scan
+  action: Delete
+  deleteOptions:
+    gracePeriodSeconds: 0
+    propagationPolicy: Background
