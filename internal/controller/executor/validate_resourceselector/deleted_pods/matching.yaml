@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  deletionTimestamp: "2024-09-30T10:50:51Z"
+spec:
+  containers:
+  - name: my-container
+    image: busybox

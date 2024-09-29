@@ -74,6 +74,11 @@ type ResourceSelector struct {
 	// object is a match and an optional "message" field.
 	// +optional
 	Evaluate string `json:"evaluate,omitempty"`
+
+	// ExcludeDeleted if set (default value), exclude resources marked as
+	// deleted. If set to false, k8s-cleaner will consider also resources marked as deleted.
+	// +kubebuilder:default:=true
+	ExcludeDeleted bool `json:"excludeDeleted,omitempty"`
 }
 
 type ResourcePolicySet struct {

@@ -224,7 +224,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 	results := make([]ResourceResult, 0)
 	for i := range resources {
 		resource := &resources[i]
-		if !resource.GetDeletionTimestamp().IsZero() {
+		if sr.ExcludeDeleted && !resource.GetDeletionTimestamp().IsZero() {
 			continue
 		}
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
