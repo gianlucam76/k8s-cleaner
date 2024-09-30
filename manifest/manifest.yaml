@@ -512,7 +512,7 @@ spec:
         - --diagnostics-address=:8443
         command:
         - /manager
-        image: docker.io/projectsveltos/k8s-cleaner:main
+        image: docker.io/projectsveltos/k8s-cleaner:v0.9.0
         livenessProbe:
           failureThreshold: 3
           httpGet:
