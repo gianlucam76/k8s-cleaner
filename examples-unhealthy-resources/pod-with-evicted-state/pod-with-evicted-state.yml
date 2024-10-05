@@ -1,0 +1,26 @@
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: evicted-pods
+spec:
+  schedule: "*/5 * * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          -- Check if the pod's status is Failed and the reason is Evicted
+          if obj.status.phase == "Failed" and obj.status.reason == "Evicted" then
+            -- If the pod is evicted, mark it for cleaning
+            hs.matching = true
+          end
+
+          return hs
+        end
+  action: Delete
