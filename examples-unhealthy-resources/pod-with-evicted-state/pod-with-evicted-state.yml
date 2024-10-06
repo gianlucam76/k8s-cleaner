@@ -1,3 +1,9 @@
+# This Cleaner instance is designed to find all evicted Pod instances in all namespaces.
+# It evaluates pods that have failed with the reason "Evicted" and marks them for deletion.
+# The cleaner runs on a scheduled interval every 5 minutes, ensuring that evicted pods
+# are promptly removed, freeing up cluster resources and maintaining a clean environment.
+# By automatically deleting evicted pods, this Cleaner helps improve resource management
+# and cluster performance.
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
