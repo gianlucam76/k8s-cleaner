@@ -72,4 +72,5 @@ Major Changes to functions are documented with the version affected. **Before up
 | serviceMonitor.namespace | string | `""` | Install the ServiceMonitor into a different Namespace, as the monitoring stack one (default: the release one) |
 | serviceMonitor.targetLabels | list | `[]` | Set targetLabels for the serviceMonitor |
 | tolerations | list | `[]` | Tolerations |
+| topologySpreadConstraints | object | `{}` | TopolySpreadConstrains |
 | volumes | list | `[]` | Additional volumes on the output Deployment definition. |
