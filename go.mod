@@ -10,7 +10,7 @@ require (
 	github.com/go-logr/zapr v1.3.0
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
 	github.com/onsi/ginkgo/v2 v2.21.0
-	github.com/onsi/gomega v1.35.0
+	github.com/onsi/gomega v1.35.1
 	github.com/pkg/errors v0.9.1
 	github.com/projectsveltos/libsveltos v0.41.1
 	github.com/robfig/cron/v3 v3.0.1
@@ -24,7 +24,7 @@ require (
 	k8s.io/client-go v0.31.2
 	k8s.io/component-base v0.31.2
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.8.4
+	sigs.k8s.io/cluster-api v1.8.5
 	sigs.k8s.io/controller-runtime v0.19.1
 )
 
