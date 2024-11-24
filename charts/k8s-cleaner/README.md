@@ -46,6 +46,7 @@ Major Changes to functions are documented with the version affected. **Before up
 | controller.volumeMounts | list | `[]` | Controller VolumeMounts |
 | crds.install | bool | `true` | Install the CustomResourceDefinitions (This also manages the lifecycle of the CRDs for update operations) |
 | crds.keep | bool | `true` | Keep the CustomResourceDefinitions (when the chart is deleted) |
+| extraObjects | list | `[]` | Extra Kubernetes objects to deploy with the helm chart |
 | fullnameOverride | string | `""` | Full name overwrite |
 | historyLimit | int | `3` | The number of old ReplicaSets to retain for a Deployment (default=10) |
 | imagePullSecrets | list | `[]` | ImagePullSecrets |

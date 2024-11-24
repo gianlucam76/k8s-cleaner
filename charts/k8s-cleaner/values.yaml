@@ -152,3 +152,6 @@ serviceMonitor:
     metricRelabelings: []
     # -- Set relabelings for the endpoint of the serviceMonitor
     relabelings: []
+
+# -- Extra Kubernetes objects to deploy with the helm chart
+extraObjects: []
