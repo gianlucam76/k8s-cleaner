@@ -70,7 +70,7 @@ KUBECTL := $(TOOLS_BIN_DIR)/kubectl
 CT := $(TOOLS_BIN_DIR)/ct
 
 GOVULNCHECK_VERSION := "v1.1.3"
-GOLANGCI_LINT_VERSION := "v1.59.0"
+GOLANGCI_LINT_VERSION := "v1.61.0"
 
 KUSTOMIZE_VER := v5.3.0
 KUSTOMIZE_BIN := kustomize
@@ -79,7 +79,7 @@ KUSTOMIZE_PKG := sigs.k8s.io/kustomize/kustomize/v5
 $(KUSTOMIZE): # Build kustomize from tools folder.
 	CGO_ENABLED=0 GOBIN=$(TOOLS_BIN_DIR) $(GO_INSTALL) $(KUSTOMIZE_PKG) $(KUSTOMIZE_BIN) $(KUSTOMIZE_VER)
 
-SETUP_ENVTEST_VER := v0.0.0-20240522175850-2e9781e9fc60
+SETUP_ENVTEST_VER := release-0.19
 SETUP_ENVTEST_BIN := setup-envtest
 SETUP_ENVTEST := $(abspath $(TOOLS_BIN_DIR)/$(SETUP_ENVTEST_BIN)-$(SETUP_ENVTEST_VER))
 SETUP_ENVTEST_PKG := sigs.k8s.io/controller-runtime/tools/setup-envtest
@@ -171,7 +171,7 @@ endif
 # K8S_VERSION for the Kind cluster can be set as environment variable. If not defined,
 # this default value is used
 ifndef K8S_VERSION
-K8S_VERSION := v1.31.0
+K8S_VERSION := v1.31.2
 endif
 
 KIND_CONFIG ?= kind-cluster.yaml

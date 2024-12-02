@@ -35,7 +35,7 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller/executor"
 
-	libsveltosutils "github.com/projectsveltos/libsveltos/lib/utils"
+	"github.com/projectsveltos/libsveltos/lib/k8s_utils"
 )
 
 const (
@@ -307,7 +307,7 @@ func getCleaner(dirName string) *appsv1alpha1.Cleaner {
 	content, err := os.ReadFile(cleanerFileName)
 	Expect(err).To(BeNil())
 
-	u, err := libsveltosutils.GetUnstructured(content)
+	u, err := k8s_utils.GetUnstructured(content)
 	Expect(err).To(BeNil())
 
 	var cleaner appsv1alpha1.Cleaner
@@ -329,7 +329,7 @@ func getResource(dirName, fileName string) *unstructured.Unstructured {
 	content, err := os.ReadFile(resourceFileName)
 	Expect(err).To(BeNil())
 
-	u, err := libsveltosutils.GetUnstructured(content)
+	u, err := k8s_utils.GetUnstructured(content)
 	Expect(err).To(BeNil())
 
 	return u
@@ -350,7 +350,7 @@ func getResources(dirName, fileName string) []executor.ResourceResult {
 	resources := make([]executor.ResourceResult, 0)
 	elements := strings.Split(string(content), "---")
 	for i := range elements {
-		u, err := libsveltosutils.GetUnstructured([]byte(elements[i]))
+		u, err := k8s_utils.GetUnstructured([]byte(elements[i]))
 		Expect(err).To(BeNil())
 		resources = append(resources, executor.ResourceResult{
 			Resource: u,
