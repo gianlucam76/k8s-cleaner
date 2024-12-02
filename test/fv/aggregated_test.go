@@ -31,7 +31,7 @@ import (
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 
-	"github.com/projectsveltos/libsveltos/lib/utils"
+	"github.com/projectsveltos/libsveltos/lib/k8s_utils"
 )
 
 var (
@@ -127,7 +127,7 @@ var _ = Describe("Aggregated Filtering", func() {
 
 		podName := randomString()
 		podYAML := fmt.Sprintf(podTemplate, podName, ns, secret1.Name)
-		pod, err := utils.GetUnstructured([]byte(podYAML))
+		pod, err := k8s_utils.GetUnstructured([]byte(podYAML))
 		Expect(err).To(BeNil())
 
 		By(fmt.Sprintf("creating pod %s/%s that mounts secret %s/%s",
