@@ -23,6 +23,7 @@ nav:
 - Getting Started:
   - Installation:
     - Install: 'getting_started/install/install.md'
+    - Install on Multiple Clusters with Sveltos: 'getting_started/install/install_on_multiple_cluster.md'
   - Features:
     - Dry Run: 'getting_started/features/dryrun/dryrun.md'
     - Label Filters: 'getting_started/features/label_filters/label_filters.md'
