@@ -75,6 +75,16 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 - ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/) 
 - 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
 
+## Install on Multiple Clusters with Sveltos
+
+If you manage a fleet of Kubernetes clusters, [Sveltos](https://github.com/projectsveltos) simplifies the deployment and management of k8s-cleaner across your entire infrastructure. Instead of manually deploying k8s-cleaner to each cluster, Sveltos offers a centralized platform to:
+
+- **Automate Deployment**: Easily deploy k8s-cleaner to multiple clusters with a single configuration.
+- **Manage Configurations**: Centrally manage k8s-cleaner configurations and apply them consistently across all clusters.
+- **Ensure Consistency**: Maintain consistent k8s-cleaner configurations and versions across your fleet.
+
+Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install_on_multiple_cluster/).
+
 ## Validate Cleaner Configuration 
 
 To verify the correctness of the __Cleaner__ configuration, follow the comprehensive instructions provided in the documentation: [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md) and [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md).
