@@ -16,7 +16,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # tag=v4.1.7
     - name: Set up Go
-      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # tag=v5.0.2
+      uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
       with:
         go-version: 1.22.7
     - name: Build
@@ -35,7 +35,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # tag=v4.1.7
     - name: Set up Go
-      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # tag=v5.0.2
+      uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
       with:
         go-version: 1.22.7
     - name: ut
@@ -48,7 +48,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # tag=v4.1.7
     - name: Set up Go
-      uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # tag=v5.0.2
+      uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed # v5.1.0
       with:
         go-version: 1.22.7
     - name: fv
