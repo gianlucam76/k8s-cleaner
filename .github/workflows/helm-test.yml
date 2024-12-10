@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
+      - uses: azure/setup-helm@fe7b79cd5ee1e45176fcad797de68ecaf3ca4814 # v4
       - name: Setup Chart Linting
         id: lint
         uses: helm/chart-testing-action@5aa1c68405a43a57240a9b2869379324b2bec0fc
