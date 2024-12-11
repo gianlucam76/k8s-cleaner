@@ -8,6 +8,7 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions: {}
 
 jobs:
   build-static-test:
