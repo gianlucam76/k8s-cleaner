@@ -35,7 +35,7 @@ The k8s-cleaner can be installed in any Kubernetes cluster independent if it is 
     ```bash
     $ export KUBECONFIG=<directory to the kubeconfig file>
 
-    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.10.0/manifest/manifest.yaml
+    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.11.0/manifest/manifest.yaml
     ```
 
 !!! note
