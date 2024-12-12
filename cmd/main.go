@@ -43,6 +43,7 @@ import (
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller"
+	"gianlucam76/k8s-cleaner/internal/telemetry"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -58,6 +59,8 @@ var (
 	syncPeriod            time.Duration
 	jitterWindowInSeconds int
 	healthAddr            string
+	disableTelemetry      bool
+	version               string
 )
 
 // Add RBAC for the authorized diagnostics endpoint.
@@ -129,6 +132,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	if !disableTelemetry {
+		err = telemetry.StartCollecting(ctx, mgr.GetClient(), version)
+		if err != nil {
+			setupLog.Error(err, "failed starting telemetry client")
+		}
+	}
+
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctx); err != nil {
 		setupLog.Error(err, "problem running manager")
@@ -137,6 +147,11 @@ func main() {
 }
 
 func initFlags(fs *pflag.FlagSet) {
+	fs.StringVar(&version, "version", "", "current k8s-cleaner version")
+
+	fs.BoolVar(&disableTelemetry, "disable-telemetry", false,
+		"When set, disable telemetry reporting")
+
 	fs.StringVar(&diagnosticsAddress, "diagnostics-address", ":8443",
 		"The address the diagnostics endpoint binds to. Per default metrics are served via https and with"+
 			"authentication/authorization. To serve via http and without authentication/authorization set --insecure-diagnostics."+

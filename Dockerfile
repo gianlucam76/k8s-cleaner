@@ -16,6 +16,7 @@ RUN go mod download
 COPY cmd/main.go cmd/main.go
 COPY api/ api/
 COPY internal/controller/ internal/controller/
+COPY internal/telemetry/ internal/telemetry/
 COPY pkg/ pkg/
 
 RUN CGO_ENABLED=0 GOOS=$BUILDOS GOARCH=$TARGETARCH go build -a -o manager cmd/main.go

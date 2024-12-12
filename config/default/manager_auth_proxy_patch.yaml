@@ -12,4 +12,5 @@ spec:
       - name: controller
         args:
         - "--diagnostics-address=:8443"
+        - "--version=main"
 

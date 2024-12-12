@@ -510,6 +510,7 @@ spec:
       containers:
       - args:
         - --diagnostics-address=:8443
+        - --version=main
         command:
         - /manager
         image: docker.io/projectsveltos/k8s-cleaner:main
