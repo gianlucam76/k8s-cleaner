@@ -41,6 +41,8 @@ There are also examples to identify unhealthy resources:
   - [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
   - [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
 
+![k8s-cleaner in action](docs/assets/sveltos_roomba.gif)
+
 ## Features and Capabilities
 
 1️⃣ [**Schedule**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/schedule/schedule/): Specify the frequency at which the k8s-cleaner should scan the cluster and identify stale resources. Utilise the Cron syntax to define recurring schedules.
