@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/a8m/envsubst v1.4.2
 	github.com/helm/chart-testing/v3 v3.11.0
-	github.com/onsi/ginkgo/v2 v2.22.0
+	github.com/onsi/ginkgo/v2 v2.22.1
 	golang.org/x/oauth2 v0.24.0
 	k8s.io/client-go v0.32.0
 	sigs.k8s.io/controller-tools v0.16.5
@@ -29,7 +29,7 @@ require (
 	github.com/gobuffalo/flect v1.0.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/pprof v0.0.0-20241029153458-d1b30febd7db // indirect
+	github.com/google/pprof v0.0.0-20241210010833-40e02aabc2ad // indirect
 	github.com/google/safetext v0.0.0-20240722112252-5a72de7e7962 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
