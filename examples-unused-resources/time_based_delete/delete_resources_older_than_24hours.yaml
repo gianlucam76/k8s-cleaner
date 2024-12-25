@@ -18,7 +18,7 @@
 #         value: nginx 
 #       - key: environment
 #         operation: Different
-#         value: prouction 
+#         value: production 
 #
 # If you need further filtering modify `function evaluate` you can access any
 # field of obj
