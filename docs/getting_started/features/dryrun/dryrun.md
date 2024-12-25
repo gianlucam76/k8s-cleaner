@@ -44,7 +44,7 @@ The example below, provides a definition of eliminating **Deployments** in the `
             value: api # Match deployments with the "serving" label set to "api"
           - key: environment
             operation: Different
-            value: prouction # Match deployments with the "environment" label different from "production"
+            value: production # Match deployments with the "environment" label different from "production"
       action: Scan
 	```
 

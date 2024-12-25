@@ -42,7 +42,7 @@ The example below, provides a definition of eliminating **Deployments** in the `
             value: api # Identifies Deployments with "serving" label set to "api"
           - key: environment
             operation: Different
-            value: prouction # Identifies Deployments with "environment" label different from "production"
+            value: production # Identifies Deployments with "environment" label different from "production"
       action: Delete # Deletes matching Deployments
 	```
 
