@@ -10,10 +10,6 @@ rules:
   - '*'
   verbs:
   - '*'
-  - delete
-  - get
-  - list
-  - watch
 - apiGroups:
   - apps.projectsveltos.io
   resources:
