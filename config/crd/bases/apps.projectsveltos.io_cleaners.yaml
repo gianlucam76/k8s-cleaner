@@ -138,6 +138,7 @@ spec:
                       - Discord
                       - Teams
                       - SMTP
+                      - Telegram
                       type: string
                   required:
                   - name

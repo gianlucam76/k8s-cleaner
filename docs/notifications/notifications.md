@@ -20,6 +20,7 @@ The below notifications are available.
 - **Slack**
 - **Webex**
 - **Discord**
+- **Telegram**
 - **Teams**
 - **SMTP**
 
@@ -136,6 +137,44 @@ $ kubectl create secret generic discord --from-literal=DISCORD_TOKEN=<YOUR TOKEN
           apiVersion: v1
           kind: Secret
           name: discord
+          namespace: default
+    ```
+
+## Telegram Notifications Example
+
+### Kubernetes Secret
+
+To allow the k8s-cleaner to write messages or upload files to a group, we need to create a Kubernetes secret
+
+```bash
+$ kubectl create secret generic telegram --from-literal=TELEGRAM_TOKEN=<YOUR TOKEN> --from-literal=TELEGRAM_CHAT_ID=<YOUR TELEGRAM CHAT ID>
+```
+
+
+!!! example "Telegram Notifications Defintion"
+
+    ```yaml
+    ---
+    apiVersion: apps.projectsveltos.io/v1alpha1
+    kind: Cleaner
+    metadata:
+      name: cleaner-with-telegram-notifications
+    spec:
+      schedule: "0 * * * *"
+      action: Delete # Delete matching resources
+      resourcePolicySet:
+        resourceSelectors:
+        - namespace: test
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: telegram
+        type: Telegram
+        notificationRef:
+          apiVersion: v1
+          kind: Secret
+          name: telegram
           namespace: default
     ```
 
