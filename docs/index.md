@@ -37,7 +37,7 @@ It is designed to handle any Kubernetes resource types (including custom Kuberne
 
 4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org/) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources.
 
-5️⃣ **Notifications**: Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams or reports.
+5️⃣ **Notifications**: Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Telegram, Teams or reports.
 
 ## Benefits
 

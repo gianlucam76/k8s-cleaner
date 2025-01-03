@@ -22,12 +22,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"time"
 
 	goteamsnotify "github.com/atc0005/go-teams-notify/v2"
 	"github.com/atc0005/go-teams-notify/v2/adaptivecard"
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-logr/logr"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	webexteams "github.com/jbogarin/go-cisco-webex-teams/sdk"
 	"github.com/slack-go/slack"
 	corev1 "k8s.io/api/core/v1"
@@ -61,6 +63,11 @@ type teamsInfo struct {
 	webhookUrl string
 }
 
+type telegramInfo struct {
+	token  string
+	chatID int64
+}
+
 // sendNotification delivers notification
 func sendNotifications(ctx context.Context, resources []ResourceResult,
 	cleaner *appsv1alpha1.Cleaner, logger logr.Logger) error {
@@ -90,6 +97,8 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 			err = sendDiscordNotification(ctx, reportSpec, message, notification, logger)
 		case appsv1alpha1.NotificationTypeTeams:
 			err = sendTeamsNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeTelegram:
+			err = sendTelegramNotification(ctx, reportSpec, message, notification, logger)
 		case appsv1alpha1.NotificationTypeSMTP:
 			err = sendSmtpNotification(ctx, reportSpec, message, notification, logger)
 		default:
@@ -299,6 +308,56 @@ func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.Repor
 	return err
 }
 
+func sendTelegramNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
+	_ string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+
+	info, err := getTelegramInfo(ctx, notification)
+	if err != nil {
+		return err
+	}
+
+	l := logger.WithValues("chatid", info.chatID)
+	l.V(logs.LogInfo).Info("send telegram message")
+
+	bot, err := tgbotapi.NewBotAPI(info.token)
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to get telegram bot: %v", err))
+		return err
+	}
+
+	resourceSpecData, err := json.Marshal(*reportSpec)
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
+		return err
+	}
+
+	// Create a temporary file
+	tmpFile, err := os.CreateTemp(os.TempDir(), "k8s-cleaner-webex")
+	if err != nil {
+		l.V(logs.LogInfo).Info(fmt.Sprintf("error creating temporary file: %v", err))
+		return err
+	}
+
+	defer func() {
+		// Close the file
+		tmpFile.Close()
+
+		// Remove the temporary file
+		os.Remove(tmpFile.Name())
+	}()
+
+	_, err = tmpFile.Write(resourceSpecData)
+	if err != nil {
+		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to write to file: %s", err))
+		return err
+	}
+
+	msg := tgbotapi.NewDocument(info.chatID, tgbotapi.FilePath(tmpFile.Name()))
+	_, err = bot.Send(msg)
+
+	return err
+}
+
 func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
 	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
 
@@ -461,6 +520,31 @@ func getDiscordInfo(ctx context.Context, notification *appsv1alpha1.Notification
 	}
 
 	return &discordInfo{token: string(authToken), serverID: string(serverID)}, nil
+}
+
+func getTelegramInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*telegramInfo, error) {
+	secret, err := getSecret(ctx, notification)
+	if err != nil {
+		return nil, err
+	}
+
+	authToken, ok := secret.Data[libsveltosv1beta1.TelegramToken]
+	if !ok {
+		return nil, fmt.Errorf("secret does not contain telegram token")
+	}
+
+	chatIDData, ok := secret.Data[libsveltosv1beta1.TelegramChatID]
+	if !ok {
+		return nil, fmt.Errorf("secret does not contain telegram chatID")
+	}
+
+	str := string(chatIDData)
+	chatID, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get chatID")
+	}
+
+	return &telegramInfo{token: string(authToken), chatID: chatID}, nil
 }
 
 func getWebexInfo(ctx context.Context, notification *appsv1alpha1.Notification) (*webexInfo, error) {
