@@ -361,13 +361,7 @@ func sendTelegramNotification(ctx context.Context, reportSpec *appsv1alpha1.Repo
 func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
 	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
 
-	sveltosNotification := &libsveltosv1beta1.Notification{
-		Name:            notification.Name,
-		Type:            libsveltosv1beta1.NotificationTypeSMTP,
-		NotificationRef: notification.NotificationRef,
-	}
-
-	mailer, err := sveltosnotifications.NewMailer(ctx, k8sClient, sveltosNotification)
+	mailer, err := sveltosnotifications.NewMailer(ctx, k8sClient, notification.NotificationRef)
 	if err != nil {
 		return err
 	}
@@ -379,7 +373,7 @@ func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSp
 	if err != nil {
 		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
 	}
-	return mailer.SendMail(message, string(resourceSpecData), false)
+	return mailer.SendMail(message, string(resourceSpecData), false, nil)
 }
 
 func sendWebexNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
