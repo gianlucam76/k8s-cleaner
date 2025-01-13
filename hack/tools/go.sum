@@ -74,6 +74,7 @@ github.com/hashicorp/hcl v1.0.0 h1:0Anlzjpi4vEasTeNFn2mLJgTSwt0+6sfsiTG8qcWGx4=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/helm/chart-testing/v3 v3.11.0 h1:oNGuYUU3oGm9Q8Gtyy1WAZeBBH0ItIDKw9LDk/AE+5I=
 github.com/helm/chart-testing/v3 v3.11.0/go.mod h1:ogYCWYMfAK87br/cPH+/0E0dndw2MYKQsj7gQKH6WVk=
+github.com/helm/chart-testing/v3 v3.12.0/go.mod h1:ZiAWDzBOKAjlOUCDdGraO1Va5SBiMaPsY7ysmJK+448=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
