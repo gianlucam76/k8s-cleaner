@@ -7,7 +7,7 @@ require (
 	github.com/helm/chart-testing/v3 v3.12.0
 	github.com/onsi/ginkgo/v2 v2.22.2
 	golang.org/x/oauth2 v0.25.0
-	k8s.io/client-go v0.32.0
+	k8s.io/client-go v0.32.1
 	sigs.k8s.io/controller-tools v0.17.1
 	sigs.k8s.io/kind v0.26.0
 )
@@ -78,9 +78,9 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	helm.sh/helm/v3 v3.16.4 // indirect
-	k8s.io/api v0.32.0 // indirect
+	k8s.io/api v0.32.1 // indirect
 	k8s.io/apiextensions-apiserver v0.32.0 // indirect
-	k8s.io/apimachinery v0.32.0 // indirect
+	k8s.io/apimachinery v0.32.1 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
 	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
