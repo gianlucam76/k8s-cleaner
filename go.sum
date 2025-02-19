@@ -320,6 +320,8 @@ sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0 h1:CPT0ExVicCzcp
 sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.31.0/go.mod h1:Ve9uj1L+deCXFrPOk1LpFXqTg7LCFzFso6PA48q/XZw=
 sigs.k8s.io/cluster-api v1.9.4 h1:pa2Ho50F9Js/Vv/Jy11TcpmGiqY2ukXCoDj/dY25Y7M=
 sigs.k8s.io/cluster-api v1.9.4/go.mod h1:9DjpPCxJJo7/mH+KceINNJHr9c5X9S9HEp2B8JG3Uv8=
+sigs.k8s.io/cluster-api v1.9.5 h1:68164Q201Y5ANVkhyrOZenoMbfL2SEBjVYZs/ihhSro=
+sigs.k8s.io/cluster-api v1.9.5/go.mod h1:DyqyZ4jRvKGKewDRn1Q4OCHaVjsdTogymbO6mrgHEDI=
 sigs.k8s.io/controller-runtime v0.20.2 h1:/439OZVxoEc02psi1h4QO3bHzTgu49bb347Xp4gW1pc=
 sigs.k8s.io/controller-runtime v0.20.2/go.mod h1:xg2XB0K5ShQzAgsoujxuKN4LNXR2LfwwHsPj7Iaw+XY=
 sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 h1:gBQPwqORJ8d8/YNZWEjoZs7npUVDpVXUUOFfW6CgAqE=
