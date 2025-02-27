@@ -27,7 +27,7 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller/executor"
 
-	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
+	libsveltosv1beta1 "github.com/projectsveltos/libsveltos/api/v1beta1"
 )
 
 var _ = Describe("Notification", func() {
@@ -50,8 +50,8 @@ var _ = Describe("Notification", func() {
 				Namespace: secretNamespace,
 			},
 			Data: map[string][]byte{
-				libsveltosv1alpha1.WebexRoomID: []byte(webexRoomID),
-				libsveltosv1alpha1.WebexToken:  []byte(webexToken),
+				libsveltosv1beta1.WebexRoomID: []byte(webexRoomID),
+				libsveltosv1beta1.WebexToken:  []byte(webexToken),
 			},
 		}
 
@@ -85,8 +85,8 @@ var _ = Describe("Notification", func() {
 				Namespace: randomString(),
 			},
 			Data: map[string][]byte{
-				libsveltosv1alpha1.SlackChannelID: []byte(slackChannelID),
-				libsveltosv1alpha1.SlackToken:     []byte(slackToken),
+				libsveltosv1beta1.SlackChannelID: []byte(slackChannelID),
+				libsveltosv1beta1.SlackToken:     []byte(slackToken),
 			},
 		}
 
