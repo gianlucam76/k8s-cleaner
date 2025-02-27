@@ -38,7 +38,6 @@ import (
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 
-	libsveltosv1alpha1 "github.com/projectsveltos/libsveltos/api/v1alpha1"
 	libsveltosv1beta1 "github.com/projectsveltos/libsveltos/api/v1beta1"
 	logs "github.com/projectsveltos/libsveltos/lib/logsettings"
 	sveltosnotifications "github.com/projectsveltos/libsveltos/lib/notifications"
@@ -470,12 +469,12 @@ func getSlackInfo(ctx context.Context, notification *appsv1alpha1.Notification) 
 		return nil, err
 	}
 
-	authToken, ok := secret.Data[libsveltosv1alpha1.SlackToken]
+	authToken, ok := secret.Data[libsveltosv1beta1.SlackToken]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain slack token")
 	}
 
-	channelID, ok := secret.Data[libsveltosv1alpha1.SlackChannelID]
+	channelID, ok := secret.Data[libsveltosv1beta1.SlackChannelID]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain slack channelID")
 	}
@@ -489,7 +488,7 @@ func getTeamsInfo(ctx context.Context, notification *appsv1alpha1.Notification) 
 		return nil, err
 	}
 
-	webhookUrl, ok := secret.Data[libsveltosv1alpha1.TeamsWebhookURL]
+	webhookUrl, ok := secret.Data[libsveltosv1beta1.TeamsWebhookURL]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain webhook URL")
 	}
@@ -503,12 +502,12 @@ func getDiscordInfo(ctx context.Context, notification *appsv1alpha1.Notification
 		return nil, err
 	}
 
-	authToken, ok := secret.Data[libsveltosv1alpha1.DiscordToken]
+	authToken, ok := secret.Data[libsveltosv1beta1.DiscordToken]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain discord token")
 	}
 
-	serverID, ok := secret.Data[libsveltosv1alpha1.DiscordChannelID]
+	serverID, ok := secret.Data[libsveltosv1beta1.DiscordChannelID]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain discord channel id")
 	}
@@ -547,12 +546,12 @@ func getWebexInfo(ctx context.Context, notification *appsv1alpha1.Notification) 
 		return nil, err
 	}
 
-	authToken, ok := secret.Data[libsveltosv1alpha1.WebexToken]
+	authToken, ok := secret.Data[libsveltosv1beta1.WebexToken]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain webex token")
 	}
 
-	room, ok := secret.Data[libsveltosv1alpha1.WebexRoomID]
+	room, ok := secret.Data[libsveltosv1beta1.WebexRoomID]
 	if !ok {
 		return nil, fmt.Errorf("secret does not contain webex room")
 	}
