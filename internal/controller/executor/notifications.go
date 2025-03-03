@@ -223,9 +223,9 @@ func sendTeamsNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 	}
 
 	// Send the meesage with the user provided webhook URL
-	if teamsClient.Send(info.webhookUrl, teamsMessage) != nil {
-		l.V(logs.LogInfo).Info("failed to send Teams message: %v", err)
-		return err
+	if errT := teamsClient.Send(info.webhookUrl, teamsMessage); errT != nil {
+		l.V(logs.LogInfo).Info("failed to send Teams message: %v", errT)
+		return errT
 	}
 
 	return nil
