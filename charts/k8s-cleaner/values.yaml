@@ -152,6 +152,9 @@ serviceMonitor:
     metricRelabelings: []
     # -- Set relabelings for the endpoint of the serviceMonitor
     relabelings: []
+    # -- Set TLSConfig for the endpoint of the serviceMonitor
+    tlsConfig:
+      insecureSkipVerify: true
 
 # -- Extra Kubernetes objects to deploy with the helm chart
 extraObjects: []
