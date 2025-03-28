@@ -19,6 +19,12 @@ spec:
   - interval: {{ .interval }}
     port: metrics
     path: /metrics
+    scheme: https
+    bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    {{- with .tlsConfig }}
+    tlsConfig:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
     {{- with .scrapeTimeout }}
     scrapeTimeout: {{ . }}
     {{- end }}

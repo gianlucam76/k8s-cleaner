@@ -67,6 +67,7 @@ Major Changes to functions are documented with the version affected. **Before up
 | serviceMonitor.endpoint.metricRelabelings | list | `[]` | Set metricRelabelings for the endpoint of the serviceMonitor |
 | serviceMonitor.endpoint.relabelings | list | `[]` | Set relabelings for the endpoint of the serviceMonitor |
 | serviceMonitor.endpoint.scrapeTimeout | string | `""` | Set the scrape timeout for the endpoint of the serviceMonitor |
+| serviceMonitor.endpoint.tlsConfig | object | `{"insecureSkipVerify":true}` | Set TLSConfig for the endpoint of the serviceMonitor |
 | serviceMonitor.jobLabel | string | `"app.kubernetes.io/name"` | Set JobLabel for the serviceMonitor |
 | serviceMonitor.labels | object | `{}` | Assign additional labels according to Prometheus' serviceMonitorSelector matching labels |
 | serviceMonitor.matchLabels | object | `{}` | Change matching labels |
