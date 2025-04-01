@@ -8,7 +8,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.23.3
 	golang.org/x/oauth2 v0.28.0
 	k8s.io/client-go v0.32.3
-	sigs.k8s.io/controller-tools v0.17.2
+	sigs.k8s.io/controller-tools v0.17.3
 	sigs.k8s.io/kind v0.27.0
 )
 
@@ -18,7 +18,7 @@ require (
 	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/evanphx/json-patch/v5 v5.6.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
@@ -56,7 +56,7 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
-	github.com/spf13/cobra v1.8.1 // indirect
+	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -77,7 +77,7 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	helm.sh/helm/v3 v3.16.4 // indirect
 	k8s.io/api v0.32.3 // indirect
-	k8s.io/apiextensions-apiserver v0.32.1 // indirect
+	k8s.io/apiextensions-apiserver v0.32.2 // indirect
 	k8s.io/apimachinery v0.32.3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
