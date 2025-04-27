@@ -26,7 +26,7 @@ controller:
     # -- Controller Image Repository
     repository: projectsveltos/k8s-cleaner
     # -- ControllerImage Tag
-    tag: "v0.12.0"
+    tag: "v0.13.0"
     # -- Controller Image pull policy
     pullPolicy: IfNotPresent
   # -- Controller ARguments
@@ -37,7 +37,7 @@ controller:
     protocol: TCP
   - containerPort: 9440
     name: healthz
-    protocol: TCP  
+    protocol: TCP
   # -- Controller SecurityCOntext
   securityContext:
     enabled: true
@@ -46,7 +46,7 @@ controller:
       drop:
       - ALL
     runAsNonRoot: true
-  # -- Controller LivenessProbe  
+  # -- Controller LivenessProbe
   livenessProbe:
     enabled: true
     httpGet:
