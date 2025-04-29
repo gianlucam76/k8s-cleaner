@@ -40,9 +40,9 @@ The maching resource will be stored in the below directory.
 	  storageClassName: standard
 	  accessModes:
 	    - ReadWriteOnce
-	resources:
-	  requests:
-	    storage: 2Gi
+	  resources:
+	    requests:
+	      storage: 2Gi
 	```
 
 The above YAML definition will create a `PersistentVolumeClaim` of 2Gi. In case more storage is required, simply update the YAML definition.
@@ -56,7 +56,7 @@ $ kubectl apply -f "pvc.yaml"
 The next is to update the `k8s-cleaner-controller` deployment located in the `projectsveltos` namespace. Then, we will define the `PersistentVolumeClaim` and the actual storage location.
 
 ```bash
-$ kubectl get deploy -n projectsveltos                        
+$ kubectl get deploy -n projectsveltos
 NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
 k8s-cleaner-controller   1/1     1            1           10m
 $ kubectl edit deploy k8s-cleaner-controller -n projectsveltos
@@ -81,18 +81,7 @@ The YAML defition files will be stored in `/pvc/`.
 
 In step 3, we will create a Cleaner Resource and define the deletion of any unused `configMap` resources based on a cron job. To store the resources before performing any deletions, we will add the argument ` storeResourcePath: "/pvc/"` and store the resources inside the `/pvc/` directory.
 
-!!! example "Cleaner Resource"
-
-	```yaml
-	apiVersion: apps.projectsveltos.io/v1alpha1
-	kind: Cleaner
-	metadata:
-	  name: unused-configmaps
-	spec:
-	  storeResourcePath: "/pvc/"
-	  schedule: "* 0 * * *"
-	  action: Delete
-	```
+For instance get this [Cleaner instance](https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/refs/heads/main/examples-unused-resources/configmaps/orphaned_configmaps.yaml) that finds unused ConfigMaps. Set __spec.storeResourcePath: "/pvc/"__ (eventually change __spec.action: Scan__)
 
 When cleaner find the ununsed `ConfigMap`, it will first store the resource definition and then delete the actual resource.
 
