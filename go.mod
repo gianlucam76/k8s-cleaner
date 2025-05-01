@@ -13,7 +13,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
 	github.com/pkg/errors v0.9.1
-	github.com/projectsveltos/libsveltos v0.52.3
+	github.com/projectsveltos/libsveltos v0.53.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/slack-go/slack v0.16.0
 	github.com/spf13/pflag v1.0.6
@@ -25,7 +25,7 @@ require (
 	k8s.io/client-go v0.32.4
 	k8s.io/component-base v0.32.4
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.10.0
+	sigs.k8s.io/cluster-api v1.10.1
 	sigs.k8s.io/controller-runtime v0.20.4
 )
 
