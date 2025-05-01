@@ -168,6 +168,8 @@ github.com/projectsveltos/libsveltos v0.52.2 h1:EUrzDKtnFPRHENOH2keLRlyNVkT99QYv
 github.com/projectsveltos/libsveltos v0.52.2/go.mod h1:FR5Zi1h1HRuRxsvhH24HQRWRCbJLcKailfYlcbG/Cvk=
 github.com/projectsveltos/libsveltos v0.52.3 h1:O2JGYmSS+ToJXt6LUi7MPuE2pIraHzMb15Rsg0CtqDg=
 github.com/projectsveltos/libsveltos v0.52.3/go.mod h1:KtqoeQ0LXDrgAWisp4hfHVbH+tGA1pJnL2+vVKYzXNU=
+github.com/projectsveltos/libsveltos v0.53.0 h1:TiMMujh6kX6evFYk1XrPrwQhiv0pNSxuwRmGeGcGEiM=
+github.com/projectsveltos/libsveltos v0.53.0/go.mod h1:sqZMoHeBgXY6cMIRrByGsdZxpOmwdK+p/H3G81yZ6q0=
 github.com/prometheus/client_golang v1.19.1 h1:wZWJDwK+NameRJuPGDhlnFgx8e8HN3XHQeLaYJFJBOE=
 github.com/prometheus/client_golang v1.19.1/go.mod h1:mP78NwGzrVks5S2H6ab8+ZZGJLZUq1hoULYBAYBw1Ho=
 github.com/prometheus/client_model v0.6.1 h1:ZKSh/rekM+n3CeS952MLRAdFwIKqeY8b62p8ais2e9E=
@@ -373,6 +375,8 @@ sigs.k8s.io/cluster-api v1.9.6 h1:2jZ434qC0bzrPQzmRDm4/b0PZWVMnOocoCjsAonQN5Q=
 sigs.k8s.io/cluster-api v1.9.6/go.mod h1:DyqyZ4jRvKGKewDRn1Q4OCHaVjsdTogymbO6mrgHEDI=
 sigs.k8s.io/cluster-api v1.10.0 h1:Jcmr8aEDI4/MCqNmvjj9YQlW7r4qTUpTnL6T9UUrVuQ=
 sigs.k8s.io/cluster-api v1.10.0/go.mod h1:aiPMrNPoaJc/GuJ4TCpWX8bVe11+iCJ4HI0f3c9QiJg=
+sigs.k8s.io/cluster-api v1.10.1 h1:5vsLNgQ4SkPudJ1USK532B0SIdJxRsCNKt2DZtBf+ww=
+sigs.k8s.io/cluster-api v1.10.1/go.mod h1:aiPMrNPoaJc/GuJ4TCpWX8bVe11+iCJ4HI0f3c9QiJg=
 sigs.k8s.io/controller-runtime v0.20.4 h1:X3c+Odnxz+iPTRobG4tp092+CvBU9UK0t/bRf+n0DGU=
 sigs.k8s.io/controller-runtime v0.20.4/go.mod h1:xg2XB0K5ShQzAgsoujxuKN4LNXR2LfwwHsPj7Iaw+XY=
 sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 h1:gBQPwqORJ8d8/YNZWEjoZs7npUVDpVXUUOFfW6CgAqE=
