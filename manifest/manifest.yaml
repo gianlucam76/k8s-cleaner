@@ -7,7 +7,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: cleaners.apps.projectsveltos.io
 spec:
   group: apps.projectsveltos.io
@@ -206,6 +206,8 @@ spec:
                                 enum:
                                 - Equal
                                 - Different
+                                - Has
+                                - DoesNotHave
                                 type: string
                               value:
                                 description: Value is the label value
@@ -213,7 +215,6 @@ spec:
                             required:
                             - key
                             - operation
-                            - value
                             type: object
                           type: array
                         namespace:
@@ -290,7 +291,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.17.3
+    controller-gen.kubebuilder.io/version: v0.18.0
   name: reports.apps.projectsveltos.io
 spec:
   group: apps.projectsveltos.io
