@@ -337,20 +337,7 @@ func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.Resource
 	options := metav1.ListOptions{}
 
 	if len(resourceSelector.LabelFilters) > 0 {
-		labelFilter := ""
-		for i := range resourceSelector.LabelFilters {
-			if labelFilter != "" {
-				labelFilter += ","
-			}
-			f := resourceSelector.LabelFilters[i]
-			if f.Operation == libsveltosv1beta1.OperationEqual {
-				labelFilter += fmt.Sprintf("%s=%s", f.Key, f.Value)
-			} else {
-				labelFilter += fmt.Sprintf("%s!=%s", f.Key, f.Value)
-			}
-		}
-
-		options.LabelSelector = labelFilter
+		options.LabelSelector = addLabelFilters(resourceSelector.LabelFilters)
 	}
 
 	var namespaces []string
@@ -367,6 +354,32 @@ func fetchResources(ctx context.Context, resourceSelector *appsv1alpha1.Resource
 	}
 
 	return result, err
+}
+
+func addLabelFilters(labelFilters []libsveltosv1beta1.LabelFilter) string {
+	labelFilter := ""
+	if len(labelFilters) > 0 {
+		for i := range labelFilters {
+			if labelFilter != "" {
+				labelFilter += ","
+			}
+			f := labelFilters[i]
+			switch f.Operation {
+			case libsveltosv1beta1.OperationEqual:
+				labelFilter += fmt.Sprintf("%s=%s", f.Key, f.Value)
+			case libsveltosv1beta1.OperationDifferent:
+				labelFilter += fmt.Sprintf("%s!=%s", f.Key, f.Value)
+			case libsveltosv1beta1.OperationHas:
+				// Key exists, value is not checked
+				labelFilter += f.Key
+			case libsveltosv1beta1.OperationDoesNotHave:
+				// Key does not exist
+				labelFilter += fmt.Sprintf("!%s", f.Key)
+			}
+		}
+	}
+
+	return labelFilter
 }
 
 func collectFromNamespaces(ctx context.Context, config *rest.Config, namespaces []string,
