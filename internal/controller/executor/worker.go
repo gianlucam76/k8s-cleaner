@@ -287,7 +287,7 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 		eventBroadcaster.StartRecordingToSink(&typedcorev1.EventSinkImpl{Interface: clientset.CoreV1().Events("")})
 		eventRecorder := eventBroadcaster.NewRecorder(scheme, corev1.EventSource{Component: "By Able"})
 
-		// send an Event to kube-public namespace
+		// send an Event
 		eventRecorder.Event(resource.Resource, corev1.EventTypeNormal, "DeleteNotification", fmt.Sprintf("Delete %s: %s/%s",
 			resource.Resource.GetKind(),
 			resource.Resource.GetNamespace(),
