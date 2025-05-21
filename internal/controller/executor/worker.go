@@ -37,6 +37,9 @@ import (
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/kubernetes"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
@@ -271,6 +274,25 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
 			return processedResources, err
 		}
+
+		// creates the clientset
+		clientset, err := kubernetes.NewForConfig(config)
+		if err != nil {
+			l.Info(fmt.Sprintf("Error create clientset : %v", err))
+		}
+
+		// create an EventRecorder
+		eventBroadcaster := record.NewBroadcaster()
+		//eventBroadcaster.StartLogging(logr.Infof)
+		eventBroadcaster.StartRecordingToSink(&typedcorev1.EventSinkImpl{Interface: clientset.CoreV1().Events("")})
+		eventRecorder := eventBroadcaster.NewRecorder(scheme, corev1.EventSource{Component: "By Able"})
+
+		// send an Event to kube-public namespace
+		eventRecorder.Event(resource.Resource, corev1.EventTypeNormal, "DeleteNotification", fmt.Sprintf("Delete %s: %s/%s",
+			resource.Resource.GetKind(),
+			resource.Resource.GetNamespace(),
+			resource.Resource.GetName()))
+
 		processedResources = append(processedResources, resource)
 	}
 
