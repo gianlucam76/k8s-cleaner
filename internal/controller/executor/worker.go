@@ -275,19 +275,14 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 			return processedResources, err
 		}
 
-		// creates the clientset
 		clientset, err := kubernetes.NewForConfig(config)
 		if err != nil {
-			l.Info(fmt.Sprintf("Error create clientset : %v", err))
+			l.Info(fmt.Sprintf("error create clientset : %v", err))
 		}
 
-		// create an EventRecorder
 		eventBroadcaster := record.NewBroadcaster()
-		//eventBroadcaster.StartLogging(logr.Infof)
 		eventBroadcaster.StartRecordingToSink(&typedcorev1.EventSinkImpl{Interface: clientset.CoreV1().Events("")})
 		eventRecorder := eventBroadcaster.NewRecorder(scheme, corev1.EventSource{Component: "By Able"})
-
-		// send an Event
 		eventRecorder.Event(resource.Resource, corev1.EventTypeNormal, "DeleteNotification", fmt.Sprintf("Delete %s: %s/%s",
 			resource.Resource.GetKind(),
 			resource.Resource.GetNamespace(),
