@@ -509,10 +509,10 @@ spec:
       containers:
       - args:
         - --diagnostics-address=:8443
-        - --version=v0.14.0
+        - --version=main
         command:
         - /manager
-        image: docker.io/projectsveltos/k8s-cleaner:v0.14.0
+        image: docker.io/projectsveltos/k8s-cleaner:main
         livenessProbe:
           failureThreshold: 3
           httpGet:
