@@ -35,7 +35,7 @@ The k8s-cleaner can be installed in any Kubernetes cluster independent if it is 
     ```bash
     $ export KUBECONFIG=<directory to the kubeconfig file>
 
-    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.13.0/manifest/manifest.yaml
+    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.14.0/manifest/manifest.yaml
     ```
 
 !!! note
@@ -48,7 +48,7 @@ There is the option to install the k8s-cleaner with a Helm chart. To do so, simp
 !!! example ""
     ```bash
     $ helm install k8s-cleaner oci://ghcr.io/gianlucam76/charts/k8s-cleaner \
-        --version 0.13.0 \
+        --version 0.14.0 \
         --namespace k8s-cleaner \
         --create-namespace #(1)
     ```
