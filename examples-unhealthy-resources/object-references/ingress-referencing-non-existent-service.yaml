@@ -97,7 +97,7 @@ spec:
           end
 
           healthy, message = allReferencedServiceValid(ingress, services) 
-          if not ahealthy then
+          if not healthy then
             table.insert(unhealthyIngresses, {resource = ingress, message = message}) 
           end
 
