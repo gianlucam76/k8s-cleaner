@@ -5,7 +5,7 @@ type: application
 # Note: The version is overwritten by the release workflow.
 version: 1.5.0
 # Note: The version is overwritten by the release workflow.
-appVersion: 0.13.0
+appVersion: 0.14.0
 home: https://github.com/gianlucam76/k8s-cleaner
 icon: https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png
 keywords:
