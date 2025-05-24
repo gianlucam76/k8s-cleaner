@@ -236,7 +236,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 			return nil, err
 		}
 		if isMatch {
-			l.Info("getMatchingResources: found a match")
+			l.Info(fmt.Sprintf("getMatchingResources: found a match %q", message))
 			resourceInfo := ResourceResult{
 				Resource: resource,
 				Message:  message,
@@ -880,10 +880,11 @@ func toGoValue(lv lua.LValue) interface{} {
 func printMatchingResources(resources []ResourceResult, logger logr.Logger) {
 	for i := range resources {
 		resource := resources[i]
-		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
+		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s %q",
 			resource.Resource.GetKind(),
 			resource.Resource.GetNamespace(),
-			resource.Resource.GetName()))
+			resource.Resource.GetName(),
+			resource.Message))
 		l = l.WithValues("message", resource.Message)
 		l.Info("resource is a match for cleaner")
 	}

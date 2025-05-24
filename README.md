@@ -23,8 +23,9 @@ k8s-cleaner keeps you in the loop with handy notifications through:
 1. <img src="assets/teams_logo.svg" alt="Teams" width="30" />  [__Teams__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#teams-notifications-example)
 1. <img src="assets/telegram_logo.png" alt="Telegram" width="30" />  [__Telegram__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#telegram-notifications-example)
 1. <img src="assets/smtp_logo.png" alt="SMTP" width="30" />  [__SMTP__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#smtp-notifications-example)
+1.  [__Kubernetes Event__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#kubernetes-event-notifications-example)
 1.  [__reports__](https://gianlucam76.github.io/k8s-cleaner/reports/k8s-cleaner_reports/)
-  
+
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
 Currently k8s-cleaner has rich set of working examples to **identify** and **list** **unused**:
@@ -76,7 +77,7 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 
 ## Getting Started Guide
 
-- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/) 
+- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/)
 - 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
 
 ## Install on Multiple Clusters with Sveltos
@@ -89,7 +90,7 @@ If you manage a fleet of Kubernetes clusters, [Sveltos](https://github.com/proje
 
 Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install_on_multiple_cluster/).
 
-## Validate Cleaner Configuration 
+## Validate Cleaner Configuration
 
 To verify the correctness of the __Cleaner__ configuration, follow the comprehensive instructions provided in the documentation: [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md) and [here](https://github.com/gianlucam76/k8s-cleaner/blob/main/internal/controller/executor/validate_transform/README.md).
 

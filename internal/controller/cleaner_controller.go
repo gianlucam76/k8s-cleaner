@@ -169,7 +169,8 @@ func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *s
 func (r *CleanerReconciler) SetupWithManager(ctx context.Context, mgr ctrl.Manager,
 	numOfWorker int, logger logr.Logger) error {
 
-	executor.InitializeClient(ctx, logger, mgr.GetConfig(), mgr.GetClient(), mgr.GetScheme(), numOfWorker)
+	executor.InitializeClient(ctx, logger, mgr.GetConfig(), mgr.GetClient(), mgr.GetScheme(),
+		mgr.GetEventRecorderFor("notification-recorder"), numOfWorker)
 
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&appsv1alpha1.Cleaner{}).

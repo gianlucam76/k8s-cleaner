@@ -7,6 +7,9 @@ kind: Cleaner
 metadata:
   name: unused-configmaps
 spec:
+  notifications:
+  - name: events
+    type: Event
   schedule: "* 0 * * *"
   action: Delete
   resourcePolicySet:
@@ -16,7 +19,7 @@ spec:
       version: v1
     - kind: ConfigMap
       group: ""
-      version: v1   
+      version: v1
     aggregatedSelection: |
       function skipNamespace(namespace)
         return string.match(namespace, '^kube')
@@ -24,7 +27,7 @@ spec:
 
       function getKey(namespace, name)
         return namespace .. ":" .. name
-      end 
+      end
 
       function configMapsUsedByPods(pods)
         local podConfigMaps = {}
@@ -32,7 +35,7 @@ spec:
         for _, pod in ipairs(pods) do
           if pod.spec.containers ~= nil then
             for _, container in ipairs(pod.spec.containers) do
-              
+
               if container.env ~= nil then
                 for _, env in ipairs(container.env) do
                   if env.valueFrom ~= nil and env.valueFrom.configMapKeyRef ~= nil then
@@ -49,7 +52,7 @@ spec:
                     podConfigMaps[key] = true
                   end
                 end
-              end  
+              end
             end
           end
 
@@ -72,12 +75,12 @@ spec:
                     podConfigMaps[key] = true
                   end
                 end
-              end  
+              end
 
             end
-          end    
+          end
 
-          if pod.spec.volumes ~= nil then  
+          if pod.spec.volumes ~= nil then
             for _, volume in ipairs(pod.spec.volumes) do
               if volume.configMap ~= nil then
                 key = getKey(pod.metadata.namespace,volume.configMap.name)
@@ -94,7 +97,7 @@ spec:
               end
             end
           end
-        end  
+        end
 
         return podConfigMaps
       end
@@ -122,7 +125,7 @@ spec:
         for _, configMap in ipairs(configMaps) do
           key = getKey(configMap.metadata.namespace,configMap.metadata.name)
           if not podConfigMaps[key] then
-            table.insert(unusedConfigMaps, {resource = configMap})
+            table.insert(unusedConfigMaps, {message = "this is my message", resource = configMap})
           end
         end
 
