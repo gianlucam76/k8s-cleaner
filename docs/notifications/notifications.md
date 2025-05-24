@@ -23,6 +23,7 @@ The below notifications are available.
 - **Telegram**
 - **Teams**
 - **SMTP**
+- **Kubernetes Event**
 
 ## Slack Notifications Example
 
@@ -260,3 +261,35 @@ $ kubectl create secret generic smtp \
           name: smtp
           namespace: default
     ```
+
+## Kubernetes Event Notifications Example
+
+To allow the k8s-cleaner to generate a Kubernetes event for each matching resource
+
+!!! example "Kubernetes Event Notifications Definition"
+
+    ```yaml
+    ---
+    apiVersion: apps.projectsveltos.io/v1alpha1
+    kind: Cleaner
+    metadata:
+      name: cleaner-with-event-notifications
+    spec:
+      schedule: "0 * * * *"
+      action: Scan # Scan matching resources
+      resourcePolicySet:
+        resourceSelectors:
+        - namespace: test
+          kind: Deployment
+          group: "apps"
+          version: v1
+      notifications:
+      - name: event
+        type: Event
+    ```
+
+Cleaner will generate a Kubernetes Event for each Deployment matching this Cleaner instance
+
+````
+20m (x2 over 56m)   Normal   k8s-cleaner   Deployment/nginx   [ns:nginx] resource matching Cleaner instance cleaner-with-event-notifications (current action Scan)
+```

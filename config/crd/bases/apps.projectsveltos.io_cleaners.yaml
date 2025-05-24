@@ -139,6 +139,7 @@ spec:
                       - Teams
                       - SMTP
                       - Telegram
+                      - Event
                       type: string
                   required:
                   - name

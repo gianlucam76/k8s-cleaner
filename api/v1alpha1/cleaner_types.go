@@ -121,7 +121,7 @@ type ResourcePolicySet struct {
 }
 
 // NotificationType specifies different type of notifications
-// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex;Discord;Teams;SMTP;Telegram
+// +kubebuilder:validation:Enum:=CleanerReport;Slack;Webex;Discord;Teams;SMTP;Telegram;Event
 type NotificationType string
 
 const (
@@ -145,6 +145,9 @@ const (
 
 	// NotificationTypeTelegram refers to sending a Telegram message
 	NotificationTypeTelegram = NotificationType("Telegram")
+
+	// NotificationTypeEvent refers to generating a Kubernetes event
+	NotificationTypeEvent = NotificationType("Event")
 )
 
 type Notification struct {

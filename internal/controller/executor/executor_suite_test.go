@@ -83,7 +83,7 @@ var _ = BeforeSuite(func() {
 	logger, err := zap.NewDevelopment()
 	Expect(err).To(BeNil())
 
-	executor.InitializeClient(context.TODO(), zapr.NewLogger(logger), config, k8sClient, scheme, 10)
+	executor.InitializeClient(context.TODO(), zapr.NewLogger(logger), config, k8sClient, scheme, nil, 10)
 
 	By("bootstrapping completed")
 })

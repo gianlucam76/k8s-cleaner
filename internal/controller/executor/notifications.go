@@ -100,6 +100,9 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 			err = sendTelegramNotification(ctx, reportSpec, message, notification, logger)
 		case appsv1alpha1.NotificationTypeSMTP:
 			err = sendSmtpNotification(ctx, reportSpec, message, notification, logger)
+		case appsv1alpha1.NotificationTypeEvent:
+			sendKubernetesEventNotification(cleaner, resources)
+
 		default:
 			logger.V(logs.LogInfo).Info("no handler registered for notification")
 			panic(1)
@@ -355,6 +358,30 @@ func sendTelegramNotification(ctx context.Context, reportSpec *appsv1alpha1.Repo
 	_, err = bot.Send(msg)
 
 	return err
+}
+
+func sendKubernetesEventNotification(cleaner *appsv1alpha1.Cleaner, resources []ResourceResult) {
+	executorClient := GetClient()
+
+	message := ""
+	switch cleaner.Spec.Action {
+	case appsv1alpha1.ActionDelete:
+		message = fmt.Sprintf("resource deleted by Cleaner instance %s", cleaner.Name)
+	case appsv1alpha1.ActionTransform:
+		message = fmt.Sprintf("resource modified by Cleaner instance %s", cleaner.Name)
+	case appsv1alpha1.ActionScan:
+		message = fmt.Sprintf("resource matching Cleaner instance %s (current action Scan)", cleaner.Name)
+	}
+
+	for i := range resources {
+		if resources[i].Resource.GetNamespace() != "" {
+			executorClient.eventRecorder.Eventf(resources[i].Resource, corev1.EventTypeNormal,
+				"k8s-cleaner", fmt.Sprintf("[ns:%s] %s", resources[i].Resource.GetNamespace(), message))
+		} else {
+			executorClient.eventRecorder.Eventf(resources[i].Resource, corev1.EventTypeNormal,
+				"k8s-cleaner", message)
+		}
+	}
 }
 
 func sendSmtpNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
