@@ -6,14 +6,14 @@ require (
 	github.com/TwiN/go-color v1.4.1
 	github.com/atc0005/go-teams-notify/v2 v2.13.0
 	github.com/bwmarrin/discordgo v0.29.0
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.3
 	github.com/go-logr/zapr v1.3.0
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
 	github.com/onsi/ginkgo/v2 v2.23.4
 	github.com/onsi/gomega v1.37.0
 	github.com/pkg/errors v0.9.1
-	github.com/projectsveltos/libsveltos v0.55.0
+	github.com/projectsveltos/libsveltos v0.56.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/slack-go/slack v0.17.0
 	github.com/spf13/pflag v1.0.6
