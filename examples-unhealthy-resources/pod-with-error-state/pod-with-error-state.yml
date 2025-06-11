@@ -1,0 +1,43 @@
+# Cleaner Instance: error-state-pods
+# This Cleaner automatically deletes pods in the "Failed" phase that have at least one container
+# terminated with reason "Error" and a non-zero exit code. This helps maintain cluster hygiene
+# by removing pods that are unlikely to recover and are in an error state.
+
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: error-state-pods
+spec:
+  schedule: "0 * * * *"
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          -- Check if pod phase is Failed
+          if obj.status.phase == "Failed" then
+            -- Check container status for Error termination
+            if obj.status.containerStatuses then
+              for _, containerStatus in ipairs(obj.status.containerStatuses) do
+                if containerStatus.state and containerStatus.state.terminated then
+                  -- Match only pods terminated with reason "Error" and exit code != 0
+                  if containerStatus.state.terminated.reason == "Error" and 
+                     containerStatus.state.terminated.exitCode ~= 0 then
+                    hs.matching = true
+                    break
+                  end
+                end
+              end
+            end
+          end
+
+          return hs
+        end
+  action: Delete
+
