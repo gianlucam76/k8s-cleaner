@@ -19,6 +19,7 @@ package executor
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -252,6 +253,7 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 	deleteOptions *appsv1alpha1.DeleteOptions, logger logr.Logger) ([]ResourceResult, error) {
 
 	processedResources := make([]ResourceResult, 0)
+	var failedActions []error // Slice to store all errors
 
 	for i := range resources {
 		resource := resources[i]
@@ -268,10 +270,21 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 		}
 
 		if err := k8sClient.Delete(ctx, resource.Resource, options); err != nil {
+			if apierrors.IsNotFound(err) {
+				// Cleaner was about to delete a resource, but the resource is gone
+				// Ignore this error as outcome is that resource is gone either way.
+				continue
+			}
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
-			return processedResources, err
+			failedActions = append(failedActions, err)
+		} else {
+			processedResources = append(processedResources, resource)
 		}
-		processedResources = append(processedResources, resource)
+	}
+
+	if len(failedActions) > 0 {
+		// Use errors.Join to combine all collected errors into a single error
+		return processedResources, errors.Join(failedActions...)
 	}
 
 	return processedResources, nil
@@ -281,6 +294,7 @@ func updateMatchingResources(ctx context.Context, resources []ResourceResult,
 	transformFunction string, logger logr.Logger) ([]ResourceResult, error) {
 
 	processedResources := make([]ResourceResult, 0)
+	var failedActions []error // Slice to store all errors
 
 	for i := range resources {
 		resource := resources[i]
@@ -292,13 +306,20 @@ func updateMatchingResources(ctx context.Context, resources []ResourceResult,
 		newResource, err := transform(resource.Resource, transformFunction, l)
 		if err != nil {
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
-			return processedResources, err
+			failedActions = append(failedActions, err)
+			continue
 		}
 		if err := k8sClient.Update(ctx, newResource); err != nil {
 			l.Info(fmt.Sprintf("failed to update resource: %v", err))
-			return processedResources, err
+			failedActions = append(failedActions, err)
+			continue
 		}
 		processedResources = append(processedResources, resource)
+	}
+
+	if len(failedActions) > 0 {
+		// Use errors.Join to combine all collected errors into a single error
+		return processedResources, errors.Join(failedActions...)
 	}
 
 	return processedResources, nil
