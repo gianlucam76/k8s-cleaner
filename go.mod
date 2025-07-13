@@ -1,6 +1,6 @@
 module gianlucam76/k8s-cleaner
 
-go 1.24.4
+go 1.24.5
 
 require (
 	github.com/TwiN/go-color v1.4.1
