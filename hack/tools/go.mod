@@ -5,7 +5,7 @@ go 1.24.6
 require (
 	github.com/a8m/envsubst v1.4.3
 	github.com/helm/chart-testing/v3 v3.13.0
-	github.com/onsi/ginkgo/v2 v2.24.0
+	github.com/onsi/ginkgo/v2 v2.25.1
 	golang.org/x/oauth2 v0.30.0
 	k8s.io/client-go v0.33.4
 	sigs.k8s.io/controller-tools v0.18.0
