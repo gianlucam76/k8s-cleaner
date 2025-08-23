@@ -94,7 +94,7 @@ func (m *instance) reportData(ctx context.Context) {
 
 func (m *instance) retrieveUUID(ctx context.Context) (string, error) {
 	var defaultNS corev1.Namespace
-	if err := m.Client.Get(ctx, types.NamespacedName{Name: "default"}, &defaultNS); err != nil {
+	if err := m.Get(ctx, types.NamespacedName{Name: "default"}, &defaultNS); err != nil {
 		return "", errors.Wrap(err, "cannot start the telemetry controller")
 	}
 
@@ -130,14 +130,14 @@ func (m *instance) collectData(ctx context.Context, uuid string) (*Cluster, erro
 	}
 
 	var cleaners appsv1alpha1.CleanerList
-	if err := m.Client.List(ctx, &cleaners); err != nil {
+	if err := m.List(ctx, &cleaners); err != nil {
 		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to collect cleaner instances: %v", err))
 		return nil, err
 	}
 	data.CleanerInstances = len(cleaners.Items)
 
 	var nodes corev1.NodeList
-	if err := m.Client.List(ctx, &nodes); err != nil {
+	if err := m.List(ctx, &nodes); err != nil {
 		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to collect nodes: %v", err))
 		return nil, err
 	}

@@ -457,7 +457,7 @@ func sendWebexNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 		var fileContentReader *os.File
 		fileContentReader, err = os.Open(tmpFile.Name())
 		if err != nil {
-			return nil, fmt.Errorf("Error opening file: %w", err)
+			return nil, fmt.Errorf("error opening file: %w", err)
 		}
 
 		return fileContentReader, nil
