@@ -188,7 +188,7 @@ func (r *CleanerReconciler) addFinalizer(ctx context.Context, cleaner *appsv1alp
 
 	controllerutil.AddFinalizer(cleaner, finalizer)
 
-	if err := r.Client.Update(ctx, cleaner); err != nil {
+	if err := r.Update(ctx, cleaner); err != nil {
 		return err
 	}
 	return r.Get(ctx, types.NamespacedName{Name: cleaner.Name}, cleaner)
