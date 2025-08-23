@@ -13,7 +13,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.25.1
 	github.com/onsi/gomega v1.38.1
 	github.com/pkg/errors v0.9.1
-	github.com/projectsveltos/libsveltos v1.0.1-0.20250820174025-32ff6422d23e
+	github.com/projectsveltos/libsveltos v1.0.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/slack-go/slack v0.17.3
 	github.com/spf13/pflag v1.0.7
