@@ -9,7 +9,7 @@ require (
 	golang.org/x/oauth2 v0.30.0
 	k8s.io/client-go v0.33.4
 	sigs.k8s.io/controller-tools v0.18.0
-	sigs.k8s.io/kind v0.29.0
+	sigs.k8s.io/kind v0.30.0
 )
 
 require (
@@ -66,7 +66,7 @@ require (
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	go.yaml.in/yaml/v3 v3.0.3 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.16.0 // indirect
