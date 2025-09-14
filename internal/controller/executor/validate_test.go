@@ -21,12 +21,12 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"github.com/google/go-cmp/cmp"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/klog/v2/textlogger"
@@ -233,7 +233,20 @@ func verifyCleanerTransform(dirName string) {
 	if expectedUpdatedResource == nil {
 		By(fmt.Sprintf("%s file not present", updatedFileName))
 	} else {
-		Expect(reflect.DeepEqual(updatedResource, expectedUpdatedResource)).To(BeTrue())
+		gvk := updatedResource.GroupVersionKind()
+		updatedTypedObj, err := scheme.New(gvk)
+		Expect(err).To(BeNil())
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(updatedResource.Object, updatedTypedObj)
+		Expect(err).To(BeNil())
+
+		gvk = expectedUpdatedResource.GroupVersionKind()
+		expectedTypedObj, err := scheme.New(gvk)
+		Expect(err).To(BeNil())
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(expectedUpdatedResource.Object, expectedTypedObj)
+		Expect(err).To(BeNil())
+
+		diff := cmp.Diff(updatedTypedObj, expectedTypedObj)
+		Expect(diff).To(BeEmpty())
 	}
 }
 
@@ -369,7 +382,10 @@ func verifyMatchingResources(result, matchingResources []executor.ResourceResult
 	expected := map[string]bool{}
 
 	for i := range matchingResources {
-		Expect(result).To(ContainElement(matchingResources[i]))
+		By(fmt.Sprintf("Verify matchingResources %s %s:%s",
+			matchingResources[i].Resource.GroupVersionKind().Kind,
+			matchingResources[i].Resource.GetNamespace(), matchingResources[i].Resource.GetName()))
+		Expect(isPresent(matchingResources[i], result)).To(BeTrue())
 		expected[getKey(matchingResources[i].Resource)] = true
 	}
 
@@ -385,7 +401,10 @@ func verifyMatchingResources(result, matchingResources []executor.ResourceResult
 
 func isPresent(r executor.ResourceResult, resources []executor.ResourceResult) bool {
 	for i := range resources {
-		if r.Resource == resources[i].Resource {
+		if r.Resource.GroupVersionKind().Kind == resources[i].Resource.GroupVersionKind().Kind &&
+			r.Resource.GetNamespace() == resources[i].Resource.GetNamespace() &&
+			r.Resource.GetName() == resources[i].Resource.GetName() {
+
 			return true
 		}
 	}
