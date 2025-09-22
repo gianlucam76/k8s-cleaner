@@ -152,6 +152,8 @@ github.com/prashantv/gostub v1.1.0 h1:BTyx3RfQjRHnUWaGF9oQos79AlQ5k8WNktv7VGvVH4
 github.com/prashantv/gostub v1.1.0/go.mod h1:A5zLQHz7ieHGG7is6LLXLz7I8+3LZzsrV0P1IAHhP5U=
 github.com/projectsveltos/libsveltos v1.1.1-0.20250913103127-453f2050df67 h1:NCxWU1p+W0DnXFfgS2FlMhopAOdl83LIvZLmIcN3Vpo=
 github.com/projectsveltos/libsveltos v1.1.1-0.20250913103127-453f2050df67/go.mod h1:pjM/s2wIcArFEk8uPRroCPNnV4cL/tlNozwb5ehoxhE=
+github.com/projectsveltos/libsveltos v1.1.1 h1:CGFN206SCufzkgXfhe8q4Zecp64Wy7xUBfRtYkxVfr8=
+github.com/projectsveltos/libsveltos v1.1.1/go.mod h1:pjM/s2wIcArFEk8uPRroCPNnV4cL/tlNozwb5ehoxhE=
 github.com/prometheus/client_golang v1.22.0 h1:rb93p9lokFEsctTys46VnV1kLCDpVZ0a/Y92Vm0Zc6Q=
 github.com/prometheus/client_golang v1.22.0/go.mod h1:R7ljNsLXhuQXYZYtw6GAE9AZg8Y7vEW5scdCXrWRXC0=
 github.com/prometheus/client_model v0.6.1 h1:ZKSh/rekM+n3CeS952MLRAdFwIKqeY8b62p8ais2e9E=
