@@ -60,6 +60,19 @@ spec:
       containers:
       - command:
         - /manager
+        env:
+        - name: GOMEMLIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
+        - name: GOMAXPROCS
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         args:
         image: controller:latest
         name: controller
@@ -69,7 +82,7 @@ spec:
            protocol: TCP
          - containerPort: 9440
            name: healthz
-           protocol: TCP        
+           protocol: TCP
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

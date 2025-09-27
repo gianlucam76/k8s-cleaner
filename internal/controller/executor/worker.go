@@ -186,9 +186,11 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	var processedResources []ResourceResult
 	switch cleaner.Spec.Action {
 	case appsv1alpha1.ActionDelete:
-		processedResources, err = deleteMatchingResources(ctx, resources, cleaner.Spec.DeleteOptions, logger)
+		processedResources, err = deleteMatchingResources(ctx, cleanerName, resources,
+			cleaner.Spec.DeleteOptions, logger)
 	case appsv1alpha1.ActionTransform:
-		processedResources, err = updateMatchingResources(ctx, resources, cleaner.Spec.Transform, logger)
+		processedResources, err = updateMatchingResources(ctx, cleanerName, resources,
+			cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
 		printMatchingResources(resources, logger)
 		processedResources = resources
@@ -249,7 +251,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 	return results, nil
 }
 
-func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
+func deleteMatchingResources(ctx context.Context, cleanerName string, resources []ResourceResult,
 	deleteOptions *appsv1alpha1.DeleteOptions, logger logr.Logger) ([]ResourceResult, error) {
 
 	processedResources := make([]ResourceResult, 0)
@@ -279,6 +281,8 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 			failedActions = append(failedActions, err)
 		} else {
 			processedResources = append(processedResources, resource)
+			reportDeletionEvent(cleanerName, resource.Resource.GetAPIVersion(),
+				resource.Resource.GetKind())
 		}
 	}
 
@@ -290,7 +294,7 @@ func deleteMatchingResources(ctx context.Context, resources []ResourceResult,
 	return processedResources, nil
 }
 
-func updateMatchingResources(ctx context.Context, resources []ResourceResult,
+func updateMatchingResources(ctx context.Context, cleanerName string, resources []ResourceResult,
 	transformFunction string, logger logr.Logger) ([]ResourceResult, error) {
 
 	processedResources := make([]ResourceResult, 0)
@@ -315,6 +319,8 @@ func updateMatchingResources(ctx context.Context, resources []ResourceResult,
 			continue
 		}
 		processedResources = append(processedResources, resource)
+		reportUpdateEvent(cleanerName, resource.Resource.GetAPIVersion(),
+			resource.Resource.GetKind())
 	}
 
 	if len(failedActions) > 0 {
