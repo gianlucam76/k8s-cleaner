@@ -3,9 +3,9 @@ name: k8s-cleaner
 description: "Cleaner identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster"
 type: application
 # Note: The version is overwritten by the release workflow.
-version: 1.5.0
+version: 1.6.0
 # Note: The version is overwritten by the release workflow.
-appVersion: 0.14.1
+appVersion: 0.16.0
 home: https://github.com/gianlucam76/k8s-cleaner
 icon: https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png
 keywords:
