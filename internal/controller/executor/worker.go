@@ -192,7 +192,7 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		processedResources, err = updateMatchingResources(ctx, cleanerName, resources,
 			cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
-		printMatchingResources(resources, logger)
+		printMatchingResources(cleanerName, resources, logger)
 		processedResources = resources
 	}
 
@@ -904,7 +904,7 @@ func toGoValue(lv lua.LValue) interface{} {
 	}
 }
 
-func printMatchingResources(resources []ResourceResult, logger logr.Logger) {
+func printMatchingResources(cleanerName string, resources []ResourceResult, logger logr.Logger) {
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s %q",
@@ -914,5 +914,6 @@ func printMatchingResources(resources []ResourceResult, logger logr.Logger) {
 			resource.Message))
 		l = l.WithValues("message", resource.Message)
 		l.Info("resource is a match for cleaner")
+		reportScanEvent(cleanerName, resource.Resource.GetAPIVersion(), resource.Resource.GetKind())
 	}
 }
