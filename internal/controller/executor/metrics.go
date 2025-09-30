@@ -31,6 +31,9 @@ const (
 
 	updatedCounterName = "k8s_cleaner_updated_resources_total"
 	updatedCounterHelp = "The cumulative count of resources successfully updated by the cleaner."
+
+	scanCounterName = "k8s_cleaner_scan_resources_total"
+	scanCounterHelp = "The cumulative count of resources successfully found by the cleaner during a scan."
 )
 
 var (
@@ -51,13 +54,22 @@ var (
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
+
+	scanResourceCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      scanCounterName,
+			Help:      scanCounterHelp,
+		},
+		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+	)
 )
 
 //nolint:gochecknoinits // forced pattern for prometheus and controller-runtime
 func init() {
 	// Register custom metrics with the controller-runtime's global registry.
 	// This ensures it is exported alongside default controller-runtime metrics.
-	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter)
+	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter, scanResourceCounter)
 }
 
 // getDeletedResourcesCounterVec returns the singleton CounterVec instance.
@@ -81,6 +93,19 @@ func getUpdatedResourcesCounterVec() *prometheus.CounterVec {
 func reportUpdateEvent(cleanerName, resourceAPIVersion, resourceKind string) {
 	// Get the global CounterVec instance.
 	counterVec := getUpdatedResourcesCounterVec()
+
+	// Increment the counter for the specific cleaner instance and resource kind.
+	counterVec.WithLabelValues(cleanerName, resourceAPIVersion, resourceKind).Inc()
+}
+
+// getScanResourcesCounterVec returns the singleton CounterVec instance.
+func getScanResourcesCounterVec() *prometheus.CounterVec {
+	return scanResourceCounter
+}
+
+func reportScanEvent(cleanerName, resourceAPIVersion, resourceKind string) {
+	// Get the global CounterVec instance.
+	counterVec := getScanResourcesCounterVec()
 
 	// Increment the counter for the specific cleaner instance and resource kind.
 	counterVec.WithLabelValues(cleanerName, resourceAPIVersion, resourceKind).Inc()
