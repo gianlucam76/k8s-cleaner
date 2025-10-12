@@ -13,7 +13,7 @@ jobs:
       - uses: azure/setup-helm@1a275c3b69536ee54be43f2070a358922e12c8d4 # v4
       - name: Setup Chart Linting
         id: lint
-        uses: helm/chart-testing-action@0d28d3144d3a25ea2cc349d6e59901c4ff469b3b
+        uses: helm/chart-testing-action@0941a6baa8bc6b125d646711df1b0693f8644cb2
       - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
