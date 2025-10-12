@@ -27,13 +27,16 @@ import (
 
 const (
 	deletedCounterName = "k8s_cleaner_deleted_resources_total"
-	deletedCounterHelp = "The cumulative count of resources successfully deleted by the cleaner."
+	deletedCounterHelp = "The cumulative count of resources successfully deleted by cleaner."
 
 	updatedCounterName = "k8s_cleaner_updated_resources_total"
-	updatedCounterHelp = "The cumulative count of resources successfully updated by the cleaner."
+	updatedCounterHelp = "The cumulative count of resources successfully updated by cleaner."
 
 	scanCounterName = "k8s_cleaner_scan_resources_total"
-	scanCounterHelp = "The cumulative count of resources successfully found by the cleaner during a scan."
+	scanCounterHelp = "The cumulative count of resources successfully found by cleaner during a scan."
+
+	errorCounterName = "k8s_cleaner_error_resources_total"
+	errorCounterHelp = "The cumulative count of erros encountered by cleaner during a scan."
 )
 
 var (
@@ -63,13 +66,22 @@ var (
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
+
+	errorResourceCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      errorCounterName,
+			Help:      errorCounterHelp,
+		},
+		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+	)
 )
 
 //nolint:gochecknoinits // forced pattern for prometheus and controller-runtime
 func init() {
 	// Register custom metrics with the controller-runtime's global registry.
 	// This ensures it is exported alongside default controller-runtime metrics.
-	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter, scanResourceCounter)
+	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter, scanResourceCounter, errorResourceCounter)
 }
 
 // getDeletedResourcesCounterVec returns the singleton CounterVec instance.
@@ -106,6 +118,19 @@ func getScanResourcesCounterVec() *prometheus.CounterVec {
 func reportScanEvent(cleanerName, resourceAPIVersion, resourceKind string) {
 	// Get the global CounterVec instance.
 	counterVec := getScanResourcesCounterVec()
+
+	// Increment the counter for the specific cleaner instance and resource kind.
+	counterVec.WithLabelValues(cleanerName, resourceAPIVersion, resourceKind).Inc()
+}
+
+// getErrorResourcesCounterVec returns the singleton CounterVec instance.
+func getErrorResourcesCounterVec() *prometheus.CounterVec {
+	return errorResourceCounter
+}
+
+func reportErrorEvent(cleanerName, resourceAPIVersion, resourceKind string) {
+	// Get the global CounterVec instance.
+	counterVec := getErrorResourcesCounterVec()
 
 	// Increment the counter for the specific cleaner instance and resource kind.
 	counterVec.WithLabelValues(cleanerName, resourceAPIVersion, resourceKind).Inc()

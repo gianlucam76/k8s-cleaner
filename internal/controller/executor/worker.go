@@ -277,6 +277,8 @@ func deleteMatchingResources(ctx context.Context, cleanerName string, resources 
 				// Ignore this error as outcome is that resource is gone either way.
 				continue
 			}
+			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
+				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
 			failedActions = append(failedActions, err)
 		} else {
@@ -309,11 +311,15 @@ func updateMatchingResources(ctx context.Context, cleanerName string, resources 
 		l.Info("updating resource")
 		newResource, err := transform(resource.Resource, transformFunction, l)
 		if err != nil {
+			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
+				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
 			failedActions = append(failedActions, err)
 			continue
 		}
 		if err := k8sClient.Update(ctx, newResource); err != nil {
+			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
+				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to update resource: %v", err))
 			failedActions = append(failedActions, err)
 			continue
