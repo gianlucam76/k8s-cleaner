@@ -11,10 +11,10 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/go-cmp v0.7.0
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
-	github.com/onsi/ginkgo/v2 v2.26.0
+	github.com/onsi/ginkgo/v2 v2.27.2
 	github.com/onsi/gomega v1.38.2
 	github.com/pkg/errors v0.9.1
-	github.com/projectsveltos/libsveltos v1.2.0
+	github.com/projectsveltos/libsveltos v1.2.1
 	github.com/prometheus/client_golang v1.23.2
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/slack-go/slack v0.17.3
