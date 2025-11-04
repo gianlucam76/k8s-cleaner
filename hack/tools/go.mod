@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/a8m/envsubst v1.4.3
 	github.com/helm/chart-testing/v3 v3.14.0
-	github.com/onsi/ginkgo/v2 v2.26.0
+	github.com/onsi/ginkgo/v2 v2.27.2
 	golang.org/x/oauth2 v0.32.0
 	k8s.io/client-go v0.34.1
 	sigs.k8s.io/controller-tools v0.19.0
@@ -63,7 +63,6 @@ require (
 	github.com/spf13/viper v1.21.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/mod v0.27.0 // indirect
