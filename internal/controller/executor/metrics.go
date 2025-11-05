@@ -39,6 +39,20 @@ const (
 	errorCounterHelp = "The cumulative count of erros encountered by cleaner during a scan."
 )
 
+const (
+	deletedGaugeName = "k8s_cleaner_current_deleted_resources_count"
+	deletedGaugeHelp = "The current total count of resources deleted by the cleaner (snapshot of the counter)."
+
+	updatedGaugeName = "k8s_cleaner_current_updated_resources_count"
+	updatedGaugeHelp = "The current total count of resources updated by the cleaner (snapshot of the counter)."
+
+	scanGaugeName = "k8s_cleaner_current_resources_count"
+	scanGaugeHelp = "The current count of resources found in the latest scan."
+
+	errorGaugeName = "k8s_cleaner_current_error_resources_count"
+	errorGaugeHelp = "The current total count of errors encountered (snapshot of the counter)."
+)
+
 var (
 	deletedResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -77,11 +91,53 @@ var (
 	)
 )
 
+var (
+	// New Gauge Definitions
+	deletedResourceGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      deletedGaugeName,
+			Help:      deletedGaugeHelp,
+		},
+		[]string{"cleaner_instance"},
+	)
+
+	updatedResourceGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      updatedGaugeName,
+			Help:      updatedGaugeHelp,
+		},
+		[]string{"cleaner_instance"},
+	)
+
+	scanResourceGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      scanGaugeName,
+			Help:      scanGaugeHelp,
+		},
+		[]string{"cleaner_instance"},
+	)
+
+	errorResourceGauge = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Namespace: os.Getenv("NAMESPACE"),
+			Name:      errorGaugeName,
+			Help:      errorGaugeHelp,
+		},
+		[]string{"cleaner_instance"},
+	)
+)
+
 //nolint:gochecknoinits // forced pattern for prometheus and controller-runtime
 func init() {
 	// Register custom metrics with the controller-runtime's global registry.
 	// This ensures it is exported alongside default controller-runtime metrics.
-	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter, scanResourceCounter, errorResourceCounter)
+	metrics.Registry.MustRegister(deletedResourceCounter, updatedResourceCounter,
+		scanResourceCounter, errorResourceCounter,
+		deletedResourceGauge, updatedResourceGauge,
+		scanResourceGauge, errorResourceGauge)
 }
 
 // getDeletedResourcesCounterVec returns the singleton CounterVec instance.
@@ -134,4 +190,68 @@ func reportErrorEvent(cleanerName, resourceAPIVersion, resourceKind string) {
 
 	// Increment the counter for the specific cleaner instance and resource kind.
 	counterVec.WithLabelValues(cleanerName, resourceAPIVersion, resourceKind).Inc()
+}
+
+// Helper functions for Gauges to report an absolute count
+
+// getDeletedResourcesGaugeVec returns the singleton GaugeVec instance.
+func getDeletedResourcesGaugeVec() *prometheus.GaugeVec {
+	return deletedResourceGauge
+}
+
+// reportDeletedCount sets the gauge to the absolute total count of deleted resources
+// for the given cleaner instance and resource kind.
+func reportDeletedCount(cleanerName string, count float64) {
+	gaugeVec := getDeletedResourcesGaugeVec()
+
+	// Set the gauge to the specific count value
+	gaugeVec.WithLabelValues(cleanerName).Set(count)
+}
+
+// ---
+
+// getUpdatedResourcesGaugeVec returns the singleton GaugeVec instance.
+func getUpdatedResourcesGaugeVec() *prometheus.GaugeVec {
+	return updatedResourceGauge
+}
+
+// reportUpdatedCount sets the gauge to the absolute total count of updated resources
+// for the given cleaner instance and resource kind.
+func reportUpdatedCount(cleanerName string, count float64) {
+	gaugeVec := getUpdatedResourcesGaugeVec()
+
+	// Set the gauge to the specific count value
+	gaugeVec.WithLabelValues(cleanerName).Set(count)
+}
+
+// ---
+
+// getScanResourcesGaugeVec returns the singleton GaugeVec instance.
+func getScanResourcesGaugeVec() *prometheus.GaugeVec {
+	return scanResourceGauge
+}
+
+// reportScanCount sets the gauge to the absolute total count of resources
+// found in the latest scan for the given cleaner instance and resource kind.
+func reportScanCount(cleanerName string, count float64) {
+	gaugeVec := getScanResourcesGaugeVec()
+
+	// Set the gauge to the specific count value
+	gaugeVec.WithLabelValues(cleanerName).Set(count)
+}
+
+// ---
+
+// getErrorResourcesGaugeVec returns the singleton GaugeVec instance.
+func getErrorResourcesGaugeVec() *prometheus.GaugeVec {
+	return errorResourceGauge
+}
+
+// reportErrorCount sets the gauge to the absolute total count of errors
+// for the given cleaner instance and resource kind.
+func reportErrorCount(cleanerName string, count float64) {
+	gaugeVec := getErrorResourcesGaugeVec()
+
+	// Set the gauge to the specific count value
+	gaugeVec.WithLabelValues(cleanerName).Set(count)
 }
