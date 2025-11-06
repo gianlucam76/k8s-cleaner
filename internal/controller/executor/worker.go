@@ -257,6 +257,9 @@ func deleteMatchingResources(ctx context.Context, cleanerName string, resources 
 	processedResources := make([]ResourceResult, 0)
 	var failedActions []error // Slice to store all errors
 
+	reportDeletedCount(cleanerName, float64(len(resources)))
+
+	numberOfErrors := 0
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
@@ -277,6 +280,7 @@ func deleteMatchingResources(ctx context.Context, cleanerName string, resources 
 				// Ignore this error as outcome is that resource is gone either way.
 				continue
 			}
+			numberOfErrors++
 			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
 				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to delete resource: %v", err))
@@ -293,6 +297,8 @@ func deleteMatchingResources(ctx context.Context, cleanerName string, resources 
 		return processedResources, errors.Join(failedActions...)
 	}
 
+	reportErrorCount(cleanerName, float64(numberOfErrors))
+
 	return processedResources, nil
 }
 
@@ -302,6 +308,9 @@ func updateMatchingResources(ctx context.Context, cleanerName string, resources 
 	processedResources := make([]ResourceResult, 0)
 	var failedActions []error // Slice to store all errors
 
+	reportUpdatedCount(cleanerName, float64(len(resources)))
+
+	numberOfErrors := 0
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s",
@@ -311,6 +320,7 @@ func updateMatchingResources(ctx context.Context, cleanerName string, resources 
 		l.Info("updating resource")
 		newResource, err := transform(resource.Resource, transformFunction, l)
 		if err != nil {
+			numberOfErrors++
 			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
 				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to transform resource: %v", err))
@@ -318,6 +328,7 @@ func updateMatchingResources(ctx context.Context, cleanerName string, resources 
 			continue
 		}
 		if err := k8sClient.Update(ctx, newResource); err != nil {
+			numberOfErrors++
 			reportErrorEvent(cleanerName, resource.Resource.GetAPIVersion(),
 				resource.Resource.GetKind())
 			l.Info(fmt.Sprintf("failed to update resource: %v", err))
@@ -333,6 +344,8 @@ func updateMatchingResources(ctx context.Context, cleanerName string, resources 
 		// Use errors.Join to combine all collected errors into a single error
 		return processedResources, errors.Join(failedActions...)
 	}
+
+	reportErrorCount(cleanerName, float64(numberOfErrors))
 
 	return processedResources, nil
 }
@@ -911,6 +924,8 @@ func toGoValue(lv lua.LValue) interface{} {
 }
 
 func printMatchingResources(cleanerName string, resources []ResourceResult, logger logr.Logger) {
+	reportScanCount(cleanerName, float64(len(resources)))
+
 	for i := range resources {
 		resource := resources[i]
 		l := logger.WithValues("resource", fmt.Sprintf("%s:%s/%s %q",
