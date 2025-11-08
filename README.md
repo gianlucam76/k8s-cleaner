@@ -140,5 +140,3 @@ By participating, you are expected to honor this code.
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-
