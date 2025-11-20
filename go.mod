@@ -20,7 +20,7 @@ require (
 	github.com/slack-go/slack v0.17.3
 	github.com/spf13/pflag v1.0.10
 	github.com/yuin/gopher-lua v1.1.1
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.34.2
 	k8s.io/apimachinery v0.34.2
