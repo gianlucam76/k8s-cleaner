@@ -19,7 +19,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
       with:
-        go-version: 1.25.4
+        go-version: 1.25.5
     - name: Build
       run: make build
     - name: FMT
@@ -38,7 +38,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
       with:
-        go-version: 1.25.4
+        go-version: 1.25.5
     - name: ut
       run: make test
       env:
@@ -51,7 +51,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
       with:
-        go-version: 1.25.4
+        go-version: 1.25.5
     - name: fv
       run: make create-cluster fv
       env:
