@@ -170,6 +170,8 @@ github.com/projectsveltos/libsveltos v1.2.1 h1:HUXX14IV0aUDaBzILiUxKDirk6csiHTCD
 github.com/projectsveltos/libsveltos v1.2.1/go.mod h1:HGP0pkbvx0InDEmmes2qTBTGTRl00S4Fpr6eqWps21s=
 github.com/projectsveltos/libsveltos v1.3.0 h1:m0AEG+HqTSkl93Wa9rizedH6nqTwUbrCeBdz4VGloNc=
 github.com/projectsveltos/libsveltos v1.3.0/go.mod h1:At1G0itHPdELlMuQh+v2rLtA/Kji9xMV8K1k0l/sQ1Q=
+github.com/projectsveltos/libsveltos v1.3.1 h1:uUQ7YRwhWnxxBUjBmf6WJprwSsHJDJAPyHkUmQ+DyXI=
+github.com/projectsveltos/libsveltos v1.3.1/go.mod h1:At1G0itHPdELlMuQh+v2rLtA/Kji9xMV8K1k0l/sQ1Q=
 github.com/prometheus/client_golang v1.23.2 h1:Je96obch5RDVy3FDMndoUsjAhG5Edi49h0RJWRi/o0o=
 github.com/prometheus/client_golang v1.23.2/go.mod h1:Tb1a6LWHB3/SPIzCoaDXI4I8UHKeFTEQ1YCr+0Gyqmg=
 github.com/prometheus/client_model v0.6.2 h1:oBsgwpGs7iVziMvrGhE53c/GrLUsZdHnqNwqPLxwZyk=
