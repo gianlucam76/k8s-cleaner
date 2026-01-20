@@ -393,11 +393,11 @@ func sendKubernetesEventNotification(cleaner *appsv1alpha1.Cleaner, resources []
 
 	for i := range resources {
 		if resources[i].Resource.GetNamespace() != "" {
-			executorClient.eventRecorder.Eventf(resources[i].Resource, corev1.EventTypeNormal,
-				"k8s-cleaner", fmt.Sprintf("[ns:%s] %s", resources[i].Resource.GetNamespace(), message))
+			executorClient.eventRecorder.Eventf(resources[i].Resource, nil, corev1.EventTypeNormal,
+				"K8sCleaner", string(cleaner.Spec.Action), fmt.Sprintf("[ns:%s] %s", resources[i].Resource.GetNamespace(), message))
 		} else {
-			executorClient.eventRecorder.Eventf(resources[i].Resource, corev1.EventTypeNormal,
-				"k8s-cleaner", message)
+			executorClient.eventRecorder.Eventf(resources[i].Resource, nil, corev1.EventTypeNormal,
+				"K8sCleaner", string(cleaner.Spec.Action), message)
 		}
 	}
 }

@@ -26,7 +26,7 @@ import (
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	logs "github.com/projectsveltos/libsveltos/lib/logsettings"
@@ -92,12 +92,12 @@ type Manager struct {
 	// results contains results for processed requests (cleaner names)
 	results map[string]error
 
-	eventRecorder record.EventRecorder
+	eventRecorder events.EventRecorder
 }
 
 // InitializeClient initializes a client
 func InitializeClient(ctx context.Context, l logr.Logger, config *rest.Config,
-	c client.Client, scheme *runtime.Scheme, eventRecorder record.EventRecorder, numOfWorker int) {
+	c client.Client, scheme *runtime.Scheme, eventRecorder events.EventRecorder, numOfWorker int) {
 
 	if managerInstance == nil {
 		getClientLock.Lock()
