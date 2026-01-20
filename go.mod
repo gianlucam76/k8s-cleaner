@@ -1,6 +1,6 @@
 module gianlucam76/k8s-cleaner
 
-go 1.25.5
+go 1.25.6
 
 require (
 	github.com/TwiN/go-color v1.4.1
@@ -11,7 +11,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/go-cmp v0.7.0
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
-	github.com/onsi/ginkgo/v2 v2.27.4
+	github.com/onsi/ginkgo/v2 v2.27.5
 	github.com/onsi/gomega v1.39.0
 	github.com/pkg/errors v0.9.1
 	github.com/projectsveltos/libsveltos v1.4.0
@@ -27,8 +27,8 @@ require (
 	k8s.io/client-go v0.35.0
 	k8s.io/component-base v0.35.0
 	k8s.io/klog/v2 v2.130.1
-	sigs.k8s.io/cluster-api v1.12.1
-	sigs.k8s.io/controller-runtime v0.22.4
+	sigs.k8s.io/cluster-api v1.12.2
+	sigs.k8s.io/controller-runtime v0.23.0
 )
 
 require (
