@@ -11,7 +11,7 @@ require (
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/go-cmp v0.7.0
 	github.com/jbogarin/go-cisco-webex-teams v0.4.3
-	github.com/onsi/ginkgo/v2 v2.28.0
+	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/pkg/errors v0.9.1
 	github.com/projectsveltos/libsveltos v1.4.0
