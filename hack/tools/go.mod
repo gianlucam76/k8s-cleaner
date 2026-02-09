@@ -6,7 +6,7 @@ require (
 	github.com/a8m/envsubst v1.4.3
 	github.com/helm/chart-testing/v3 v3.14.0
 	github.com/onsi/ginkgo/v2 v2.28.1
-	golang.org/x/oauth2 v0.34.0
+	golang.org/x/oauth2 v0.35.0
 	golang.org/x/tools v0.41.0
 	k8s.io/client-go v0.35.0
 	sigs.k8s.io/controller-tools v0.20.0
