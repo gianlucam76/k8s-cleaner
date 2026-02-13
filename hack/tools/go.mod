@@ -9,7 +9,7 @@ require (
 	golang.org/x/oauth2 v0.35.0
 	golang.org/x/tools v0.41.0
 	k8s.io/client-go v0.35.0
-	sigs.k8s.io/controller-tools v0.20.0
+	sigs.k8s.io/controller-tools v0.20.1
 	sigs.k8s.io/kind v0.31.0
 )
 
