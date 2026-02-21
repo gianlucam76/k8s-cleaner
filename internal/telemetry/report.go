@@ -173,6 +173,7 @@ func (m *instance) sendData(ctx context.Context, payload *Cluster) {
 		},
 	}
 	// Send the request
+	//nolint: gosec // Just sending telemetry data.
 	resp, err := c.Do(req)
 	if err != nil {
 		logger.V(logs.LogInfo).Info(fmt.Sprintf("error sending data: %v", err))
