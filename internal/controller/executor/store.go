@@ -123,7 +123,12 @@ func dumpObject(resource *unstructured.Unstructured, scheme *runtime.Scheme, log
 	defer f.Close()
 
 	logger.V(logs.LogDebug).Info(fmt.Sprintf("storing resource in %s", resourceFilePath))
-	return os.WriteFile(f.Name(), resourceYAML, permission0600)
+	_, err = f.Write(resourceYAML)
+	if err != nil {
+		return fmt.Errorf("failed to write resource to temp file: %w", err)
+	}
+
+	return f.Sync()
 }
 
 func addTypeInformationToObject(scheme *runtime.Scheme, obj client.Object) error {
