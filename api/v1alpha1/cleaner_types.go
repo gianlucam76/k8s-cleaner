@@ -208,6 +208,14 @@ type CleanerSpec struct {
 	// Must be a volume where Cleaner can dump all matching resources.
 	// +optional
 	StoreResourcePath string `json:"storeResourcePath,omitempty"`
+
+	// OccurrenceThreshold specifies how many consecutive times a resource must
+	// be identified as a match before the Action is taken or Notifications are sent.
+	// k8s-cleaner tracks these occurrences in an internal registry to ensure
+	// counters are reset if a resource becomes healthy between scans.
+	// +kubebuilder:default:=1
+	// +optional
+	OccurrenceThreshold int `json:"occurrenceThreshold,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner
