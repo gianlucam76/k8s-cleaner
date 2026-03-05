@@ -15,10 +15,10 @@
 #       labelFilters:
 #       - key: app
 #         operation: Equal
-#         value: nginx 
+#         value: nginx
 #       - key: environment
 #         operation: Different
-#         value: production 
+#         value: production
 #
 # If you need further filtering modify `function evaluate` you can access any
 # field of obj
@@ -61,7 +61,7 @@ spec:
           hs = {}
           hs.matching = false
 
-          -- any resource older than this time will be removed 
+          -- any resource older than this time will be removed
           local removeAfterHour = 24
 
           currentTime = os.time()
@@ -83,4 +83,4 @@ spec:
 
           return hs
         end
-  action: Delete
+  action: Scan

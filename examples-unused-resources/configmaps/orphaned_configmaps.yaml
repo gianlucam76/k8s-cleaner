@@ -11,7 +11,7 @@ spec:
   - name: events
     type: Event
   schedule: "* 0 * * *"
-  action: Delete
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Pod

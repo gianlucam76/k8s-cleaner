@@ -1,5 +1,5 @@
 # This Cleaner instance finds any Pod with conditions PodCompleted
-# set to true and instructs Cleaner to delete it.
+# set to true.
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
@@ -24,4 +24,4 @@ spec:
           end
           return hs
         end
-  action: Delete
+  action: Scan

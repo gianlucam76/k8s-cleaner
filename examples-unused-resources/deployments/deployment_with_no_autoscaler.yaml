@@ -7,7 +7,7 @@ metadata:
   name: deployment-with-no-autoscaler
 spec:
   schedule: "* 0 * * *"
-  action: Delete # Delete matching resources
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment

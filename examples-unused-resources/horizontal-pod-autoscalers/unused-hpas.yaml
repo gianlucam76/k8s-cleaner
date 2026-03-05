@@ -1,12 +1,12 @@
 # This Cleaner instance find any HorizontalPodAutoscaler instance
-# matching no Deployment or StatefulSet and delete those nstances
+# matching no Deployment or StatefulSet
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
   name: unused-horizontal-pod-autoscalers
 spec:
   schedule: "* 0 * * *"
-  action: Delete # Delete matching resources
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment
@@ -14,7 +14,7 @@ spec:
       version: v1
     - kind: StatefulSet
       group: "apps"
-      version: v1      
+      version: v1
     - kind: HorizontalPodAutoscaler
       group: "autoscaling"
       version: v2
@@ -39,7 +39,7 @@ spec:
             deployments[key] = true
           elseif kind == "StatefulSet" then
             key = getKey(resource.metadata.namespace, resource.metadata.name)
-            statefulSets[key] = true  
+            statefulSets[key] = true
           elseif kind == "HorizontalPodAutoscaler" then
             table.insert(autoscalers, resource)
           end
