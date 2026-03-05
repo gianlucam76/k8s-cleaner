@@ -153,6 +153,14 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+              occurrenceThreshold:
+                default: 1
+                description: |-
+                  OccurrenceThreshold specifies how many consecutive times a resource must
+                  be identified as a match before the Action is taken or Notifications are sent.
+                  k8s-cleaner tracks these occurrences in an internal registry to ensure
+                  counters are reset if a resource becomes healthy between scans.
+                type: integer
               resourcePolicySet:
                 description: ResourcePolicySet identifies a group of resources
                 properties:
@@ -419,6 +427,16 @@ kind: ClusterRole
 metadata:
   name: k8s-cleaner-controller-role
 rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
 - apiGroups:
   - '*'
   resources:

@@ -24,6 +24,11 @@ var (
 	Transform               = transform
 	AggregatedSelection     = aggregatedSelection
 	GetNamespaces           = getNamespaces
+
+	GetResourceKey             = getResourceKey
+	GetThrottledResources      = getThrottledResources
+	FilterResourcesByThreshold = filterResourcesByThreshold
+	UpdateRegistry             = updateRegistry
 )
 
 var (

@@ -52,6 +52,7 @@ type CleanerReconciler struct {
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners,verbs=get;list;watch;patch
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=apps.projectsveltos.io,resources=cleaners/finalizers,verbs=update
+//+kubebuilder:rbac:groups="",resources=configmaps,verbs=create;update;delete;get;list
 //+kubebuilder:rbac:groups="*",resources="*",verbs="*"
 
 func (r *CleanerReconciler) Reconcile(ctx context.Context, req ctrl.Request) (_ ctrl.Result, reterr error) {
@@ -117,6 +118,11 @@ func (r *CleanerReconciler) reconcileDelete(ctx context.Context,
 		return err
 	}
 
+	err = executor.DeleteConfigMap(ctx, cleanerScope.Cleaner)
+	if err != nil {
+		return err
+	}
+
 	if controllerutil.ContainsFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer) {
 		controllerutil.RemoveFinalizer(cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer)
 	}
@@ -138,6 +144,13 @@ func (r *CleanerReconciler) reconcileNormal(ctx context.Context, cleanerScope *s
 	if err := r.addFinalizer(ctx, cleanerScope.Cleaner, appsv1alpha1.CleanerFinalizer); err != nil {
 		logger.Info(fmt.Sprintf("failed to add finalizer: %s", err))
 		return reconcile.Result{}, err
+	}
+
+	if cleanerScope.Cleaner.Spec.OccurrenceThreshold == 1 {
+		err := executor.DeleteConfigMap(ctx, cleanerScope.Cleaner)
+		if err != nil {
+			return reconcile.Result{}, err
+		}
 	}
 
 	executorClient := executor.GetClient()

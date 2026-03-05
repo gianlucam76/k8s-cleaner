@@ -5,6 +5,16 @@ metadata:
   name: controller-role
 rules:
 - apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
+- apiGroups:
   - '*'
   resources:
   - '*'

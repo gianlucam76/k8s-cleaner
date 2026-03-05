@@ -41,6 +41,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
+	"github.com/projectsveltos/libsveltos/lib/logsettings"
+
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller"
 	"gianlucam76/k8s-cleaner/internal/telemetry"
@@ -89,6 +91,11 @@ func main() {
 	ctrl.SetLogger(zapr.NewLogger(zapLogger))
 
 	ctx := ctrl.SetupSignalHandler()
+
+	if os.Getenv("NAMESPACE") == "" {
+		setupLog.V(logsettings.LogInfo).Info("NAMESPACE env variable must be specified")
+		os.Exit(1)
+	}
 
 	ctrlOptions := ctrl.Options{
 		Scheme:                 scheme,

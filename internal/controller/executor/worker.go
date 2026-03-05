@@ -104,6 +104,10 @@ type aggregatedStatus struct {
 	Resources []ResourceResult `json:"resources,omitempty"`
 }
 
+const (
+	namespace = "NAMESPACE"
+)
+
 func processRequests(ctx context.Context, i int, logger logr.Logger) {
 	id := i
 	var cleanerName *string
@@ -183,17 +187,33 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		}
 	}
 
+	throttledResources, err := getThrottledResources(ctx, cleaner)
+	if err != nil {
+		logger.Info(fmt.Sprintf("failed to get throttled resources: %v", err))
+		return err
+	}
+
+	filteredResources := filterResourcesByThreshold(resources, throttledResources, cleaner.Spec.OccurrenceThreshold-1)
+
 	var processedResources []ResourceResult
 	switch cleaner.Spec.Action {
 	case appsv1alpha1.ActionDelete:
-		processedResources, err = deleteMatchingResources(ctx, cleanerName, resources,
+		processedResources, err = deleteMatchingResources(ctx, cleanerName, filteredResources,
 			cleaner.Spec.DeleteOptions, logger)
 	case appsv1alpha1.ActionTransform:
-		processedResources, err = updateMatchingResources(ctx, cleanerName, resources,
+		processedResources, err = updateMatchingResources(ctx, cleanerName, filteredResources,
 			cleaner.Spec.Transform, logger)
 	case appsv1alpha1.ActionScan:
-		printMatchingResources(cleanerName, resources, logger)
-		processedResources = resources
+		printMatchingResources(cleanerName, filteredResources, logger)
+		processedResources = filteredResources
+	}
+
+	// Update the ConfigMap registry with CURRENT unhealthy matches
+	// This increments counts for existing ones and adds new ones.
+	// It also "heals" (removes) resources not present in 'resources'.
+	if updateErr := updateRegistry(ctx, cleaner, resources, throttledResources); updateErr != nil {
+		logger.Info(fmt.Sprintf("failed to update registry: %v", updateErr))
+		// We log but don't necessarily return here so notifications still go out
 	}
 
 	// Send notification irrespective of err
