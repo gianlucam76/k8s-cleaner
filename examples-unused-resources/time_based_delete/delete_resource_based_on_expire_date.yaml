@@ -4,7 +4,7 @@
 # - Execute resource removal: Purge resources that have surpassed their expiration date, ensuring a streamlined environment.
 #
 # Example cleaner/expires values: 2023-12-12T09:35:56Z
-# 
+#
 # If you want to filter resources based on namespace =>
 #     - kind: Deployment
 #       group: "apps"
@@ -18,10 +18,10 @@
 #       labelFilters:
 #       - key: app
 #         operation: Equal
-#         value: nginx 
+#         value: nginx
 #       - key: environment
 #         operation: Different
-#         value: production 
+#         value: production
 #
 # If you need further filtering modify `function evaluate` you can access any
 # field of obj
@@ -76,10 +76,10 @@ spec:
           hs = {}
 
           local expiredResources = {}
-          
+
           currentTime = os.time()
           print("current time:" .. currentTime)
-          
+
           for _, resource in ipairs(resources) do
             if resource.metadata.annotations ~= nil then
               if resource.metadata.annotations["cleaner/expires"] then
@@ -102,4 +102,4 @@ spec:
 
         return hs
         end
-  action: Delete
+  action: Scan

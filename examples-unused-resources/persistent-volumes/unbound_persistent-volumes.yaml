@@ -1,5 +1,5 @@
-# This Cleaner instance will find any PersistentVolume with Phase 
-# set to anything but "Bound" and delete those
+# This Cleaner instance will find any PersistentVolume with Phase
+# set to anything but "Bound"
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
@@ -20,4 +20,4 @@ spec:
           end
           return hs
         end
-  action: Delete
+  action: Scan

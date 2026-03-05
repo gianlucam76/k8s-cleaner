@@ -2,7 +2,6 @@
 # - has status.completionTime set
 # - has status.succeeded set to a value greater than zero
 # - has no running or pending pods
-# and instruct Cleaner to delete this Job.
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
@@ -25,4 +24,4 @@ spec:
           end
           return hs
         end
-  action: Delete
+  action: Scan

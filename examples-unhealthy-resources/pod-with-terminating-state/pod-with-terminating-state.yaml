@@ -23,7 +23,7 @@ spec:
 
           return hs
         end
-  action: Delete
+  action: Scan
   deleteOptions:
     gracePeriodSeconds: 0
     propagationPolicy: Background

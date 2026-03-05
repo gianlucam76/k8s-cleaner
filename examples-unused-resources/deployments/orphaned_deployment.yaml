@@ -1,4 +1,4 @@
-# Selects Deployment, Pod, and Service resources, and then filters the results to 
+# Selects Deployment, Pod, and Service resources, and then filters the results to
 # identify deployments that have no pods or services associated with them.
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
@@ -6,7 +6,7 @@ metadata:
   name: orphaned-deployments
 spec:
   schedule: "* 0 * * *"
-  action: Delete # Delete matching resources
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Deployment
@@ -14,10 +14,10 @@ spec:
       version: v1
     - kind: Pod
       group: ""
-      version: v1      
+      version: v1
     - kind: Service
       group: ""
-      version: v1      
+      version: v1
     aggregatedSelection: |
       function table_equal(t1, t2)
         local metatable = {}
@@ -85,9 +85,9 @@ spec:
                 if owner.name == deploymentName then
                   hasPod = true
                   break
-                end  
+                end
               end
-            end 
+            end
           end
 
           for _, service in ipairs(services) do

@@ -1,5 +1,5 @@
 # Cleaner Instance: error-state-pods
-# This Cleaner automatically deletes pods in the "Failed" phase that have at least one container
+# This Cleaner automatically scans pods in the "Failed" phase that have at least one container
 # terminated with reason "Error" and a non-zero exit code. This helps maintain cluster hygiene
 # by removing pods that are unlikely to recover and are in an error state.
 
@@ -27,7 +27,7 @@ spec:
               for _, containerStatus in ipairs(obj.status.containerStatuses) do
                 if containerStatus.state and containerStatus.state.terminated then
                   -- Match only pods terminated with reason "Error" and exit code != 0
-                  if containerStatus.state.terminated.reason == "Error" and 
+                  if containerStatus.state.terminated.reason == "Error" and
                      containerStatus.state.terminated.exitCode ~= 0 then
                     hs.matching = true
                     break
@@ -39,5 +39,5 @@ spec:
 
           return hs
         end
-  action: Delete
+  action: Scan
 

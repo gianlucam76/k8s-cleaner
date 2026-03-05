@@ -1,8 +1,8 @@
-# Find all unused Ingress instances. 
+# Find all unused Ingress instances.
 # An Ingress instance is considered unused if:
 # - default backend is not defined or not existings
 # - none of referenced services (via spec.rules) exists
-# 
+#
 # This does not take into account resource (field Resource *v1.TypedLocalObjectReference)
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
@@ -10,7 +10,7 @@ metadata:
   name: stale-ingresses
 spec:
   schedule: "* 0 * * *"
-  action: Delete # Delete matching resources
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Ingress
@@ -54,7 +54,7 @@ spec:
               end
             end
           end
-        end 
+        end
         return false
       end
 
@@ -63,7 +63,7 @@ spec:
         local hs = {}
         hs.valid = true
         hs.message = ""
-        
+
         local services = {}
         local ingresses = {}
         local unusedIngresses = {}

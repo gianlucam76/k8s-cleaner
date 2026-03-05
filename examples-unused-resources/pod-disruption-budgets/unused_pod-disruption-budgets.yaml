@@ -1,4 +1,4 @@
-# This Cleaner instance finds all PodDisruptionBudget instances which are stale. 
+# This Cleaner instance finds all PodDisruptionBudget instances which are stale.
 # A PodDisruptionBudget is stale if:
 # - matches no Deployment instance
 # - matches no StatefulSet instance
@@ -8,7 +8,7 @@ metadata:
   name: stale-pod-disruption-budgets
 spec:
   schedule: "* 0 * * *"
-  action: Delete
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: PodDisruptionBudget
@@ -16,10 +16,10 @@ spec:
       version: v1
     - kind: Deployment
       group: "apps"
-      version: v1 
+      version: v1
     - kind: StatefulSet
       group: "apps"
-      version: v1   
+      version: v1
     aggregatedSelection: |
       function isMatch(pdbLabels, destLabels)
         for k,v in pairs(pdbLabels) do
@@ -47,7 +47,7 @@ spec:
       function evaluate()
         local hs = {}
         hs.message = ""
-      
+
         local pdbs= {}
         local deployments = {}
         local statefulsets = {}

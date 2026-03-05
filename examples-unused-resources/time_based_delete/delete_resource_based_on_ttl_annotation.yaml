@@ -15,7 +15,7 @@
 #   24h: 24 hours
 #   7d: 7 days
 #   2w: 2 weeks
-# 
+#
 # If you want to filter resources based on namespace =>
 #     - kind: Deployment
 #       group: "apps"
@@ -29,10 +29,10 @@
 #       labelFilters:
 #       - key: app
 #         operation: Equal
-#         value: nginx 
+#         value: nginx
 #       - key: environment
 #         operation: Different
-#         value: production 
+#         value: production
 #
 # If you need further filtering modify `function evaluate` you can access any
 # field of obj
@@ -77,7 +77,7 @@ spec:
           return convertedTimestamp
         end
 
-        -- Convert ttl to seconds 
+        -- Convert ttl to seconds
         function toSeconds(durationString)
           local number, suffix = durationString:match("^(%d+)(%a)$")
 
@@ -111,7 +111,7 @@ spec:
           hs = {}
 
           local expiredResources = {}
-          
+
           currentTime = os.time()
 
           for _, resource in ipairs(resources) do
@@ -141,4 +141,4 @@ spec:
 
         return hs
         end
-  action: Delete
+  action: Scan

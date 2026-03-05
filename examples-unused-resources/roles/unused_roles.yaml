@@ -8,7 +8,7 @@ metadata:
   name: unused-roles
 spec:
   schedule: "* 0 * * *"
-  action: Delete
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: Role
@@ -54,7 +54,7 @@ spec:
             table.insert(unusedRoles, {resource = role})
           end
         end
-        
+
         if #unusedRoles > 0 then
           hs.resources = unusedRoles
         end

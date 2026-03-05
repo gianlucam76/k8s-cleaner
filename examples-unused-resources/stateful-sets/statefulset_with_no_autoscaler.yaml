@@ -1,13 +1,12 @@
 # This Cleaner instance will find StatefulSet instances in all namespaces
-# with has no associated Autoscaler and instructs Cleaner to
-# delete those instances
+# with has no associated Autoscaler
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
   name: statefulset-with-no-autoscaler
 spec:
   schedule: "* 0 * * *"
-  action: Delete # Delete matching resources
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: StatefulSet

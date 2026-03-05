@@ -7,7 +7,7 @@ metadata:
   name: unused-roles
 spec:
   schedule: "* 0 * * *"
-  action: Delete
+  action: Scan
   resourcePolicySet:
     resourceSelectors:
     - kind: ClusterRole
@@ -15,7 +15,7 @@ spec:
       version: v1
     - kind: ClusterRoleBinding
       group: "rbac.authorization.k8s.io"
-      version: v1      
+      version: v1
     - kind: RoleBinding
       group: "rbac.authorization.k8s.io"
       version: v1
@@ -54,7 +54,7 @@ spec:
             table.insert(unusedClusterRoles, {resource = clusterRole})
           end
         end
-        
+
         if #unusedClusterRoles > 0 then
           hs.resources = unusedClusterRoles
         end

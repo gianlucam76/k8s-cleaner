@@ -1,7 +1,6 @@
 # This Cleaner instance finds any Pod that:
 # - has been running for longer than one hour (3600 seconds)
 # - was created by a Job
-# and instruct Cleaner to delete this Pod.
 # This does not delete the Job.
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
@@ -64,4 +63,4 @@ spec:
 
           return hs
         end
-  action: Delete
+  action: Scan

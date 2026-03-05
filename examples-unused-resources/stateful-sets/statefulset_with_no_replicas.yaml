@@ -1,5 +1,5 @@
 # This Cleaner instance will find any StatefulSets in any namespace
-# with spec.replicas set to 0 and deletes those instances
+# with spec.replicas set to 0
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
@@ -20,4 +20,4 @@ spec:
           end
           return hs
         end
-  action: Delete
+  action: Scan
