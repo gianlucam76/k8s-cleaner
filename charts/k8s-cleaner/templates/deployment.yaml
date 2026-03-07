@@ -51,7 +51,15 @@ spec:
             {{- end }}
         {{- end }}
           env:
-          - name: POD_NAMESPACE
+          - name: GOMEMLIMIT
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.memory
+          - name: GOMAXPROCS
+            valueFrom:
+              resourceFieldRef:
+                resource: limits.cpu
+          - name: NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
