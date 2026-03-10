@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/badge/license-Apache-blue.svg)](LICENSE)
 [![Twitter Follow](https://img.shields.io/twitter/follow/projectsveltos?style=social)](https://twitter.com/projectsveltos)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <img src="https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/main/assets/logo.png" width="200">
@@ -125,6 +125,7 @@ By participating, you are expected to honor this code.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/egrosdou01"><img src="https://avatars.githubusercontent.com/u/147995681?v=4?s=100" width="100px;" alt="Eleni Grosdouli"/><br /><sub><b>Eleni Grosdouli</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=egrosdou01" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/colinjlacy"><img src="https://avatars.githubusercontent.com/u/4993605?v=4?s=100" width="100px;" alt="Colin J Lacy"/><br /><sub><b>Colin J Lacy</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=colinjlacy" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/aminmr"><img src="https://avatars.githubusercontent.com/u/61911987?v=4?s=100" width="100px;" alt="Amin Mohammadian"/><br /><sub><b>Amin Mohammadian</b></sub></a><br /><a href="https://github.com/gianlucam76/k8s-cleaner/commits?author=aminmr" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/vtmocanu"><img src="https://avatars.githubusercontent.com/u/1106868?v=4?s=100" width="100px;" alt="Vlad Mocanu"/><br /><sub><b>Vlad Mocanu</b></sub></a><br /><a href="#ideas-vtmocanu" title="Ideas, Planning, & Feedback">🤔</a> <a href="#blog-vtmocanu" title="Blogposts">📝</a></td>
     </tr>
   </tbody>
 </table>
