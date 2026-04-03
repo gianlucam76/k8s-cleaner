@@ -39,7 +39,7 @@ export function CleanerDetail({ cleaner }) {
 
   if (loading.value) {
     return (
-      <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 space-y-2">
+      <div class="space-y-2">
         <div class="skeleton h-4 w-32 rounded" />
         <div class="skeleton h-20 rounded" />
       </div>
@@ -50,7 +50,7 @@ export function CleanerDetail({ cleaner }) {
   const resources = report.value?.resources || [];
 
   return (
-    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 space-y-3">
+    <div class="space-y-3">
       {/* Selectors */}
       <div>
         <div class="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">

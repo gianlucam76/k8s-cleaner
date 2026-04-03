@@ -1,15 +1,19 @@
 // Copyright 2026 vtmocanu. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+import { useSignal } from '@preact/signals';
 import { summaryData, cleanersData, configData } from '../../app';
 import { StatusPanel } from '../dashboard/StatusPanel';
 import { CleanerCard } from '../dashboard/CleanerCard';
+import { CleanerDetail } from '../dashboard/CleanerDetail';
+import { SlidePanel } from '../dashboard/SlidePanel';
 import { TriggerAllButton } from '../dashboard/TriggerAllButton';
 
 export function DashboardPage() {
   const summary = summaryData.value;
   const cleaners = cleanersData.value;
   const readOnly = configData.value?.readOnly ?? true;
+  const selected = useSignal(null);
 
   if (!summary) {
     return (
@@ -24,7 +28,6 @@ export function DashboardPage() {
     );
   }
 
-  // Sort: flagged first (desc), then by name
   const sorted = cleaners
     ? [...cleaners].sort((a, b) => {
         if (b.flaggedCount !== a.flaggedCount) return b.flaggedCount - a.flaggedCount;
@@ -32,11 +35,16 @@ export function DashboardPage() {
       })
     : [];
 
+  const selectedCleaner = sorted.find((c) => c.name === selected.value);
+
+  function onSelect(name) {
+    selected.value = selected.value === name ? null : name;
+  }
+
   return (
     <div class="space-y-6">
       <StatusPanel summary={summary} />
 
-      {/* Actions bar */}
       <div class="flex items-center justify-between">
         <h2 class="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Cleaners ({sorted.length})
@@ -44,11 +52,15 @@ export function DashboardPage() {
         <TriggerAllButton cleaners={sorted} readOnly={readOnly} />
       </div>
 
-      {/* Cleaner cards */}
       {sorted.length > 0 ? (
-        <div class="columns-1 sm:columns-2 lg:columns-2 xl:columns-3 gap-4 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {sorted.map((c) => (
-            <CleanerCard key={c.name} cleaner={c} />
+            <CleanerCard
+              key={c.name}
+              cleaner={c}
+              isSelected={c.name === selected.value}
+              onSelect={onSelect}
+            />
           ))}
         </div>
       ) : (
@@ -62,6 +74,15 @@ export function DashboardPage() {
           </p>
         </div>
       )}
+
+      {/* Slide-over detail panel */}
+      <SlidePanel
+        isOpen={!!selectedCleaner}
+        onClose={() => { selected.value = null; }}
+        cleaner={selectedCleaner}
+      >
+        {selectedCleaner && <CleanerDetail cleaner={selectedCleaner} />}
+      </SlidePanel>
     </div>
   );
 }
