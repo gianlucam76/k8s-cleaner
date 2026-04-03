@@ -41,11 +41,11 @@ export function SlidePanel({ isOpen, onClose, cleaner, children }) {
   return (
     <div
       ref={panelRef}
-      class="fixed top-0 right-0 bottom-0 w-full sm:w-[58%] lg:w-[52%] xl:w-[48%] z-30 bg-white dark:bg-gray-800 shadow-[-20px_0_60px_rgba(0,0,0,0.15)] dark:shadow-[-20px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+      class="fixed top-3 right-3 bottom-3 w-full sm:w-[58%] lg:w-[52%] xl:w-[48%] z-30 bg-white dark:bg-gray-800 shadow-[-20px_0_60px_rgba(0,0,0,0.15)] dark:shadow-[-20px_0_60px_rgba(0,0,0,0.4)] flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] rounded-2xl"
       style={{ transform: 'translateX(0)' }}
     >
       {/* Header */}
-      <div class="px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700/50 flex-shrink-0 bg-white dark:bg-gray-800">
+      <div class="px-6 pt-5 pb-4 border-b border-gray-100 dark:border-gray-700/50 flex-shrink-0 bg-white dark:bg-gray-800 rounded-t-2xl">
         <div class="flex items-start justify-between">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2.5 mb-2">
