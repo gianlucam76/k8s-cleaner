@@ -46,6 +46,7 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 	"gianlucam76/k8s-cleaner/internal/controller"
 	"gianlucam76/k8s-cleaner/internal/telemetry"
+	internalweb "gianlucam76/k8s-cleaner/internal/web"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -53,6 +54,9 @@ var (
 	setupLog              = ctrl.Log.WithName("setup")
 	diagnosticsAddress    string
 	insecureDiagnostics   bool
+	enableWeb             bool
+	webPort               int
+	webReadOnly           bool
 	workers               int
 	restConfigQPS         float32
 	restConfigBurst       int
@@ -139,6 +143,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	if enableWeb {
+		webServer := internalweb.NewDashboard(webPort, webReadOnly, version,
+			mgr.GetClient(), ctrl.Log.WithName("web"))
+		if err := mgr.Add(webServer); err != nil {
+			setupLog.Error(err, "unable to add web server")
+			os.Exit(1)
+		}
+		setupLog.Info("web server enabled", "port", webPort, "readOnly", webReadOnly)
+	}
+
 	if !disableTelemetry {
 		err = telemetry.StartCollecting(ctx, mgr.GetClient(), version)
 		if err != nil {
@@ -200,6 +214,16 @@ func initFlags(fs *pflag.FlagSet) {
 
 	fs.StringVar(&healthAddr, "health-addr", ":9440",
 		"The address the health endpoint binds to.")
+
+	fs.BoolVar(&enableWeb, "enable-web", false,
+		"Enable the embedded web dashboard")
+
+	const defaultWebPort = 9080
+	fs.IntVar(&webPort, "web-port", defaultWebPort,
+		"Web dashboard listen port")
+
+	fs.BoolVar(&webReadOnly, "web-read-only", false,
+		"Disable scan triggers from the web UI")
 }
 
 //+kubebuilder:rbac:groups=*,resources=*,verbs=get;list;watch;delete

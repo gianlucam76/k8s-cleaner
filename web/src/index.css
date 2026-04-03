@@ -1,0 +1,62 @@
+/* Copyright 2026 vtmocanu. All rights reserved. */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* highlight.js - minimal Lua syntax colors */
+.hljs-keyword { color: #8b5cf6; }
+.hljs-string { color: #059669; }
+.hljs-comment { color: #9ca3af; font-style: italic; }
+.hljs-number { color: #d97706; }
+.hljs-built_in { color: #2563eb; }
+.hljs-function .hljs-title { color: #dc2626; }
+.dark .hljs-keyword { color: #a78bfa; }
+.dark .hljs-string { color: #34d399; }
+.dark .hljs-comment { color: #6b7280; }
+.dark .hljs-number { color: #fbbf24; }
+.dark .hljs-built_in { color: #60a5fa; }
+.dark .hljs-function .hljs-title { color: #f87171; }
+
+@layer components {
+  .panel {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 p-5;
+  }
+
+  .panel-interactive {
+    @apply panel transition-shadow duration-150 hover:shadow-md;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold;
+  }
+
+  .badge-ok {
+    @apply badge bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400;
+  }
+
+  .badge-alert {
+    @apply badge bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400;
+  }
+
+  .badge-warn {
+    @apply badge bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400;
+  }
+
+  .action {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold rounded-md border transition-colors duration-150;
+  }
+
+  .action-primary {
+    @apply action border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-gray-900;
+  }
+
+  .action-danger {
+    @apply action border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white dark:border-rose-400 dark:text-rose-400;
+  }
+
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 bg-[length:200%_100%] animate-shimmer rounded-lg;
+  }
+}
