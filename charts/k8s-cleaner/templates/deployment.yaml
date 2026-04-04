@@ -43,6 +43,14 @@ spec:
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
           args:
           - "--diagnostics-address=:8443"
+          - "--version={{ .Chart.AppVersion }}"
+        {{- if .Values.web.enabled }}
+          - "--enable-web"
+          - "--web-port={{ .Values.web.port }}"
+          {{- if .Values.web.readOnly }}
+          - "--web-read-only"
+          {{- end }}
+        {{- end }}
         {{- range $key, $value := .Values.controller.args }}
              {{- if not (kindIs "invalid" $value) }}
           - -{{ $key | mustRegexFind "^[^_]+" }}={{ include "k8s-cleaner.template" (dict "tpl" $value "ctx" $.ctx) }}
@@ -72,6 +80,11 @@ spec:
             - containerPort: 9440
               name: healthz
               protocol: TCP
+          {{- if .Values.web.enabled }}
+            - containerPort: {{ .Values.web.port }}
+              name: web
+              protocol: TCP
+          {{- end }}
           {{- if .Values.controller.livenessProbe.enabled }}
           livenessProbe:
             {{- toYaml (omit .Values.controller.livenessProbe "enabled") | nindent 12 }}

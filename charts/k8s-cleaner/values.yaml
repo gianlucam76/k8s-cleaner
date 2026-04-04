@@ -156,5 +156,26 @@ serviceMonitor:
     tlsConfig:
       insecureSkipVerify: true
 
+# Web Dashboard
+web:
+  # -- Enable the embedded web dashboard
+  enabled: false
+  # -- Web dashboard listen port
+  port: 9080
+  # -- Disable scan triggers from the web UI
+  readOnly: false
+  # -- Ingress configuration for the web dashboard
+  ingress:
+    # -- Enable ingress for web dashboard
+    enabled: false
+    # -- Ingress class name
+    className: ""
+    # -- Ingress annotations
+    annotations: {}
+    # -- Ingress hostname
+    host: ""
+    # -- TLS configuration
+    tls: []
+
 # -- Extra Kubernetes objects to deploy with the helm chart
 extraObjects: []

@@ -13,3 +13,21 @@ spec:
       name: metrics
   selector:
     {{- include "k8s-cleaner.selectorLabels" . | nindent 4 }}
+{{- if .Values.web.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "k8s-cleaner.fullname" . }}-web
+  labels:
+    {{- include "k8s-cleaner.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.web.port }}
+      targetPort: web
+      protocol: TCP
+      name: web
+  selector:
+    {{- include "k8s-cleaner.selectorLabels" . | nindent 4 }}
+{{- end }}
