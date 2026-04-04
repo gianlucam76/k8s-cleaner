@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useSignal } from '@preact/signals';
-import { reportsData } from '../../app';
+import { reportsData, cleanersData } from '../../app';
 import { ReportCard } from '../reports/ReportCard';
 import { FilterBar } from '../reports/FilterBar';
 
 export function ReportsPage() {
   const reports = reportsData.value;
-  const filters = useSignal({ cleaner: '', kind: '', namespace: '' });
+  const cleaners = cleanersData.value;
+  const filters = useSignal({ kind: '' });
 
   if (!reports) {
     return (
@@ -21,19 +22,19 @@ export function ReportsPage() {
     );
   }
 
-  // Apply filters
+  // Build a map of cleaner name -> configured selector kinds
+  const cleanerKindsMap = {};
+  if (cleaners) {
+    for (const c of cleaners) {
+      cleanerKindsMap[c.name] = (c.selectors || []).map((s) => s.kind);
+    }
+  }
+
+  // Apply filters: kind matches against cleaner's configured selectors
   const filtered = reports.filter((r) => {
-    if (filters.value.cleaner && r.name !== filters.value.cleaner) return false;
-    if (filters.value.kind || filters.value.namespace) {
-      // Check if report has any resources matching the kind/namespace filter
-      const hasMatch = r.resources.some((res) => {
-        if (filters.value.kind && res.kind !== filters.value.kind) return false;
-        if (filters.value.namespace && res.namespace !== filters.value.namespace) return false;
-        return true;
-      });
-      // Show reports with matching resources, or reports with no resources if no kind/ns filter would exclude them
-      if (!hasMatch && r.resources.length > 0) return false;
-      if (r.resources.length === 0 && (filters.value.kind || filters.value.namespace)) return false;
+    if (filters.value.kind) {
+      const configuredKinds = cleanerKindsMap[r.name] || [];
+      if (!configuredKinds.includes(filters.value.kind)) return false;
     }
     return true;
   });
@@ -58,7 +59,7 @@ export function ReportsPage() {
         <FilterBar
           filters={filters.value}
           onFilterChange={(f) => { filters.value = f; }}
-          reports={reports}
+          cleaners={cleaners}
         />
       </div>
 
@@ -104,16 +105,16 @@ export function ReportsPage() {
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
           </svg>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            {filters.value.cleaner || filters.value.kind || filters.value.namespace
-              ? 'No reports match the current filters'
+            {filters.value.kind
+              ? 'No cleaners scan this resource kind'
               : 'No reports found'}
           </p>
-          {(filters.value.cleaner || filters.value.kind || filters.value.namespace) && (
+          {filters.value.kind && (
             <button
               class="text-xs text-blue-600 hover:underline mt-2"
-              onClick={() => { filters.value = { cleaner: '', kind: '', namespace: '' }; }}
+              onClick={() => { filters.value = { kind: '' }; }}
             >
-              Clear filters
+              Clear filter
             </button>
           )}
         </div>
