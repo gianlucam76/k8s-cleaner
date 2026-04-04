@@ -1,5 +1,18 @@
-// Copyright 2026 vtmocanu. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*
+Copyright 2026. projectsveltos.io. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package web
 
@@ -15,7 +28,7 @@ import (
 
 // applyMiddleware wraps a handler with the full middleware stack.
 func applyMiddleware(h http.Handler, readOnly bool, log logr.Logger) http.Handler {
-	h = withMaxBody(h, 1<<20)
+	h = withMaxBody(h, 1<<20) //nolint:mnd // 1 MiB max request body
 	h = withCaching(h)
 	h = withCompression(h)
 	h = withSecurityHeaders(h)
@@ -45,7 +58,9 @@ func withSecurityHeaders(next http.Handler) http.Handler {
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com")
+		w.Header().Set("Content-Security-Policy",
+			"default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "+
+				"font-src 'self' https://fonts.gstatic.com")
 		next.ServeHTTP(w, r)
 	})
 }
@@ -56,7 +71,7 @@ func withReadOnlyGuard(next http.Handler) http.Handler {
 			if strings.HasPrefix(r.URL.Path, "/api/") {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusForbidden)
-				w.Write([]byte(`{"error":"read-only mode enabled"}`))
+				_, _ = w.Write([]byte(`{"error":"read-only mode enabled"}`))
 				return
 			}
 		}

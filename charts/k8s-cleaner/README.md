@@ -76,3 +76,12 @@ Major Changes to functions are documented with the version affected. **Before up
 | tolerations | list | `[]` | Tolerations |
 | topologySpreadConstraints | object | `{}` | TopolySpreadConstrains |
 | volumes | list | `[]` | Additional volumes on the output Deployment definition. |
+| web.enabled | bool | `false` | Enable the embedded web dashboard |
+| web.ingress | object | `{"annotations":{},"className":"","enabled":false,"host":"","tls":[]}` | Ingress configuration for the web dashboard |
+| web.ingress.annotations | object | `{}` | Ingress annotations |
+| web.ingress.className | string | `""` | Ingress class name |
+| web.ingress.enabled | bool | `false` | Enable ingress for web dashboard |
+| web.ingress.host | string | `""` | Ingress hostname |
+| web.ingress.tls | list | `[]` | TLS configuration |
+| web.port | int | `9080` | Web dashboard listen port |
+| web.readOnly | bool | `false` | Disable scan triggers from the web UI |

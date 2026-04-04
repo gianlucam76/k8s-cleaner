@@ -1,5 +1,18 @@
-// Copyright 2026 vtmocanu. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*
+Copyright 2026. projectsveltos.io. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package web
 
@@ -121,7 +134,8 @@ func toCleanerResponse(cleaner *appsv1alpha1.Cleaner, report *appsv1alpha1.Repor
 	}
 
 	selectors := make([]selectorInfo, 0, len(cleaner.Spec.ResourcePolicySet.ResourceSelectors))
-	for _, rs := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+		rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 		selectors = append(selectors, selectorInfo{
 			Group:   rs.Group,
 			Version: rs.Version,
@@ -132,7 +146,8 @@ func toCleanerResponse(cleaner *appsv1alpha1.Cleaner, report *appsv1alpha1.Repor
 
 	if includeDetails {
 		// Include the first non-empty Lua evaluate script
-		for _, rs := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 			if rs.Evaluate != "" {
 				resp.LuaScript = rs.Evaluate
 				break

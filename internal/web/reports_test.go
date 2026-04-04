@@ -1,5 +1,18 @@
-// Copyright 2026 vtmocanu. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
+/*
+Copyright 2026. projectsveltos.io. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 
 package web
 
@@ -7,7 +20,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -15,102 +30,87 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
-// TestListReports verifies the reports list endpoint.
-func TestListReports(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newTestScheme()).
-		WithObjects(
-			newTestReport("report-a", appsv1alpha1.ActionScan, nil),
-			newTestReport("report-b", appsv1alpha1.ActionScan, []appsv1alpha1.ResourceInfo{
-				{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old-cm"}, Message: "orphaned"},
-			}),
-		).
-		Build()
-	handler := testHandler(c, false)
+var _ = Describe("Reports", func() {
+	It("should list all reports", func() {
+		c := fake.NewClientBuilder().WithScheme(newTestScheme()).
+			WithObjects(
+				newTestReport("report-a", nil),
+				newTestReport("report-b", []appsv1alpha1.ResourceInfo{
+					{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old-cm"}, Message: "orphaned"},
+				}),
+			).
+			Build()
+		handler := testHandler(c, false)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/reports", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/reports", http.NoBody)
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, req)
 
-	if w.Code != http.StatusOK {
-		t.Fatalf("expected 200, got %d", w.Code)
-	}
+		Expect(w.Code).To(Equal(http.StatusOK))
 
-	var reports []reportResponse
-	json.NewDecoder(w.Body).Decode(&reports)
-	if len(reports) != 2 {
-		t.Fatalf("expected 2 reports, got %d", len(reports))
-	}
-}
+		var reports []reportResponse
+		Expect(json.NewDecoder(w.Body).Decode(&reports)).To(Succeed())
+		Expect(reports).To(HaveLen(2))
+	})
 
-// TestListReportsFilterByCleaner verifies filtering by cleaner name.
-func TestListReportsFilterByCleaner(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newTestScheme()).
-		WithObjects(
-			newTestReport("report-a", appsv1alpha1.ActionScan, nil),
-			newTestReport("report-b", appsv1alpha1.ActionScan, nil),
-		).
-		Build()
-	handler := testHandler(c, false)
+	It("should filter reports by cleaner name", func() {
+		c := fake.NewClientBuilder().WithScheme(newTestScheme()).
+			WithObjects(
+				newTestReport("report-a", nil),
+				newTestReport("report-b", nil),
+			).
+			Build()
+		handler := testHandler(c, false)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/reports?cleaner=report-a", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/reports?cleaner=report-a", http.NoBody)
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, req)
 
-	var reports []reportResponse
-	json.NewDecoder(w.Body).Decode(&reports)
-	if len(reports) != 1 {
-		t.Fatalf("expected 1 report, got %d", len(reports))
-	}
-	if reports[0].Name != "report-a" {
-		t.Fatalf("expected report-a, got %s", reports[0].Name)
-	}
-}
+		var reports []reportResponse
+		Expect(json.NewDecoder(w.Body).Decode(&reports)).To(Succeed())
+		Expect(reports).To(HaveLen(1))
+		Expect(reports[0].Name).To(Equal("report-a"))
+	})
 
-// TestListReportsFilterByKind verifies kind filter removes non-matching resources within reports.
-func TestListReportsFilterByKind(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newTestScheme()).
-		WithObjects(
-			newTestReport("report-with-cm", appsv1alpha1.ActionScan, []appsv1alpha1.ResourceInfo{
-				{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old"}, Message: "orphaned"},
-			}),
-			newTestReport("report-with-secret", appsv1alpha1.ActionScan, []appsv1alpha1.ResourceInfo{
-				{Resource: corev1.ObjectReference{Kind: "Secret", Namespace: "default", Name: "old"}, Message: "orphaned"},
-			}),
-		).
-		Build()
-	handler := testHandler(c, false)
+	It("should filter report resources by kind", func() {
+		c := fake.NewClientBuilder().WithScheme(newTestScheme()).
+			WithObjects(
+				newTestReport("report-with-cm", []appsv1alpha1.ResourceInfo{
+					{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old"}, Message: "orphaned"},
+				}),
+				newTestReport("report-with-secret", []appsv1alpha1.ResourceInfo{
+					{Resource: corev1.ObjectReference{Kind: "Secret", Namespace: "default", Name: "old"}, Message: "orphaned"},
+				}),
+			).
+			Build()
+		handler := testHandler(c, false)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/reports?kind=ConfigMap", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/reports?kind=ConfigMap", http.NoBody)
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, req)
 
-	var reports []reportResponse
-	json.NewDecoder(w.Body).Decode(&reports)
-	// Both reports are returned, but only the ConfigMap report has resources
-	if len(reports) != 2 {
-		t.Fatalf("expected 2 reports, got %d", len(reports))
-	}
-	// Find the CM report and verify it has 1 resource
-	for _, r := range reports {
-		if r.Name == "report-with-cm" && len(r.Resources) != 1 {
-			t.Fatalf("expected 1 resource in cm report, got %d", len(r.Resources))
+		var reports []reportResponse
+		Expect(json.NewDecoder(w.Body).Decode(&reports)).To(Succeed())
+		// Both reports are returned, but only the ConfigMap report has resources
+		Expect(reports).To(HaveLen(2))
+		for _, r := range reports {
+			if r.Name == "report-with-cm" {
+				Expect(r.Resources).To(HaveLen(1))
+			}
+			if r.Name == "report-with-secret" {
+				Expect(r.Resources).To(HaveLen(0))
+			}
 		}
-		if r.Name == "report-with-secret" && len(r.Resources) != 0 {
-			t.Fatalf("expected 0 resources in secret report after kind filter, got %d", len(r.Resources))
-		}
-	}
-}
+	})
 
-// TestGetReportNotFound verifies 404 for nonexistent report.
-func TestGetReportNotFound(t *testing.T) {
-	c := fake.NewClientBuilder().WithScheme(newTestScheme()).Build()
-	handler := testHandler(c, false)
+	It("should return 404 for nonexistent report", func() {
+		c := fake.NewClientBuilder().WithScheme(newTestScheme()).Build()
+		handler := testHandler(c, false)
 
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/reports/nonexistent", nil)
-	w := httptest.NewRecorder()
-	handler.ServeHTTP(w, req)
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/reports/nonexistent", http.NoBody)
+		w := httptest.NewRecorder()
+		handler.ServeHTTP(w, req)
 
-	if w.Code != http.StatusNotFound {
-		t.Fatalf("expected 404, got %d", w.Code)
-	}
-}
+		Expect(w.Code).To(Equal(http.StatusNotFound))
+	})
+})

@@ -17,15 +17,13 @@ limitations under the License.
 package web
 
 import (
-	"embed"
+	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
-var (
-	//go:embed all:dist
-	staticAssets embed.FS
-)
-
-// StaticFS returns the embedded filesystem with the built SPA.
-func StaticFS() embed.FS {
-	return staticAssets
+func TestWeb(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "Web Suite")
 }
