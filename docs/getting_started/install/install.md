@@ -35,7 +35,7 @@ The k8s-cleaner can be installed in any Kubernetes cluster independent if it is 
     ```bash
     $ export KUBECONFIG=<directory to the kubeconfig file>
 
-    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.19.1/manifest/manifest.yaml
+    $ kubectl apply -f https://raw.githubusercontent.com/gianlucam76/k8s-cleaner/v0.20.0/manifest/manifest.yaml
     ```
 
 !!! note
@@ -48,7 +48,7 @@ There is the option to install the k8s-cleaner with a Helm chart. To do so, simp
 !!! example ""
     ```bash
     $ helm install k8s-cleaner oci://ghcr.io/gianlucam76/charts/k8s-cleaner \
-        --version 0.19.1 \
+        --version 0.20.0 \
         --namespace k8s-cleaner \
         --create-namespace #(1)
     ```
@@ -82,3 +82,23 @@ replicaset.apps/k8s-cleaner-78b9d794c5   1         1         1       43s
 
 !!! tip
     Before getting started with the k8s-cleaner, have a look at the **Features** section. Familiarise with the [label filters](../features/label_filters/label_filters.md), [store resource](../features/store_resources/store_resource_yaml.md), [update resources](../features/update_resources/update_resources.md), [resource selector](../features/resourceselector/resourceselector.md), and [schedule](../features/schedule/schedule.md) sections. Use the examples provided and familiarise with the syntax and the capabilities provided
+
+
+### Web Dashboard
+
+The k8s-cleaner includes an optional **embedded web dashboard** that provides a visual interface to manage your cluster's health. It is a lightweight designed to give you instant visibility into your scan results.
+
+**Key Features**
+
+1. **Visual Summaries**: A masonry card layout sorted by severity to help you prioritize issues.
+2. **On-Demand Triggers**: Manually initiate specific cleaners or run a full cluster scan directly from the UI.
+3. **Lua Script Viewer**: Browse and search your custom Lua logic with syntax highlighting and a copy-to-clipboard feature.
+4. **Report Browser**: Filterable scan reports with status bar charts to track resource improvements over time.
+5. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
+
+#### Enabling the Dashboard via Helm
+
+The dashboard is disabled by default. To enable it during installation, set the web.enabled value to true.
+
+![Dashboard](../../assets/webui_dashboard.png)
+![Reports](../../assets/webui_reports.png)
