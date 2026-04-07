@@ -81,6 +81,7 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 
 - ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/)
 - 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
+- 🖥️  [Web Dashboard](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install#web-dashboard)
 
 ## Install on Multiple Clusters with Sveltos
 

@@ -1,5 +1,5 @@
 # Stage 1: Build the web UI
-FROM node:22-alpine AS web-builder
+FROM node:24-alpine AS web-builder
 WORKDIR /web
 # Copy dependency manifests first for layer caching
 COPY web/package.json web/package-lock.json* ./
