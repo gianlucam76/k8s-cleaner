@@ -96,6 +96,22 @@ The k8s-cleaner includes an optional **embedded web dashboard** that provides a 
 4. **Report Browser**: Filterable scan reports with status bar charts to track resource improvements over time.
 5. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
 
+**⚠️ Important: Data Requirements**
+
+The dashboard does not "poll" the cluster directly for matches; instead, it visualizes CleanerReport objects. For a Cleaner instance to appear in the dashboard, you must configure it to generate a report via the notifications field.
+
+Without this configuration, the dashboard will remain empty even if the Cleaner is active.
+
+Add the following to your Cleaner custom resources to enable reporting:
+
+```yaml
+spec:
+  # ... other cleaner settings ...
+  notifications:
+    - name: report
+      type: CleanerReport
+```
+
 #### Enabling the Dashboard via Helm
 
 The dashboard is disabled by default. To enable it during installation, set the web.enabled value to true.
