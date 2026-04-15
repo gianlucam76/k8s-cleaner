@@ -1,10 +1,14 @@
 site_name: k8s-cleaner
-copyright: Copyright © 2022 projectsveltos. All Rights Reserved.
+copyright: Copyright © 2022-2026 projectsveltos. All Rights Reserved.
 site_description: 'The k8s-cleaner (Kubernetes Conrtoller Cleaner) identifies, removes, or updates stale/orphaned or unhealthy resources to maintain a clean and efficient Kubernetes cluster'
 markdown_extensions:
 - admonition
 - pymdownx.details
-- pymdownx.superfences
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format ""
 - attr_list
 - md_in_html
 - footnotes
@@ -16,8 +20,8 @@ markdown_extensions:
 - pymdownx.inlinehilite
 - pymdownx.snippets
 - pymdownx.emoji:
-    emoji_index: !!python/name:material.extensions.emoji.twemoji
-    emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    emoji_index: !!python/name:zensical.extensions.emoji.twemoji
+    emoji_generator: !!python/name:zensical.extensions.emoji.to_svg
 nav:
 - What is k8s-cleaner?: 'index.md'
 - Getting Started:
@@ -59,22 +63,22 @@ theme:
   - navigation.footer
   - navigation.instant.progress
   - content.code.annotate
-  name: material
   logo: assets/logo.png
-  palette:
-  - scheme: default
-    primary: white
-    accent: blue
-    toggle:
-      icon: material/toggle-switch
-      name: Switch to dark mode
-  # Palette toggle for dark mode
-  - scheme: slate
-    primary: white
-    accent: blue
-    toggle:
-      icon: material/toggle-switch-off-outline
-      name: Switch to light mode
+  palette: 
+    # Palette toggle for light mode
+    - scheme: default
+      primary: white
+      accent: blue
+      toggle:
+        icon: lucide/toggle-left
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: white
+      accent: blue
+      toggle:
+        icon: lucide/toggle-right
+        name: Switch to light mode
 repo_url: https://github.com/gianlucam76/k8s-cleaner
 repo_name: k8s-cleaner
 extra:
