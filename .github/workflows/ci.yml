@@ -2,16 +2,27 @@ name: ci
 on:
   push:
     branches:
-      - main
+    - main
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - uses: actions/setup-python@v6
-        with:
-          python-version: 3.x
-      - run: pip install mkdocs-material 
-      - run: mkdocs gh-deploy --force
+    - uses: actions/configure-pages@v5
+    - uses: actions/checkout@v5
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+    - run: pip install zensical==0.0.32
+    - run: zensical build --clean
+    - uses: actions/upload-pages-artifact@v4
+      with:
+        path: site
+    - uses: actions/deploy-pages@v4
+      id: deployment
