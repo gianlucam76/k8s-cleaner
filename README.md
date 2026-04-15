@@ -57,7 +57,7 @@ There are also examples to identify unhealthy resources:
 
 5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
 
-6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
+6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
 
 For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun/).
 
