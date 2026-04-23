@@ -17,7 +17,7 @@ require (
 	github.com/projectsveltos/libsveltos v1.8.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/slack-go/slack v0.22.0
+	github.com/slack-go/slack v0.23.0
 	github.com/spf13/pflag v1.0.10
 	github.com/yuin/gopher-lua v1.1.2
 	go.uber.org/zap v1.27.1
