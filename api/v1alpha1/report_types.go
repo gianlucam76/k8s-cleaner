@@ -19,6 +19,7 @@ package v1alpha1
 import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 type ResourceInfo struct {
@@ -65,5 +66,11 @@ type ReportList struct {
 }
 
 func init() {
-	SchemeBuilder.Register(&Report{}, &ReportList{})
+	SchemeBuilder.Register(func(scheme *runtime.Scheme) error {
+		scheme.AddKnownTypes(GroupVersion,
+			&Report{},
+			&ReportList{},
+		)
+		return nil
+	})
 }
