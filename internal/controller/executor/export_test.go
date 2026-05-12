@@ -36,6 +36,18 @@ var (
 	GetSlackInfo = getSlackInfo
 )
 
+var (
+	GetDeletedResourcesCounterVec = getDeletedResourcesCounterVec
+	GetUpdatedResourcesCounterVec = getUpdatedResourcesCounterVec
+	GetScanResourcesCounterVec    = getScanResourcesCounterVec
+	GetErrorResourcesCounterVec   = getErrorResourcesCounterVec
+
+	GetDeletedResourcesGaugeVec = getDeletedResourcesGaugeVec
+	GetUpdatedResourcesGaugeVec = getUpdatedResourcesGaugeVec
+	GetScanResourcesGaugeVec    = getScanResourcesGaugeVec
+	GetErrorResourcesGaugeVec   = getErrorResourcesGaugeVec
+)
+
 func (m *Manager) ClearInternalStruct() {
 	m.dirty = make([]string, 0)
 	m.inProgress = make([]string, 0)
