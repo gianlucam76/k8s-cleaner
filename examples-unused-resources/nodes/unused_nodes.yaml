@@ -1,0 +1,50 @@
+# This Cleaner instance finds all Nodes with no Pods scheduled on them.
+# Nodes without any scheduled Pods incur cost without running workloads.
+# Note: DaemonSet Pods count as scheduled. To exclude them, filter by
+# pod.metadata.ownerReferences and skip pods owned by a DaemonSet.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: unused-nodes
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Node
+      group: ""
+      version: v1
+    - kind: Pod
+      group: ""
+      version: v1
+    aggregatedSelection: |
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local nodes = {}
+        local usedNodes = {}
+        local unusedNodes = {}
+
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Node" then
+            table.insert(nodes, resource)
+          elseif kind == "Pod" then
+            if resource.spec ~= nil and resource.spec.nodeName ~= nil then
+              usedNodes[resource.spec.nodeName] = true
+            end
+          end
+        end
+
+        for _, node in ipairs(nodes) do
+          if not usedNodes[node.metadata.name] then
+            table.insert(unusedNodes, {resource = node, message = "node has no scheduled pods"})
+          end
+        end
+
+        if #unusedNodes > 0 then
+          hs.resources = unusedNodes
+        end
+        return hs
+      end
