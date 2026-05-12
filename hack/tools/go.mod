@@ -1,13 +1,13 @@
 module github.com/projectsveltos/addon-controller/hack/tools
 
-go 1.26.2
+go 1.26.3
 
 require (
 	github.com/a8m/envsubst v1.4.3
 	github.com/helm/chart-testing/v3 v3.14.0
 	github.com/onsi/ginkgo/v2 v2.28.3
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/tools v0.44.0
+	golang.org/x/tools v0.45.0
 	k8s.io/client-go v0.36.0
 	sigs.k8s.io/controller-tools v0.21.0
 	sigs.k8s.io/kind v0.31.0
@@ -76,13 +76,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/mod v0.35.0 // indirect
-	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/telemetry v0.0.0-20260409153401-be6f6cb8b1fa // indirect
-	golang.org/x/term v0.42.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/telemetry v0.0.0-20260508192327-42602be52be6 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
 	google.golang.org/protobuf v1.36.12-0.20260120151049-f2248ac996af // indirect
