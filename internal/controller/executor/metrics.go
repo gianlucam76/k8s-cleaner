@@ -17,8 +17,6 @@ limitations under the License.
 package executor
 
 import (
-	"os"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
@@ -56,8 +54,7 @@ const (
 var (
 	deletedResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      deletedCounterName,
+				Name:      deletedCounterName,
 			Help:      deletedCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
@@ -65,8 +62,7 @@ var (
 
 	updatedResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      updatedCounterName,
+				Name:      updatedCounterName,
 			Help:      updatedCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
@@ -74,8 +70,7 @@ var (
 
 	scanResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      scanCounterName,
+				Name:      scanCounterName,
 			Help:      scanCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
@@ -83,8 +78,7 @@ var (
 
 	errorResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      errorCounterName,
+				Name:      errorCounterName,
 			Help:      errorCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
@@ -95,8 +89,7 @@ var (
 	// New Gauge Definitions
 	deletedResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      deletedGaugeName,
+				Name:      deletedGaugeName,
 			Help:      deletedGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
@@ -104,8 +97,7 @@ var (
 
 	updatedResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      updatedGaugeName,
+				Name:      updatedGaugeName,
 			Help:      updatedGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
@@ -113,8 +105,7 @@ var (
 
 	scanResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      scanGaugeName,
+				Name:      scanGaugeName,
 			Help:      scanGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
@@ -122,8 +113,7 @@ var (
 
 	errorResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: os.Getenv("NAMESPACE"),
-			Name:      errorGaugeName,
+				Name:      errorGaugeName,
 			Help:      errorGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
@@ -155,7 +145,7 @@ func reportDeletionEvent(cleanerName, resourceAPIVersion, resourceKind string) {
 
 // getUpdatedResourcesCounterVec returns the singleton CounterVec instance.
 func getUpdatedResourcesCounterVec() *prometheus.CounterVec {
-	return deletedResourceCounter
+	return updatedResourceCounter
 }
 
 func reportUpdateEvent(cleanerName, resourceAPIVersion, resourceKind string) {
