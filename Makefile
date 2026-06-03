@@ -171,7 +171,7 @@ endif
 # K8S_VERSION for the Kind cluster can be set as environment variable. If not defined,
 # this default value is used
 ifndef K8S_VERSION
-K8S_VERSION := v1.35.0
+K8S_VERSION := v1.36.1
 endif
 
 KIND_CONFIG ?= kind-cluster.yaml
