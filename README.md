@@ -49,19 +49,19 @@ There are also examples to identify unhealthy resources:
 
 ## Features and Capabilities
 
-1️⃣ [**Schedule**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/schedule/schedule/): Specify the frequency at which the k8s-cleaner should scan the cluster and identify stale resources. Utilise the Cron syntax to define recurring schedules.
+1️⃣ [**Schedule**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/schedule/schedule/): Specify the frequency at which the k8s-cleaner should scan the cluster and identify stale resources. Utilise the Cron syntax to define recurring schedules.
 
-2️⃣ [**DryRun**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun/): Enable safe testing of the k8s-cleaner filtering logic without affecting actual resource configurations. Resources matching the criteria will get identified, but no changes will get applied.
+2️⃣ [**DryRun**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/dryrun/dryrun/): Enable safe testing of the k8s-cleaner filtering logic without affecting actual resource configurations. Resources matching the criteria will get identified, but no changes will get applied.
 
-3️⃣ [**Label Filtering**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/label_filters/label_filters/): Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
+3️⃣ [**Label Filtering**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/label_filters/label_filters): Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
 4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org/) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources. To validate the Cleaner configuration, have a look [here](#validate-the-cleaner-configuration).
 
-5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
+5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
 
 6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
 
-For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun/).
+For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/dryrun/dryrun).
 
 ## Benefits
 
@@ -83,9 +83,9 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 
 ## Getting Started Guide
 
-- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/)
+- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install)
 - 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
-- 🖥️  [Web Dashboard](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install#web-dashboard)
+- 🖥️  [Web Dashboard](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard)
 
 ## Install on Multiple Clusters with Sveltos
 
@@ -95,7 +95,7 @@ If you manage a fleet of Kubernetes clusters, [Sveltos](https://github.com/proje
 - **Manage Configurations**: Centrally manage k8s-cleaner configurations and apply them consistently across all clusters.
 - **Ensure Consistency**: Maintain consistent k8s-cleaner configurations and versions across your fleet.
 
-Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install_on_multiple_cluster/).
+Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install_on_multiple_cluster).
 
 ## Validate Cleaner Configuration
 
