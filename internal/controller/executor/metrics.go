@@ -54,32 +54,32 @@ const (
 var (
 	deletedResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-				Name:      deletedCounterName,
-			Help:      deletedCounterHelp,
+			Name: deletedCounterName,
+			Help: deletedCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
 
 	updatedResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-				Name:      updatedCounterName,
-			Help:      updatedCounterHelp,
+			Name: updatedCounterName,
+			Help: updatedCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
 
 	scanResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-				Name:      scanCounterName,
-			Help:      scanCounterHelp,
+			Name: scanCounterName,
+			Help: scanCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
 
 	errorResourceCounter = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-				Name:      errorCounterName,
-			Help:      errorCounterHelp,
+			Name: errorCounterName,
+			Help: errorCounterHelp,
 		},
 		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
 	)
@@ -89,32 +89,32 @@ var (
 	// New Gauge Definitions
 	deletedResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-				Name:      deletedGaugeName,
-			Help:      deletedGaugeHelp,
+			Name: deletedGaugeName,
+			Help: deletedGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
 	)
 
 	updatedResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-				Name:      updatedGaugeName,
-			Help:      updatedGaugeHelp,
+			Name: updatedGaugeName,
+			Help: updatedGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
 	)
 
 	scanResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-				Name:      scanGaugeName,
-			Help:      scanGaugeHelp,
+			Name: scanGaugeName,
+			Help: scanGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
 	)
 
 	errorResourceGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-				Name:      errorGaugeName,
-			Help:      errorGaugeHelp,
+			Name: errorGaugeName,
+			Help: errorGaugeHelp,
 		},
 		[]string{"cleaner_instance"},
 	)
