@@ -45,6 +45,11 @@ There are also examples to identify unhealthy resources:
   - [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
   - [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
 
+And examples that combine resource state with **live Prometheus metrics**:
+
+  - [Scale Down Deployments on High Error Rate](https://github.com/gianlucam76/k8s-cleaner/tree/main/internal/controller/executor/validate_resourceselector/metrics): Scale Deployments to zero when the HTTP error rate reported by Prometheus exceeds a threshold.
+  - [Restart Memory-Saturated Pods](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/examples/metrics/metric_based_selection): Delete Pods when their memory working set exceeds 90% of the configured limit.
+
 ![k8s-cleaner in action](docs/assets/sveltos_roomba.gif)
 
 ## Features and Capabilities
@@ -60,6 +65,8 @@ There are also examples to identify unhealthy resources:
 5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
 
 6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
+
+7️⃣ [**Metric-based Selection**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/examples/metrics/metric_based_selection): Query any Prometheus-compatible endpoint before evaluating each resource. The results are exposed as a global `metrics` table in the Lua script, so you can gate resource matching on live metric values — for example, scale down Deployments only when their HTTP error rate exceeds 5%, or restart Pods only when memory saturation is reported by Prometheus.
 
 For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/dryrun/dryrun).
 

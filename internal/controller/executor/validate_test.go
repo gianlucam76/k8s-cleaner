@@ -138,7 +138,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, _, err := executor.IsMatch(matchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err := executor.IsMatch(matchingResource, rs.Evaluate, nil, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -155,7 +155,7 @@ func verifyCleanerResourceSelector(dirName string) {
 		isMatch := false
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			tmpIsMatch, _, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err := executor.IsMatch(nonMatchingResource, rs.Evaluate, nil, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true
@@ -216,7 +216,7 @@ func verifyCleanerTransform(dirName string) {
 		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 			var tmpIsMatch bool
-			tmpIsMatch, _, err = executor.IsMatch(matchingResource, rs.Evaluate, logger)
+			tmpIsMatch, _, err = executor.IsMatch(matchingResource, rs.Evaluate, nil, logger)
 			Expect(err).To(BeNil())
 			if tmpIsMatch {
 				isMatch = true

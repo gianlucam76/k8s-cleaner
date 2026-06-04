@@ -21,6 +21,8 @@ var (
 	GetMatchingResources    = getMatchingResources
 	DeleteMatchingResources = deleteMatchingResources
 	IsMatch                 = isMatch
+	FetchMetrics            = fetchMetrics
+	BuildAuthHeader         = buildAuthHeader
 	Transform               = transform
 	AggregatedSelection     = aggregatedSelection
 	GetNamespaces           = getNamespaces

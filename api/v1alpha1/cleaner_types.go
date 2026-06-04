@@ -67,6 +67,38 @@ type DeleteOptions struct {
 	PropagationPolicy *metav1.DeletionPropagation `json:"propagationPolicy,omitempty"`
 }
 
+// MetricSource identifies a Prometheus-compatible metrics endpoint reachable
+// from within the cluster.
+type MetricSource struct {
+	// URL is the base HTTP(S) address of the Prometheus-compatible endpoint
+	// (e.g. http://prometheus.monitoring.svc:9090).
+	// +kubebuilder:validation:MinLength=1
+	URL string `json:"url"`
+
+	// Path is the HTTP path for Prometheus instant queries.
+	// Defaults to api/v1/query when empty.
+	// +optional
+	Path string `json:"path,omitempty"`
+
+	// SecretRef optionally references a Secret containing credentials to
+	// authenticate against the endpoint.
+	// Supported keys: "token" (bearer), "username"+"password" (basic auth).
+	// +optional
+	SecretRef *corev1.SecretReference `json:"secretRef,omitempty"`
+}
+
+// MetricQuery binds a PromQL instant-query result to a name the Evaluate
+// script can reference via the global metrics table (e.g. metrics["errorRate"]).
+type MetricQuery struct {
+	// Name is the key under which the scalar result is available in the script.
+	// +kubebuilder:validation:MinLength=1
+	Name string `json:"name"`
+
+	// Query is a PromQL instant-query expression.
+	// +kubebuilder:validation:MinLength=1
+	Query string `json:"query"`
+}
+
 type ResourceSelector struct {
 	// Namespace of the resource deployed in the  Cluster.
 	// Empty for resources scoped at cluster level.
@@ -95,6 +127,7 @@ type ResourceSelector struct {
 	// above criteria.
 	// Must return struct with field "matching" representing whether
 	// object is a match and an optional "message" field.
+	// The global metrics table is available when MetricSource is set.
 	// +optional
 	Evaluate string `json:"evaluate,omitempty"`
 
@@ -102,6 +135,18 @@ type ResourceSelector struct {
 	// deleted. If set to false, k8s-cleaner will consider also resources marked as deleted.
 	// +kubebuilder:default:=true
 	ExcludeDeleted bool `json:"excludeDeleted,omitempty"`
+
+	// MetricSource identifies a Prometheus-compatible endpoint to query before
+	// evaluating each resource. Results are exposed to the Evaluate script via
+	// the global metrics table (e.g. metrics["myQuery"]).
+	// +optional
+	MetricSource *MetricSource `json:"metricSource,omitempty"`
+
+	// MetricQueries is a list of PromQL instant queries to execute against
+	// MetricSource. Each result is a scalar accessible in the Evaluate script
+	// via metrics["<name>"].
+	// +optional
+	MetricQueries []MetricQuery `json:"metricQueries,omitempty"`
 }
 
 type ResourcePolicySet struct {
