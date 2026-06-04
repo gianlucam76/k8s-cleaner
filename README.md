@@ -26,7 +26,7 @@ k8s-cleaner keeps you in the loop with handy notifications through:
 1. <img src="assets/telegram_logo.png" alt="Telegram" width="30" />  [__Telegram__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#telegram-notifications-example)
 1. <img src="assets/smtp_logo.png" alt="SMTP" width="30" />  [__SMTP__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#smtp-notifications-example)
 1.  [__Kubernetes Event__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#kubernetes-event-notifications-example)
-1.  [__reports__](https://gianlucam76.github.io/k8s-cleaner/docs/reports/k8s-cleaner_reports)
+1.  [__Reports__](https://gianlucam76.github.io/k8s-cleaner/docs/reports/k8s-cleaner_reports)
 
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
