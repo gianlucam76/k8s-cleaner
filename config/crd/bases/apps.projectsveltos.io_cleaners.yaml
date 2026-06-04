@@ -184,6 +184,7 @@ spec:
                             above criteria.
                             Must return struct with field "matching" representing whether
                             object is a match and an optional "message" field.
+                            The global metrics table is available when MetricSource is set.
                           type: string
                         excludeDeleted:
                           default: true
@@ -222,6 +223,66 @@ spec:
                             - operation
                             type: object
                           type: array
+                        metricQueries:
+                          description: |-
+                            MetricQueries is a list of PromQL instant queries to execute against
+                            MetricSource. Each result is a scalar accessible in the Evaluate script
+                            via metrics["<name>"].
+                          items:
+                            description: |-
+                              MetricQuery binds a PromQL instant-query result to a name the Evaluate
+                              script can reference via the global metrics table (e.g. metrics["errorRate"]).
+                            properties:
+                              name:
+                                description: Name is the key under which the scalar
+                                  result is available in the script.
+                                minLength: 1
+                                type: string
+                              query:
+                                description: Query is a PromQL instant-query expression.
+                                minLength: 1
+                                type: string
+                            required:
+                            - name
+                            - query
+                            type: object
+                          type: array
+                        metricSource:
+                          description: |-
+                            MetricSource identifies a Prometheus-compatible endpoint to query before
+                            evaluating each resource. Results are exposed to the Evaluate script via
+                            the global metrics table (e.g. metrics["myQuery"]).
+                          properties:
+                            path:
+                              description: |-
+                                Path is the HTTP path for Prometheus instant queries.
+                                Defaults to api/v1/query when empty.
+                              type: string
+                            secretRef:
+                              description: |-
+                                SecretRef optionally references a Secret containing credentials to
+                                authenticate against the endpoint.
+                                Supported keys: "token" (bearer), "username"+"password" (basic auth).
+                              properties:
+                                name:
+                                  description: name is unique within a namespace to
+                                    reference a secret resource.
+                                  type: string
+                                namespace:
+                                  description: namespace defines the space within
+                                    which the secret name must be unique.
+                                  type: string
+                              type: object
+                              x-kubernetes-map-type: atomic
+                            url:
+                              description: |-
+                                URL is the base HTTP(S) address of the Prometheus-compatible endpoint
+                                (e.g. http://prometheus.monitoring.svc:9090).
+                              minLength: 1
+                              type: string
+                          required:
+                          - url
+                          type: object
                         namespace:
                           description: |-
                             Namespace of the resource deployed in the  Cluster.

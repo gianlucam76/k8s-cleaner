@@ -244,6 +244,12 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 		return nil, nil
 	}
 
+	metricsData, err := fetchMetrics(ctx, sr, logger)
+	if err != nil {
+		logger.Info(fmt.Sprintf("failed to fetch metrics: %v", err))
+		return nil, err
+	}
+
 	results := make([]ResourceResult, 0)
 	for i := range resources {
 		resource := &resources[i]
@@ -254,7 +260,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
 		l.V(logs.LogDebug).Info("considering resource for deletion")
 
-		isMatch, message, err := isMatch(resource, sr.Evaluate, l)
+		isMatch, message, err := isMatch(resource, sr.Evaluate, metricsData, l)
 		if err != nil {
 			return nil, err
 		}
@@ -535,7 +541,7 @@ func getNamespaces(ctx context.Context, resourceSelector *appsv1alpha1.ResourceS
 	return matchingNamespaces, nil
 }
 
-func isMatch(resource *unstructured.Unstructured, script string, logger logr.Logger,
+func isMatch(resource *unstructured.Unstructured, script string, metricsData map[string]float64, logger logr.Logger,
 ) (matching bool, message string, err error) {
 
 	if script == "" {
@@ -544,6 +550,12 @@ func isMatch(resource *unstructured.Unstructured, script string, logger logr.Log
 
 	l := lua.NewState()
 	defer l.Close()
+
+	metricsTable := l.NewTable()
+	for k, v := range metricsData {
+		metricsTable.RawSetString(k, lua.LNumber(v))
+	}
+	l.SetGlobal("metrics", metricsTable)
 
 	obj := mapToTable(resource.UnstructuredContent())
 

@@ -50,6 +50,8 @@ nav:
       - Example - Outdated Secret Data: 'getting_started/examples/unhealthy_resources/outdated_secret_data.md'
       - Example - Pod with Expired Certificates: 'getting_started/examples/unhealthy_resources/pod_expired_certs.md'
       - More Examples: 'getting_started/examples/unhealthy_resources/more_examples.md'
+    - Metric-based Selection:
+      - Example - Scale Down on High Error Rate / Restart on Memory Saturation: 'getting_started/examples/metrics/metric_based_selection.md'
 - Reports: 'reports/k8s-cleaner_reports.md'
 - Notifications: 'notifications/notifications.md'
 - Blogs and videos: 'resources/blogs.md'

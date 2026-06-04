@@ -1,0 +1,51 @@
+# This Cleaner instance scales down Deployments in the "my-app" namespace
+# when the HTTP error rate (as reported by Prometheus) exceeds 5%.
+#
+# Before evaluating each Deployment, k8s-cleaner queries the Prometheus
+# endpoint defined in metricSource and exposes the results through the
+# global metrics table in the Lua script.
+#
+# metrics["errorRate"] holds the ratio returned by the PromQL query.
+# A nil value means the query returned no data — the script skips those
+# Deployments to avoid false positives.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: scale-down-high-error-rate-deployments
+spec:
+  schedule: "*/15 * * * *"
+  action: Transform
+  transform: |
+    function transform()
+      hs = {}
+      obj.spec.replicas = 0
+      hs.resource = obj
+      return hs
+    end
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Deployment
+      group: apps
+      version: v1
+      namespace: my-app
+      metricSource:
+        url: http://prometheus-server.monitoring.svc:9090
+      metricQueries:
+      - name: errorRate
+        query: >-
+          sum(rate(http_requests_errors_total{namespace="my-app"}[5m]))
+          /
+          sum(rate(http_requests_total{namespace="my-app"}[5m]))
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+          if metrics["errorRate"] == nil then
+            return hs
+          end
+          if metrics["errorRate"] > 0.05 then
+            hs.matching = true
+            hs.message = "error rate above 5%: " .. tostring(metrics["errorRate"])
+          end
+          return hs
+        end
