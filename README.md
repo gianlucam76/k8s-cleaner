@@ -19,14 +19,14 @@ __Cleaner__ can also be used to identify unhealthy resources.
 
 k8s-cleaner keeps you in the loop with handy notifications through:
 
-1. <img src="assets/slack_logo.png" alt="Slack" width="30" />  [__Slack__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#slack-notifications-example)
-1. <img src="assets/webex_logo.png" alt="Webex" width="30" />  [__Webex__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#webex-notifications-example)
-1. <img src="assets/discord_logo.png" alt="Discord" width="30" />  [__Discord__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#discord-notifications-example)
-1. <img src="assets/teams_logo.svg" alt="Teams" width="30" />  [__Teams__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#teams-notifications-example)
-1. <img src="assets/telegram_logo.png" alt="Telegram" width="30" />  [__Telegram__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#telegram-notifications-example)
-1. <img src="assets/smtp_logo.png" alt="SMTP" width="30" />  [__SMTP__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#smtp-notifications-example)
-1.  [__Kubernetes Event__](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications#kubernetes-event-notifications-example)
-1.  [__Reports__](https://gianlucam76.github.io/k8s-cleaner/docs/reports/k8s-cleaner_reports)
+1. <img src="assets/slack_logo.png" alt="Slack" width="30" />  [__Slack__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#slack-notifications-example)
+1. <img src="assets/webex_logo.png" alt="Webex" width="30" />  [__Webex__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#webex-notifications-example)
+1. <img src="assets/discord_logo.png" alt="Discord" width="30" />  [__Discord__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#discord-notifications-example)
+1. <img src="assets/teams_logo.svg" alt="Teams" width="30" />  [__Teams__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#teams-notifications-example)
+1. <img src="assets/telegram_logo.png" alt="Telegram" width="30" />  [__Telegram__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#telegram-notifications-example)
+1. <img src="assets/smtp_logo.png" alt="SMTP" width="30" />  [__SMTP__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#smtp-notifications-example)
+1.  [__Kubernetes Event__](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/#kubernetes-event-notifications-example)
+1.  [__Reports__](https://gianlucam76.github.io/k8s-cleaner/reports/k8s-cleaner_reports/)
 
 Each notification contains list of all resources successfully deleted (or modified) by k8s-cleaner. Choose what works best for you!
 
@@ -54,19 +54,19 @@ And examples that combine resource state with **live Prometheus metrics**:
 
 ## Features and Capabilities
 
-1️⃣ [**Schedule**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/schedule/schedule): Specify the frequency at which the k8s-cleaner should scan the cluster and identify stale resources. Utilise the Cron syntax to define recurring schedules.
+1️⃣ [**Schedule**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/schedule/schedule/): Specify the frequency at which the k8s-cleaner should scan the cluster and identify stale resources. Utilise the Cron syntax to define recurring schedules.
 
-2️⃣ [**DryRun**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/dryrun/dryrun): Enable safe testing of the k8s-cleaner filtering logic without affecting actual resource configurations. Resources matching the criteria will get identified, but no changes will get applied.
+2️⃣ [**DryRun**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun/): Enable safe testing of the k8s-cleaner filtering logic without affecting actual resource configurations. Resources matching the criteria will get identified, but no changes will get applied.
 
-3️⃣ [**Label Filtering**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/label_filters/label_filters): Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
+3️⃣ [**Label Filtering**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/label_filters/label_filters/): Select resources based on user-defined labels, filtering out unwanted or outdated components. Refine the selection based on label key, operation (equal, different, etc.), and value.
 
-4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources. To validate the Cleaner configuration, have a look [here](#validate-cleaner-configuration).
+4️⃣ **Lua-based Selection Criteria**: Leverage the [Lua](https://lua.org) scripting language to create complex and dynamic selection criteria, catering to specific resource management needs. Define custom logic to identify and handle stale resources. To validate the Cleaner configuration, have a look [here](https://github.com/gianlucam76/k8s-cleaner/tree/main/internal/controller/executor/validate_resourceselector).
 
-5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/docs/notifications/notifications): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
+5️⃣ [**Notifications**](https://gianlucam76.github.io/k8s-cleaner/notifications/notifications/): Stay informed! The k8s-cleaner keeps users in the loop about every cleaned-up resource, whether removed or optimized. Get detailed notification lists and pick your preferred channel: Slack, Webex, Discord, Teams, Telegram, SMTP or reports.
 
-6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
+6️⃣ [**Web Dashboard**](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/#web-dashboard): Visualize your cluster's health! Use the optional embedded dashboard to browse scan results via a responsive UI, inspect your Lua scripts, and trigger on-demand cleanup tasks with a single click. It can be easily enabled via Helm and supports both dark mode and read-only configurations.
 
-7️⃣ [**Metric-based Selection**](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/examples/metrics/metric_based_selection): Query any Prometheus-compatible endpoint before evaluating each resource. The results are exposed as a global `metrics` table in the Lua script, so you can gate resource matching on live metric values — for example, scale down Deployments only when their HTTP error rate exceeds 5%, or restart Pods only when memory saturation is reported by Prometheus.
+7️⃣ [**Metric-based Selection**](https://gianlucam76.github.io/k8s-cleaner/getting_started/examples/metrics/metric_based_selection/): Query any Prometheus-compatible endpoint before evaluating each resource. The results are exposed as a global `metrics` table in the Lua script, so you can gate resource matching on live metric values — for example, scale down Deployments only when their HTTP error rate exceeds 5%, or restart Pods only when memory saturation is reported by Prometheus.
 
 For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/features/dryrun/dryrun).
 
@@ -90,9 +90,9 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 
 ## Getting Started Guide
 
-- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install)
-- 📖  [Complete Documentation](http://k8scleaner.projectsveltos.io/)
-- 🖥️  [Web Dashboard](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install#web-dashboard)
+- ✅  [Install](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/)
+- 📖  [Complete Documentation](https://gianlucam76.github.io/k8s-cleaner/)
+- 🖥️  [Web Dashboard](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install/#web-dashboard)
 
 ## Install on Multiple Clusters with Sveltos
 
@@ -102,7 +102,7 @@ If you manage a fleet of Kubernetes clusters, [Sveltos](https://github.com/proje
 - **Manage Configurations**: Centrally manage k8s-cleaner configurations and apply them consistently across all clusters.
 - **Ensure Consistency**: Maintain consistent k8s-cleaner configurations and versions across your fleet.
 
-Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/docs/getting_started/install/install_on_multiple_cluster).
+Detailed information can be found [here](https://gianlucam76.github.io/k8s-cleaner/getting_started/install/install_on_multiple_cluster/).
 
 ## Validate Cleaner Configuration
 
