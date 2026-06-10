@@ -26,7 +26,7 @@ By choosing to participate in telemetry, users contribute to the ongoing improve
 
 We collect minimal, anonymized data about Sveltos usage:
 
-- **Version Information**: To track the distribution of different k8s-cleaner versions.
+- **Version Information**: To track the distribution of different k8s-cleaner versions;
 - **Cluster Management Data**: To understand the scale and complexity of Sveltos deployments. This includes:
     1. Number of Cleaner instances
     1. Number of nodes
