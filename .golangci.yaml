@@ -20,7 +20,7 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - gomodguard
+    - gomodguard_v2
     - goprintffuncname
     - gosec
     - govet
@@ -72,12 +72,10 @@ linters:
         - style
     gocyclo:
       min-complexity: 20
-    gomodguard:
+    gomodguard_v2:
       blocked:
-        modules:
-          - k8s.io/kubernetes:
-              reason: There is no good, avoidable reason to use this package and often leads to issues such as https://bit.ly/3dlKScY. However, if you disagree please include @ravchama in code review highlighting the reason.
-        local-replace-directives: true
+        - module: k8s.io/kubernetes
+      local-replace-directives: true
     govet:
       settings:
         printf:
@@ -132,6 +130,7 @@ linters:
       - third_party$
       - builtin$
       - examples$
+      - internal/test/helpers
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
@@ -149,3 +148,4 @@ formatters:
       - third_party$
       - builtin$
       - examples$
+      - internal/test/helpers

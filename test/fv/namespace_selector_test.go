@@ -116,9 +116,9 @@ var _ = Describe("NamespaceSelector:", func() {
 				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 					ResourceSelectors: []appsv1alpha1.ResourceSelector{
 						{
-							Kind:              "Secret",
+							Kind:              kindSecret,
 							Group:             "",
-							Version:           "v1",
+							Version:           apiVersionV1,
 							NamespaceSelector: fmt.Sprintf("%s=%s, %s=%s", key1, value1, key2, value2),
 						},
 					},

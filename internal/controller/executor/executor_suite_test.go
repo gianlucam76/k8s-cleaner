@@ -103,6 +103,11 @@ func setupScheme() (*runtime.Scheme, error) {
 	return s, nil
 }
 
+const (
+	kindSecret   = "Secret"
+	apiVersionV1 = "v1"
+)
+
 func randomString() string {
 	const length = 10
 	return util.RandomString(length)

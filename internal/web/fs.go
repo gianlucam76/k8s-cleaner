@@ -44,6 +44,6 @@ func SPAHandler(embedded fs.FS) http.Handler {
 			fullPath = path.Join("dist", "index.html")
 		}
 
-		http.ServeFileFS(w, r, embedded, fullPath)
+		http.ServeFileFS(w, r, embedded, fullPath) //nolint:gosec // path traversal blocked above: ".." is rejected before reaching here
 	})
 }

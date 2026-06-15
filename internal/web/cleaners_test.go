@@ -84,8 +84,8 @@ var _ = Describe("Cleaners", func() {
 
 	It("should include flagged count from reports", func() {
 		report := newTestReport("my-cleaner", []appsv1alpha1.ResourceInfo{
-			{Message: "orphaned"},
-			{Message: "orphaned"},
+			{Message: msgOrphaned},
+			{Message: msgOrphaned},
 		})
 
 		c := fake.NewClientBuilder().WithScheme(newTestScheme()).

@@ -59,8 +59,8 @@ var _ = Describe("Notification", func() {
 			Name: randomString(),
 			Type: appsv1alpha1.NotificationTypeWebex,
 			NotificationRef: &corev1.ObjectReference{
-				Kind:       "Secret",
-				APIVersion: "v1",
+				Kind:       kindSecret,
+				APIVersion: apiVersionV1,
 				Namespace:  secret.Namespace,
 				Name:       secret.Name,
 			},
@@ -94,8 +94,8 @@ var _ = Describe("Notification", func() {
 			Name: randomString(),
 			Type: appsv1alpha1.NotificationTypeSlack,
 			NotificationRef: &corev1.ObjectReference{
-				Kind:       "Secret",
-				APIVersion: "v1",
+				Kind:       kindSecret,
+				APIVersion: apiVersionV1,
 				Namespace:  secret.Namespace,
 				Name:       secret.Name,
 			},

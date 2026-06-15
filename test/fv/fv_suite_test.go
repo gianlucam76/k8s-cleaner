@@ -49,6 +49,16 @@ const (
 	pollingInterval = 5 * time.Second
 )
 
+const (
+	kindSecret         = "Secret"
+	kindServiceAccount = "ServiceAccount"
+	apiVersionV1       = "v1"
+	labelApp           = "app"
+	volumeMountConf    = "conf"
+	metricNameUp       = "up"
+	sveltosNamespace   = "projectsveltos"
+)
+
 func TestFv(t *testing.T) {
 	RegisterFailHandler(Fail)
 

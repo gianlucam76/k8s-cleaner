@@ -73,7 +73,7 @@ var _ = Describe("ResourceSelector metric-based evaluate", func() {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      podName,
 					Namespace: ns,
-					Labels:    map[string]string{"app": podName},
+					Labels:    map[string]string{labelApp: podName},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
@@ -82,7 +82,7 @@ var _ = Describe("ResourceSelector metric-based evaluate", func() {
 							Image: "nginx:alpine",
 							Ports: []corev1.ContainerPort{{ContainerPort: 80}},
 							VolumeMounts: []corev1.VolumeMount{
-								{Name: "conf", MountPath: "/etc/nginx/conf.d"},
+								{Name: volumeMountConf, MountPath: "/etc/nginx/conf.d"},
 							},
 						},
 					},
@@ -104,7 +104,7 @@ var _ = Describe("ResourceSelector metric-based evaluate", func() {
 			Expect(k8sClient.Create(context.TODO(), &corev1.Service{
 				ObjectMeta: metav1.ObjectMeta{Name: svcName, Namespace: ns},
 				Spec: corev1.ServiceSpec{
-					Selector: map[string]string{"app": podName},
+					Selector: map[string]string{labelApp: podName},
 					Ports:    []corev1.ServicePort{{Port: 80, Protocol: corev1.ProtocolTCP}},
 				},
 			})).To(Succeed())
@@ -178,9 +178,9 @@ end`, key, value)
 					ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 						ResourceSelectors: []appsv1alpha1.ResourceSelector{
 							{
-								Kind:      "ServiceAccount",
+								Kind:      kindServiceAccount,
 								Group:     "",
-								Version:   "v1",
+								Version:   apiVersionV1,
 								Namespace: ns,
 								Evaluate:  evaluateWithMetric,
 								MetricSource: &appsv1alpha1.MetricSource{
@@ -188,7 +188,7 @@ end`, key, value)
 								},
 								MetricQueries: []appsv1alpha1.MetricQuery{
 									{
-										Name:  "up",
+										Name:  metricNameUp,
 										Query: "up",
 									},
 								},

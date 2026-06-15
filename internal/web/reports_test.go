@@ -36,7 +36,7 @@ var _ = Describe("Reports", func() {
 			WithObjects(
 				newTestReport("report-a", nil),
 				newTestReport("report-b", []appsv1alpha1.ResourceInfo{
-					{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old-cm"}, Message: "orphaned"},
+					{Resource: corev1.ObjectReference{Kind: kindConfigMap, Namespace: namespaceDefault, Name: resourceNameOld + "-cm"}, Message: msgOrphaned},
 				}),
 			).
 			Build()
@@ -76,10 +76,10 @@ var _ = Describe("Reports", func() {
 		c := fake.NewClientBuilder().WithScheme(newTestScheme()).
 			WithObjects(
 				newTestReport("report-with-cm", []appsv1alpha1.ResourceInfo{
-					{Resource: corev1.ObjectReference{Kind: "ConfigMap", Namespace: "default", Name: "old"}, Message: "orphaned"},
+					{Resource: corev1.ObjectReference{Kind: kindConfigMap, Namespace: namespaceDefault, Name: resourceNameOld}, Message: msgOrphaned},
 				}),
 				newTestReport("report-with-secret", []appsv1alpha1.ResourceInfo{
-					{Resource: corev1.ObjectReference{Kind: "Secret", Namespace: "default", Name: "old"}, Message: "orphaned"},
+					{Resource: corev1.ObjectReference{Kind: kindSecret, Namespace: namespaceDefault, Name: resourceNameOld}, Message: msgOrphaned},
 				}),
 			).
 			Build()

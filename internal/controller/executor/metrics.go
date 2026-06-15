@@ -38,6 +38,12 @@ const (
 )
 
 const (
+	cleanerInstanceLabel    = "cleaner_instance"
+	resourceAPIVersionLabel = "resource_apiversion"
+	resourceTypeLabel       = "resource_type"
+)
+
+const (
 	deletedGaugeName = "k8s_cleaner_current_deleted_resources_count"
 	deletedGaugeHelp = "The current total count of resources deleted by the cleaner (snapshot of the counter)."
 
@@ -57,7 +63,7 @@ var (
 			Name: deletedCounterName,
 			Help: deletedCounterHelp,
 		},
-		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+		[]string{cleanerInstanceLabel, resourceAPIVersionLabel, resourceTypeLabel},
 	)
 
 	updatedResourceCounter = prometheus.NewCounterVec(
@@ -65,7 +71,7 @@ var (
 			Name: updatedCounterName,
 			Help: updatedCounterHelp,
 		},
-		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+		[]string{cleanerInstanceLabel, resourceAPIVersionLabel, resourceTypeLabel},
 	)
 
 	scanResourceCounter = prometheus.NewCounterVec(
@@ -73,7 +79,7 @@ var (
 			Name: scanCounterName,
 			Help: scanCounterHelp,
 		},
-		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+		[]string{cleanerInstanceLabel, resourceAPIVersionLabel, resourceTypeLabel},
 	)
 
 	errorResourceCounter = prometheus.NewCounterVec(
@@ -81,7 +87,7 @@ var (
 			Name: errorCounterName,
 			Help: errorCounterHelp,
 		},
-		[]string{"cleaner_instance", "resource_apiversion", "resource_type"},
+		[]string{cleanerInstanceLabel, resourceAPIVersionLabel, resourceTypeLabel},
 	)
 )
 
@@ -92,7 +98,7 @@ var (
 			Name: deletedGaugeName,
 			Help: deletedGaugeHelp,
 		},
-		[]string{"cleaner_instance"},
+		[]string{cleanerInstanceLabel},
 	)
 
 	updatedResourceGauge = prometheus.NewGaugeVec(
@@ -100,7 +106,7 @@ var (
 			Name: updatedGaugeName,
 			Help: updatedGaugeHelp,
 		},
-		[]string{"cleaner_instance"},
+		[]string{cleanerInstanceLabel},
 	)
 
 	scanResourceGauge = prometheus.NewGaugeVec(
@@ -108,7 +114,7 @@ var (
 			Name: scanGaugeName,
 			Help: scanGaugeHelp,
 		},
-		[]string{"cleaner_instance"},
+		[]string{cleanerInstanceLabel},
 	)
 
 	errorResourceGauge = prometheus.NewGaugeVec(
@@ -116,7 +122,7 @@ var (
 			Name: errorGaugeName,
 			Help: errorGaugeHelp,
 		},
-		[]string{"cleaner_instance"},
+		[]string{cleanerInstanceLabel},
 	)
 )
 

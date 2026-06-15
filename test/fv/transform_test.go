@@ -126,7 +126,7 @@ var _ = Describe("CleanerClient", func() {
 						{
 							Kind:      "Service",
 							Group:     "",
-							Version:   "v1",
+							Version:   apiVersionV1,
 							Namespace: ns,
 							Evaluate:  fmt.Sprintf(evaluateService, key, value),
 						},

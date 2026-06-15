@@ -40,8 +40,8 @@ var _ = Describe("Summary", func() {
 		cleaner2 := newTestCleaner("cleaner-b", "5 * * * *")
 
 		report := newTestReport("cleaner-a", []appsv1alpha1.ResourceInfo{
-			{Resource: corev1.ObjectReference{Kind: "ConfigMap", Name: "old"}, Message: "orphaned"},
-			{Resource: corev1.ObjectReference{Kind: "ConfigMap", Name: "stale"}, Message: "orphaned"},
+			{Resource: corev1.ObjectReference{Kind: kindConfigMap, Name: resourceNameOld}, Message: msgOrphaned},
+			{Resource: corev1.ObjectReference{Kind: kindConfigMap, Name: "stale"}, Message: msgOrphaned},
 		})
 
 		c := fake.NewClientBuilder().WithScheme(newTestScheme()).

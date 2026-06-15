@@ -33,6 +33,15 @@ import (
 	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
+const (
+	kindConfigMap    = "ConfigMap"
+	kindSecret       = "Secret"
+	apiVersionV1     = "v1"
+	msgOrphaned      = "orphaned"
+	resourceNameOld  = "old"
+	namespaceDefault = "default"
+)
+
 // testHandler creates a fully wrapped handler for testing (routes + middleware).
 func testHandler(c client.Client, readOnly bool) http.Handler {
 	log := zap.New(zap.UseDevMode(true))
@@ -54,7 +63,7 @@ func newTestCleaner(name, schedule string) *appsv1alpha1.Cleaner {
 			Action:   appsv1alpha1.ActionScan,
 			ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 				ResourceSelectors: []appsv1alpha1.ResourceSelector{
-					{Group: "", Version: "v1", Kind: "ConfigMap"},
+					{Group: "", Version: apiVersionV1, Kind: kindConfigMap},
 				},
 			},
 		},
