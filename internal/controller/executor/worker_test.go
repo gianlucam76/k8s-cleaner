@@ -68,9 +68,9 @@ var _ = Describe("Worker", func() {
 
 		Expect(k8sClient.Create(context.TODO(), secret)).To(Succeed())
 		matchingResources := &appsv1alpha1.ResourceSelector{
-			Kind:      "Secret",
+			Kind:      kindSecret,
 			Group:     "",
-			Version:   "v1",
+			Version:   apiVersionV1,
 			Namespace: secret.Namespace,
 		}
 
@@ -152,9 +152,9 @@ var _ = Describe("Worker", func() {
 		Expect(waitForObject(context.TODO(), k8sClient, secret3)).To(Succeed())
 
 		matchingResources := &appsv1alpha1.ResourceSelector{
-			Kind:              "Secret",
+			Kind:              kindSecret,
 			Group:             "",
-			Version:           "v1",
+			Version:           apiVersionV1,
 			NamespaceSelector: fmt.Sprintf("%s=%s", key, value),
 		}
 
@@ -189,9 +189,9 @@ var _ = Describe("Worker", func() {
 
 		Expect(k8sClient.Create(context.TODO(), secret2)).To(Succeed())
 		matchingResources := &appsv1alpha1.ResourceSelector{
-			Kind:    "Secret",
+			Kind:    kindSecret,
 			Group:   "",
-			Version: "v1",
+			Version: apiVersionV1,
 			LabelFilters: []libsveltosv1beta1.LabelFilter{
 				{
 					Key:       key,
@@ -343,9 +343,9 @@ var _ = Describe("Worker", func() {
    `
 
 		matchingResources := &appsv1alpha1.ResourceSelector{
-			Kind:     "Secret",
+			Kind:     kindSecret,
 			Group:    "",
-			Version:  "v1",
+			Version:  apiVersionV1,
 			Evaluate: secretWithLabel,
 		}
 		logger, err := zap.NewDevelopment()

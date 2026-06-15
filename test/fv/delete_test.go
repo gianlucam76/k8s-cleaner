@@ -99,9 +99,9 @@ var _ = Describe("CleanerClient", func() {
 				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 					ResourceSelectors: []appsv1alpha1.ResourceSelector{
 						{
-							Kind:      "ServiceAccount",
+							Kind:      kindServiceAccount,
 							Group:     "",
-							Version:   "v1",
+							Version:   apiVersionV1,
 							Namespace: ns,
 							Evaluate:  fmt.Sprintf(evaluateServiceAccounts, key, value),
 						},

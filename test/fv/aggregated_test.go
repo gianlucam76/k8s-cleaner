@@ -159,15 +159,15 @@ var _ = Describe("Aggregated Filtering", func() {
 				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 					ResourceSelectors: []appsv1alpha1.ResourceSelector{
 						{
-							Kind:      "Secret",
+							Kind:      kindSecret,
 							Group:     "",
-							Version:   "v1",
+							Version:   apiVersionV1,
 							Namespace: ns,
 						},
 						{
 							Kind:      "Pod",
 							Group:     "",
-							Version:   "v1",
+							Version:   apiVersionV1,
 							Namespace: ns,
 						},
 					},

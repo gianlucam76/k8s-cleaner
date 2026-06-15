@@ -113,7 +113,7 @@ spec:
 			configMapName := fmt.Sprintf("cleaner-%s", cleaner.GetName())
 			currentConfigMap := &corev1.ConfigMap{}
 			err := k8sClient.Get(context.TODO(),
-				types.NamespacedName{Namespace: "projectsveltos", Name: configMapName}, currentConfigMap)
+				types.NamespacedName{Namespace: sveltosNamespace, Name: configMapName}, currentConfigMap)
 			if err != nil {
 				return false
 			}
@@ -137,7 +137,7 @@ spec:
 			configMapName := fmt.Sprintf("cleaner-%s", cleaner.GetName())
 			currentConfigMap := &corev1.ConfigMap{}
 			err := k8sClient.Get(context.TODO(),
-				types.NamespacedName{Namespace: "projectsveltos", Name: configMapName}, currentConfigMap)
+				types.NamespacedName{Namespace: sveltosNamespace, Name: configMapName}, currentConfigMap)
 			if err != nil {
 				return false
 			}
@@ -169,7 +169,7 @@ spec:
 			configMapName := fmt.Sprintf("cleaner-%s", cleaner.GetName())
 			currentConfigMap := &corev1.ConfigMap{}
 			err = k8sClient.Get(context.TODO(),
-				types.NamespacedName{Namespace: "projectsveltos", Name: configMapName}, currentConfigMap)
+				types.NamespacedName{Namespace: sveltosNamespace, Name: configMapName}, currentConfigMap)
 			if err == nil {
 				return false
 			}
