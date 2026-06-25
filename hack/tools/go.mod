@@ -7,7 +7,7 @@ require (
 	github.com/helm/chart-testing/v3 v3.14.0
 	github.com/onsi/ginkgo/v2 v2.32.0
 	golang.org/x/oauth2 v0.36.0
-	golang.org/x/tools v0.46.0
+	golang.org/x/tools v0.47.0
 	k8s.io/client-go v0.36.2
 	sigs.k8s.io/controller-tools v0.21.0
 	sigs.k8s.io/kind v0.32.0
@@ -80,7 +80,7 @@ require (
 	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/telemetry v0.0.0-20260610154732-fb80ec83bdd9 // indirect
+	golang.org/x/telemetry v0.0.0-20260625142307-59b4966ccb57 // indirect
 	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
