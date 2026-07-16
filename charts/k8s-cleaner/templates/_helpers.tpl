@@ -61,6 +61,19 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{/*
+Resolve a controller port by name, falling back to a default value when absent.
+*/}}
+{{- define "k8s-cleaner.portByName" -}}
+{{- $ports := .ports | default (list) -}}
+{{- $port := .default | default 0 -}}
+{{- range $ports }}
+{{- if eq .name $.name }}
+{{- $port = .containerPort -}}
+{{- end }}
+{{- end }}
+{{- printf "%v" $port -}}
+{{- end }}
 
 {{- define "k8s-cleaner.template" -}}
   {{- if $.ctx }}
