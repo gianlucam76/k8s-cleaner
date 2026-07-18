@@ -42,7 +42,8 @@ spec:
           image: "{{ .Values.controller.image.registry | trimSuffix "/" }}/{{ .Values.controller.image.repository }}:{{ .Values.controller.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.controller.image.pullPolicy }}
           args:
-          - "--diagnostics-address=:8443"
+          - "--diagnostics-address=:{{ include "k8s-cleaner.portByName" (dict "ports" .Values.controller.ports "name" "metrics" "default" 8443) }}"
+          - "--health-addr=:{{ include "k8s-cleaner.portByName" (dict "ports" .Values.controller.ports "name" "healthz" "default" 9440) }}"
           - "--version={{ .Chart.AppVersion }}"
         {{- if .Values.web.enabled }}
           - "--enable-web"
@@ -74,12 +75,19 @@ spec:
           command:
           - /manager
           ports:
-            - containerPort: 8443
+            - containerPort: {{ include "k8s-cleaner.portByName" (dict "ports" .Values.controller.ports "name" "metrics" "default" 8443) }}
               name: metrics
               protocol: TCP
-            - containerPort: 9440
+            - containerPort: {{ include "k8s-cleaner.portByName" (dict "ports" .Values.controller.ports "name" "healthz" "default" 9440) }}
               name: healthz
               protocol: TCP
+          {{- range .Values.controller.ports }}
+          {{- if and (ne .name "metrics") (ne .name "healthz") }}
+            - containerPort: {{ .containerPort }}
+              name: {{ .name }}
+              protocol: {{ .protocol }}
+          {{- end }}
+          {{- end }}
           {{- if .Values.web.enabled }}
             - containerPort: {{ .Values.web.port }}
               name: web
