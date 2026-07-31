@@ -31,6 +31,8 @@ var (
 	GetThrottledResources      = getThrottledResources
 	FilterResourcesByThreshold = filterResourcesByThreshold
 	UpdateRegistry             = updateRegistry
+
+	CheckBlastRadiusLimit = checkBlastRadiusLimit
 )
 
 var (

@@ -45,7 +45,7 @@ var (
 )
 
 const (
-	timeout         = 2 * time.Minute
+	timeout         = 3 * time.Minute
 	pollingInterval = 5 * time.Second
 )
 

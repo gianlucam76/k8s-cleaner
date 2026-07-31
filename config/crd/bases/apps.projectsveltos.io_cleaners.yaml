@@ -50,6 +50,26 @@ spec:
                 - Transform
                 - Scan
                 type: string
+              blastRadiusLimit:
+                description: |-
+                  BlastRadiusLimit, when set, aborts Delete/Transform actions if the number of
+                  matching resources exceeds the configured limit. This does not apply when
+                  Action is Scan. Matching resources are still reported via Notifications and
+                  StoreResourcePath so the run can be inspected.
+                properties:
+                  maxCount:
+                    description: MaxCount aborts the run if more than this many resources
+                      match.
+                    type: integer
+                  maxPercentage:
+                    description: |-
+                      MaxPercentage aborts the run if the matching resources are more than this
+                      percentage of all resources considered by the ResourceSelectors (i.e., before
+                      label/Lua filtering narrows them down).
+                    maximum: 100
+                    minimum: 1
+                    type: integer
+                type: object
               deleteOptions:
                 description: |-
                   DeleteOption is some configuration that modifies options for a delete request.

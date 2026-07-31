@@ -166,16 +166,19 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	}
 
 	resources := make([]ResourceResult, 0)
+	totalScanned := 0
 	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 		selector := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
 		var tmpResources []ResourceResult
-		tmpResources, err = getMatchingResources(ctx, selector, logger)
+		var scanned int
+		tmpResources, scanned, err = getMatchingResources(ctx, selector, logger)
 		if err != nil {
 			logger.Info(fmt.Sprintf("failed to fetch resource (gvk: %s): %v",
 				fmt.Sprintf("%s:%s:%s", selector.Group, selector.Version, selector.Kind), err))
 			return err
 		}
 		resources = append(resources, tmpResources...)
+		totalScanned += scanned
 	}
 
 	if cleaner.Spec.ResourcePolicySet.AggregatedSelection != "" {
@@ -196,16 +199,24 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	filteredResources := filterResourcesByThreshold(resources, throttledResources, cleaner.Spec.OccurrenceThreshold-1)
 
 	var processedResources []ResourceResult
-	switch cleaner.Spec.Action {
-	case appsv1alpha1.ActionDelete:
-		processedResources, err = deleteMatchingResources(ctx, cleanerName, filteredResources,
-			cleaner.Spec.DeleteOptions, logger)
-	case appsv1alpha1.ActionTransform:
-		processedResources, err = updateMatchingResources(ctx, cleanerName, filteredResources,
-			cleaner.Spec.Transform, logger)
-	case appsv1alpha1.ActionScan:
-		printMatchingResources(cleanerName, filteredResources, logger)
+	if cleaner.Spec.Action != appsv1alpha1.ActionScan {
+		err = checkBlastRadiusLimit(cleaner.Spec.BlastRadiusLimit, len(filteredResources), totalScanned)
+	}
+	if err != nil {
+		logger.Info(fmt.Sprintf("blast radius limit exceeded, skipping action: %v", err))
 		processedResources = filteredResources
+	} else {
+		switch cleaner.Spec.Action {
+		case appsv1alpha1.ActionDelete:
+			processedResources, err = deleteMatchingResources(ctx, cleanerName, filteredResources,
+				cleaner.Spec.DeleteOptions, logger)
+		case appsv1alpha1.ActionTransform:
+			processedResources, err = updateMatchingResources(ctx, cleanerName, filteredResources,
+				cleaner.Spec.Transform, logger)
+		case appsv1alpha1.ActionScan:
+			printMatchingResources(cleanerName, filteredResources, logger)
+			processedResources = filteredResources
+		}
 	}
 
 	// Update the ConfigMap registry with CURRENT unhealthy matches
@@ -231,23 +242,26 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 	return err
 }
 
+// getMatchingResources returns the resources selected by sr along with the total
+// number of resources it considered (before label/Lua filtering narrows them down).
+// The total is used for BlastRadiusLimit's MaxPercentage check.
 func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector, logger logr.Logger,
-) ([]ResourceResult, error) {
+) ([]ResourceResult, int, error) {
 
 	resources, err := fetchResources(ctx, sr, logger)
 	if err != nil {
 		logger.Info(fmt.Sprintf("failed to fetch resources: %v", err))
-		return nil, err
+		return nil, 0, err
 	}
 
 	if resources == nil {
-		return nil, nil
+		return nil, 0, nil
 	}
 
 	metricsData, err := fetchMetrics(ctx, sr, logger)
 	if err != nil {
 		logger.Info(fmt.Sprintf("failed to fetch metrics: %v", err))
-		return nil, err
+		return nil, 0, err
 	}
 
 	results := make([]ResourceResult, 0)
@@ -262,7 +276,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 
 		isMatch, message, err := isMatch(resource, sr.Evaluate, metricsData, l)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		if isMatch {
 			l.Info(fmt.Sprintf("getMatchingResources: found a match %q", message))
@@ -274,7 +288,7 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 		}
 	}
 
-	return results, nil
+	return results, len(resources), nil
 }
 
 func deleteMatchingResources(ctx context.Context, cleanerName string, resources []ResourceResult,
