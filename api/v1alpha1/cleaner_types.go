@@ -262,6 +262,30 @@ type CleanerSpec struct {
 	// +kubebuilder:default:=1
 	// +optional
 	OccurrenceThreshold int `json:"occurrenceThreshold,omitempty"`
+
+	// BlastRadiusLimit, when set, aborts Delete/Transform actions if the number of
+	// matching resources exceeds the configured limit. This does not apply when
+	// Action is Scan. Matching resources are still reported via Notifications and
+	// StoreResourcePath so the run can be inspected.
+	// +optional
+	BlastRadiusLimit *BlastRadiusLimit `json:"blastRadiusLimit,omitempty"`
+}
+
+// BlastRadiusLimit caps how many resources a single Cleaner run is allowed to
+// affect. If both MaxCount and MaxPercentage are set, exceeding either aborts
+// the run.
+type BlastRadiusLimit struct {
+	// MaxCount aborts the run if more than this many resources match.
+	// +optional
+	MaxCount *int `json:"maxCount,omitempty"`
+
+	// MaxPercentage aborts the run if the matching resources are more than this
+	// percentage of all resources considered by the ResourceSelectors (i.e., before
+	// label/Lua filtering narrows them down).
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=100
+	// +optional
+	MaxPercentage *int `json:"maxPercentage,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner

@@ -1,6 +1,6 @@
 
 [![CI](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/main.yaml/badge.svg)](https://github.com/gianlucam76/k8s-cleaner/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/gianlucam76/k8s-cleaner)](https://goreportcard.com/report/github.com/gianlucam76/k8s-cleaner)
+[![CodeQL](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/codeql.yaml/badge.svg)](https://github.com/gianlucam76/k8s-cleaner/actions/workflows/codeql.yaml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gianlucam76/k8s-cleaner/badge)](https://scorecard.dev/viewer/?uri=github.com/gianlucam76/k8s-cleaner)
 [![Docker Pulls](https://img.shields.io/docker/pulls/projectsveltos/k8s-cleaner.svg)](https://store.docker.com/community/images/projectsveltos/k8s-cleaner)
 [![Release](https://img.shields.io/github/v/release/gianlucam76/k8s-cleaner)](https://github.com/gianlucam76/k8s-cleaner/releases)

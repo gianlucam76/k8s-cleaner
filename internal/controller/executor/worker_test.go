@@ -350,11 +350,14 @@ var _ = Describe("Worker", func() {
 		}
 		logger, err := zap.NewDevelopment()
 		Expect(err).To(BeNil())
-		resources, err := executor.GetMatchingResources(context.TODO(), matchingResources,
+		resources, totalScanned, err := executor.GetMatchingResources(context.TODO(), matchingResources,
 			zapr.NewLogger(logger))
 		Expect(err).To(BeNil())
 		Expect(resources).ToNot(BeNil())
 		Expect(len(resources)).To(Equal(1))
+		// totalScanned counts every Secret in the cluster (no namespace restriction on the
+		// selector), so it can be larger than 2, but must at least cover secret and secret2.
+		Expect(totalScanned).To(BeNumerically(">=", 2))
 		Expect(resources[0].Resource.GetName()).To(Equal(secret.Name))
 	})
 })
