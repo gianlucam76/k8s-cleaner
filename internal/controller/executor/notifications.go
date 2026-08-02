@@ -23,7 +23,6 @@ import (
 	"io"
 	"os"
 	"strconv"
-	"time"
 
 	goteamsnotify "github.com/atc0005/go-teams-notify/v2"
 	"github.com/atc0005/go-teams-notify/v2/adaptivecard"
@@ -94,7 +93,7 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 			err = createReportInstance(ctx, cleaner, addRollbackResourceData(reportSpec, resources, cleaner, logger), logger)
 		case appsv1alpha1.NotificationTypeSlack:
 			if len(resources) != 0 {
-				err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
+				err = sendSlackNotification(ctx, reportSpec, message, cleaner.Name, notification, logger)
 			}
 		case appsv1alpha1.NotificationTypeWebex:
 			if len(resources) != 0 {
@@ -138,7 +137,6 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 func generateReportSpec(resources []ResourceResult, cleaner *appsv1alpha1.Cleaner) *appsv1alpha1.ReportSpec {
 	reportSpec := appsv1alpha1.ReportSpec{}
 	reportSpec.Action = cleaner.Spec.Action
-	message := fmt.Sprintf(". time: %v", time.Now())
 
 	reportSpec.ResourceInfo = make([]appsv1alpha1.ResourceInfo, len(resources))
 	for i := range resources {
@@ -149,7 +147,7 @@ func generateReportSpec(resources []ResourceResult, cleaner *appsv1alpha1.Cleane
 				Kind:       resources[i].Resource.GetKind(),
 				APIVersion: resources[i].Resource.GetAPIVersion(),
 			},
-			Message: resources[i].Message + message,
+			Message: resources[i].Message,
 		}
 	}
 
@@ -258,7 +256,7 @@ func createReportInstance(ctx context.Context, cleaner *appsv1alpha1.Cleaner,
 }
 
 func sendSlackNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportSpec,
-	message string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
+	message, cleanerName string, notification *appsv1alpha1.Notification, logger logr.Logger) error {
 
 	info, err := getSlackInfo(ctx, notification)
 	if err != nil {
@@ -268,15 +266,7 @@ func sendSlackNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 	l := logger.WithValues("channel", info.channelID)
 	l.V(logs.LogInfo).Info("send slack message")
 
-	resourceSpecString, err := json.Marshal(*reportSpec)
-	if err != nil {
-		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
-		return err
-	}
-
-	attachment := slack.Attachment{
-		Text: string(resourceSpecString),
-	}
+	attachment := buildSlackAttachment(reportSpec, cleanerName)
 
 	api := slack.New(info.token)
 	if api == nil {
@@ -311,13 +301,13 @@ func sendTeamsNotification(ctx context.Context, reportSpec *appsv1alpha1.ReportS
 		return err
 	}
 
-	resourceSpecData, err := json.Marshal(*reportSpec)
+	card, err := buildTeamsCard(reportSpec, message)
 	if err != nil {
-		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
+		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to build Teams card: %v", err))
 		return err
 	}
 
-	teamsMessage, err := adaptivecard.NewSimpleMessage(string(resourceSpecData), message, true)
+	teamsMessage, err := adaptivecard.NewMessageFromCard(card)
 	if err != nil {
 		l.V(logs.LogInfo).Info("failed to create Teams message: %v", err)
 		return err
@@ -350,59 +340,9 @@ func sendDiscordNotification(ctx context.Context, reportSpec *appsv1alpha1.Repor
 		return err
 	}
 
-	resourceSpecData, err := json.Marshal(*reportSpec)
-	if err != nil {
-		l.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resourceSpec: %v", err))
-		return err
-	}
-
-	// Create a temporary file
-	tmpFile, err := os.CreateTemp(os.TempDir(), "k8s-cleaner-webex")
-	if err != nil {
-		l.V(logs.LogInfo).Info(fmt.Sprintf("error creating temporary file: %v", err))
-		return err
-	}
-
-	defer func() {
-		// Close the file
-		tmpFile.Close()
-
-		// Remove the temporary file
-		os.Remove(tmpFile.Name())
-	}()
-
-	_, err = tmpFile.Write(resourceSpecData)
-	if err != nil {
-		logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to write to file: %s", err))
-		return err
-	}
-
-	// Open the temporary file for reading
-	withFileReader := func() (io.Reader, error) {
-		_, err := tmpFile.Seek(0, 0)
-		if err != nil {
-			return nil, fmt.Errorf("error seeking to start of file: %w", err)
-		}
-
-		// Return the existing file handle as the reader
-		return tmpFile, nil
-	}
-
-	// Create the attachment object
-	fileReader, err := withFileReader()
-	if err != nil {
-		return err
-	}
-
-	// Create a new message with both a text content and the file attachment
 	_, err = dg.ChannelMessageSendComplex(info.serverID, &discordgo.MessageSend{
 		Content: message,
-		Files: []*discordgo.File{
-			{
-				Name:   "k8s-cleaner-report", // Replace with desired filename
-				Reader: fileReader,
-			},
-		},
+		Embeds:  []*discordgo.MessageEmbed{buildDiscordEmbed(reportSpec)},
 	})
 
 	return err

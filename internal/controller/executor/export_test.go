@@ -45,6 +45,19 @@ var (
 const MaxRollbackResourceSize = maxRollbackResourceSize
 
 var (
+	BuildSlackAttachment         = buildSlackAttachment
+	BuildTeamsCard               = buildTeamsCard
+	BuildDiscordEmbed            = buildDiscordEmbed
+	ResourceRef                  = resourceRef
+	TruncateResourceInfo         = truncateResourceInfo
+	SlackColorForAction          = slackColorForAction
+	TeamsContainerStyleForAction = teamsContainerStyleForAction
+	DiscordColorForAction        = discordColorForAction
+)
+
+const MaxNotificationResourceLines = maxNotificationResourceLines
+
+var (
 	GetWebexInfo = getWebexInfo
 	GetSlackInfo = getSlackInfo
 )

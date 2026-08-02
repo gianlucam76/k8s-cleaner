@@ -63,13 +63,15 @@ metadata:
   uid: dda9a231-9a51-4133-aeb5-f0520feb8746
 spec:
   action: Delete
-  message: 'time: 2023-12-17 17:07:00.394736089 +0000 UTC m=+129.172023518'
-  resources:
-  - apiVersion: apps/v1
-    kind: Deployment
-    name: my-nginx-deployment
-    namespace: test
+  resourceInfo:
+  - resource:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: my-nginx-deployment
+      namespace: test
 ```
+
+`metadata.creationTimestamp` (and `resourceVersion`, once the Report has been updated by a later run) already tell you when the report was last generated, so nothing about timing is duplicated on each entry.
 
 ## Rollback
 
