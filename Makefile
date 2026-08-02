@@ -201,6 +201,16 @@ create-cluster: $(KIND) $(KUBECTL) $(ENVSUBST) ## Create a new kind cluster desi
 delete-cluster: $(KIND) ## Deletes the kind cluster $(CONTROL_CLUSTER_NAME)
 	$(KIND) delete cluster --name $(CONTROL_CLUSTER_NAME)
 
+.PHONY: web-dashboard
+web-dashboard: $(KUBECTL) ## Enable the web dashboard on a kustomize-deployed cluster and port-forward to it
+	@if ! $(KUBECTL) -n projectsveltos get deployment k8s-cleaner-controller \
+		-o jsonpath='{.spec.template.spec.containers[0].args}' | grep -q -- '--enable-web=true'; then \
+		$(KUBECTL) -n projectsveltos patch deployment k8s-cleaner-controller --type=json \
+			-p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--enable-web=true"}]'; \
+	fi
+	$(KUBECTL) -n projectsveltos rollout status deployment/k8s-cleaner-controller
+	$(KUBECTL) -n projectsveltos port-forward deployment/k8s-cleaner-controller 9080:9080
+
 ### fv helpers
 
 create-control-cluster: $(KIND) $(KUBECTL)

@@ -36,6 +36,15 @@ var (
 )
 
 var (
+	GenerateReportSpec      = generateReportSpec
+	AddRollbackResourceData = addRollbackResourceData
+	ValidateRollbackConfig  = validateRollbackConfig
+	PersistRollbackSnapshot = persistRollbackSnapshot
+)
+
+const MaxRollbackResourceSize = maxRollbackResourceSize
+
+var (
 	GetWebexInfo = getWebexInfo
 	GetSlackInfo = getSlackInfo
 )

@@ -26,6 +26,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -51,6 +52,7 @@ func testHandler(c client.Client, readOnly bool) http.Handler {
 
 func newTestScheme() *runtime.Scheme {
 	s := runtime.NewScheme()
+	_ = clientgoscheme.AddToScheme(s)
 	_ = appsv1alpha1.AddToScheme(s)
 	return s
 }
@@ -71,10 +73,16 @@ func newTestCleaner(name, schedule string) *appsv1alpha1.Cleaner {
 }
 
 func newTestReport(name string, resources []appsv1alpha1.ResourceInfo) *appsv1alpha1.Report {
+	return newTestReportWithAction(name, appsv1alpha1.ActionScan, resources)
+}
+
+func newTestReportWithAction(name string, action appsv1alpha1.Action,
+	resources []appsv1alpha1.ResourceInfo) *appsv1alpha1.Report {
+
 	return &appsv1alpha1.Report{
 		ObjectMeta: metav1.ObjectMeta{Name: name},
 		Spec: appsv1alpha1.ReportSpec{
-			Action:       appsv1alpha1.ActionScan,
+			Action:       action,
 			ResourceInfo: resources,
 		},
 	}

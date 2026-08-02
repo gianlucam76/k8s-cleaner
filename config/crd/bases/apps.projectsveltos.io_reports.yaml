@@ -52,8 +52,10 @@ spec:
                   properties:
                     fullResource:
                       description: |-
-                        FullResource contains full resources before
-                        before Cleaner took an action on it
+                        FullResource contains the full resource as it was right before Cleaner
+                        took an action on it. It is only populated when the owning Cleaner has
+                        Rollback configured, and is used to revert the most recent Delete or
+                        Transform action. Never populated for Scan.
                       format: byte
                       type: string
                     message:

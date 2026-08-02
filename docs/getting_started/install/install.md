@@ -94,7 +94,8 @@ The k8s-cleaner includes an optional **embedded web dashboard** that provides a 
 2. **On-Demand Triggers**: Manually initiate specific cleaners or run a full cluster scan directly from the UI.
 3. **Lua Script Viewer**: Browse and search your custom Lua logic with syntax highlighting and a copy-to-clipboard feature.
 4. **Report Browser**: Filterable scan reports with status bar charts to track resource improvements over time.
-5. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
+5. **[Rollback](../features/rollback/rollback.md)**: Revert the most recent `Delete` or `Transform` execution for a Cleaner with one click, when it has `rollback` configured.
+6. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
 
 **⚠️ Important: Data Requirements**
 

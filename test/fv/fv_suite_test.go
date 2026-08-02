@@ -52,11 +52,20 @@ const (
 const (
 	kindSecret         = "Secret"
 	kindServiceAccount = "ServiceAccount"
+	kindService        = "Service"
 	apiVersionV1       = "v1"
 	labelApp           = "app"
 	volumeMountConf    = "conf"
 	metricNameUp       = "up"
 	sveltosNamespace   = "projectsveltos"
+
+	// everyMinuteSchedule is used, instead of a fixed-minute schedule, by tests
+	// that assert on status.FailureMessage: that field is only refreshed on the
+	// *next* Reconcile, and the controller's GenerationChangedPredicate means
+	// only the cron-driven requeue triggers one. A fixed-minute schedule only
+	// requeues about once an hour; running every minute keeps that follow-up
+	// reconcile within the test's timeout.
+	everyMinuteSchedule = "* * * * *"
 )
 
 func TestFv(t *testing.T) {

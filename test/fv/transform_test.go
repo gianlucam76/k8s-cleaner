@@ -124,7 +124,7 @@ var _ = Describe("CleanerClient", func() {
 				ResourcePolicySet: appsv1alpha1.ResourcePolicySet{
 					ResourceSelectors: []appsv1alpha1.ResourceSelector{
 						{
-							Kind:      "Service",
+							Kind:      kindService,
 							Group:     "",
 							Version:   apiVersionV1,
 							Namespace: ns,

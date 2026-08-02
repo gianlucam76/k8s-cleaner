@@ -165,6 +165,11 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		return nil
 	}
 
+	if err := validateRollbackConfig(cleaner); err != nil {
+		logger.Info(fmt.Sprintf("invalid rollback configuration, skipping run: %v", err))
+		return err
+	}
+
 	resources := make([]ResourceResult, 0)
 	totalScanned := 0
 	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
@@ -206,6 +211,14 @@ func processCleanerInstance(ctx context.Context, cleanerName string, logger logr
 		logger.Info(fmt.Sprintf("blast radius limit exceeded, skipping action: %v", err))
 		processedResources = filteredResources
 	} else {
+		// Rollback data must be durably persisted before any resource is deleted or
+		// transformed. Otherwise a crash between the two steps would leave resources
+		// mutated with no way to revert them.
+		if snapshotErr := persistRollbackSnapshot(ctx, cleaner, filteredResources, logger); snapshotErr != nil {
+			logger.Info(fmt.Sprintf("failed to persist rollback snapshot, skipping action: %v", snapshotErr))
+			return snapshotErr
+		}
+
 		switch cleaner.Spec.Action {
 		case appsv1alpha1.ActionDelete:
 			processedResources, err = deleteMatchingResources(ctx, cleanerName, filteredResources,

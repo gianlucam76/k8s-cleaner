@@ -26,8 +26,10 @@ type ResourceInfo struct {
 	// Resource identify a Kubernetes resource
 	Resource corev1.ObjectReference `json:"resource,omitempty"`
 
-	// FullResource contains full resources before
-	// before Cleaner took an action on it
+	// FullResource contains the full resource as it was right before Cleaner
+	// took an action on it. It is only populated when the owning Cleaner has
+	// Rollback configured, and is used to revert the most recent Delete or
+	// Transform action. Never populated for Scan.
 	// +optional
 	FullResource []byte `json:"fullResource,omitempty"`
 

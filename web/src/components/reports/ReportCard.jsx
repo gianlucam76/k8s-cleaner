@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useSignal } from '@preact/signals';
+import { RollbackButton } from './RollbackButton';
 
 export function ReportCard({ report }) {
   const expanded = useSignal(false);
   const hasFlagged = report.resources.length > 0;
+  const canRollback = hasFlagged && report.action !== 'Scan';
 
   function toggle(e) {
     if (e.target.closest('a')) return;
@@ -90,6 +92,12 @@ export function ReportCard({ report }) {
               </div>
             ))}
           </div>
+
+          {canRollback && (
+            <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex justify-end">
+              <RollbackButton cleanerName={report.name} resourceCount={report.resources.length} />
+            </div>
+          )}
         </div>
       )}
 

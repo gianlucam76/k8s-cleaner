@@ -27,6 +27,18 @@ export async function api(url, opts = {}) {
       const { mockReports } = await import('../mock/reports.js');
       return mockReports.find((r) => r.name === name) || null;
     }
+    if (url.includes('/rollback')) {
+      await new Promise((r) => setTimeout(r, 400));
+      const name = url.split('/')[4];
+      const { mockReports } = await import('../mock/reports.js');
+      const report = mockReports.find((r) => r.name === name);
+      return (report?.resources || []).map((res) => ({
+        kind: res.kind,
+        namespace: res.namespace,
+        name: res.name,
+        success: true,
+      }));
+    }
     if (url.includes('/trigger')) {
       await new Promise((r) => setTimeout(r, 400));
       return { message: 'scan triggered', cleaner: url.split('/')[4] };
