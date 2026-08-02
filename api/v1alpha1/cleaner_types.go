@@ -269,6 +269,13 @@ type CleanerSpec struct {
 	// StoreResourcePath so the run can be inspected.
 	// +optional
 	BlastRadiusLimit *BlastRadiusLimit `json:"blastRadiusLimit,omitempty"`
+
+	// Rollback, when set, captures the pre-action state of resources affected by
+	// a Delete or Transform action, so the most recent execution can be reverted.
+	// Capturing this state requires a CleanerReport Notification to also be
+	// configured, since captured resources are persisted on the Report instance.
+	// +optional
+	Rollback *RollbackOptions `json:"rollback,omitempty"`
 }
 
 // BlastRadiusLimit caps how many resources a single Cleaner run is allowed to
@@ -286,6 +293,25 @@ type BlastRadiusLimit struct {
 	// +kubebuilder:validation:Maximum=100
 	// +optional
 	MaxPercentage *int `json:"maxPercentage,omitempty"`
+}
+
+// RollbackStorage specifies where Cleaner persists the pre-action state of a
+// resource so it can later be rolled back.
+// +kubebuilder:validation:Enum:=Report
+type RollbackStorage string
+
+const (
+	// RollbackStorageReport stores the pre-action resource inline in the
+	// Report instance, in ResourceInfo.FullResource.
+	RollbackStorageReport = RollbackStorage("Report")
+)
+
+// RollbackOptions configures rollback capture for a Cleaner.
+type RollbackOptions struct {
+	// Storage indicates where captured resources are persisted for rollback.
+	// +kubebuilder:default:=Report
+	// +optional
+	Storage RollbackStorage `json:"storage,omitempty"`
 }
 
 // CleanerStatus defines the observed state of Cleaner

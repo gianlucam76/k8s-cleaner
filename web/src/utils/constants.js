@@ -17,4 +17,5 @@ export const ENDPOINTS = {
   trigger: (name) => `${API_BASE}/cleaners/${encodeURIComponent(name)}/trigger`,
   cleaner: (name) => `${API_BASE}/cleaners/${encodeURIComponent(name)}`,
   report: (name) => `${API_BASE}/reports/${encodeURIComponent(name)}`,
+  rollback: (name) => `${API_BASE}/reports/${encodeURIComponent(name)}/rollback`,
 };

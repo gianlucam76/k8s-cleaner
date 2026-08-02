@@ -37,6 +37,8 @@ import (
 	"sigs.k8s.io/cluster-api/util"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
+
+	appsv1alpha1 "gianlucam76/k8s-cleaner/api/v1alpha1"
 )
 
 var (
@@ -97,6 +99,9 @@ var _ = AfterSuite(func() {
 func setupScheme() (*runtime.Scheme, error) {
 	s := runtime.NewScheme()
 	if err := clientgoscheme.AddToScheme(s); err != nil {
+		return nil, err
+	}
+	if err := appsv1alpha1.AddToScheme(s); err != nil {
 		return nil, err
 	}
 

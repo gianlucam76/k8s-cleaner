@@ -78,13 +78,6 @@ var _ = Describe("CleanerClient", func() {
 			secretNames = append(secretNames, secret.Name)
 		}
 
-		// Runs every minute rather than once at a fixed minute (as other fv tests do)
-		// because status.FailureMessage is only refreshed on the *next* Reconcile
-		// (the controller uses a GenerationChangedPredicate, so nothing but the
-		// cron-driven requeue triggers a reconcile once the Cleaner is created).
-		// A recurring schedule keeps that follow-up reconcile within this test's
-		// timeout instead of up to an hour away.
-		//
 		// This Cleaner matches all numSecrets Secrets, but BlastRadiusLimit.MaxCount
 		// only allows maxCount resources to be affected. Every run must abort without
 		// deleting any Secret.
@@ -108,7 +101,7 @@ var _ = Describe("CleanerClient", func() {
 				BlastRadiusLimit: &appsv1alpha1.BlastRadiusLimit{
 					MaxCount: ptrInt(maxCount),
 				},
-				Schedule: "* * * * *",
+				Schedule: everyMinuteSchedule,
 			},
 		}
 

@@ -38,6 +38,7 @@ nav:
     - Resource Selection: 'getting_started/features/resourceselector/resourceselector.md'
     - Automated Operations: 'getting_started/features/automated_operations/scale_up_down_resources.md'
     - Blast Radius Limit: 'getting_started/features/blast_radius_limit/blast_radius_limit.md'
+    - Rollback: 'getting_started/features/rollback/rollback.md'
   - Examples:
     - Unused Resources:
       - Example - ConfigMap: 'getting_started/examples/unused_resources/configmap.md'

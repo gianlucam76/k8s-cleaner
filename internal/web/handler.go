@@ -37,6 +37,7 @@ func setupRoutes(c client.Client, readOnly bool, version string, log logr.Logger
 	mux.HandleFunc("GET /api/v1/cleaners/{name}", GetCleanerHandler(c, log))
 	mux.HandleFunc("GET /api/v1/reports", ListReportsHandler(c, log))
 	mux.HandleFunc("GET /api/v1/reports/{name}", GetReportHandler(c, log))
+	mux.HandleFunc("POST /api/v1/reports/{name}/rollback", RollbackHandler(c, log))
 	mux.HandleFunc("POST /api/v1/cleaners/{name}/trigger", TriggerHandler(c, log))
 	mux.HandleFunc("POST /api/v1/trigger-all", TriggerAllHandler(c, log))
 	mux.HandleFunc("GET /api/v1/config", ConfigHandler(readOnly, version))

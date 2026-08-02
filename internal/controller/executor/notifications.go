@@ -91,7 +91,7 @@ func sendNotifications(ctx context.Context, resources []ResourceResult,
 
 		switch notification.Type {
 		case appsv1alpha1.NotificationTypeCleanerReport:
-			err = createReportInstance(ctx, cleaner, reportSpec, logger)
+			err = createReportInstance(ctx, cleaner, addRollbackResourceData(reportSpec, resources, cleaner, logger), logger)
 		case appsv1alpha1.NotificationTypeSlack:
 			if len(resources) != 0 {
 				err = sendSlackNotification(ctx, reportSpec, message, notification, logger)
@@ -154,6 +154,86 @@ func generateReportSpec(resources []ResourceResult, cleaner *appsv1alpha1.Cleane
 	}
 
 	return &reportSpec
+}
+
+// validateRollbackConfig ensures that a Cleaner with Rollback enabled also has a
+// CleanerReport Notification configured, since that is what actually persists the
+// captured rollback data on the Report instance. Without it, Cleaner would delete
+// or transform resources while never being able to revert them.
+func validateRollbackConfig(cleaner *appsv1alpha1.Cleaner) error {
+	if cleaner.Spec.Rollback == nil {
+		return nil
+	}
+
+	for i := range cleaner.Spec.Notifications {
+		if cleaner.Spec.Notifications[i].Type == appsv1alpha1.NotificationTypeCleanerReport {
+			return nil
+		}
+	}
+
+	return fmt.Errorf("rollback is enabled but no CleanerReport notification is configured: " +
+		"rollback data would never be persisted")
+}
+
+// persistRollbackSnapshot durably stores the pre-action state of resources about
+// to be deleted or transformed. It must be called, and succeed, before Cleaner
+// mutates any of those resources: otherwise a crash between the two steps would
+// leave resources changed with no way to revert them. It is a no-op unless the
+// Cleaner has Rollback configured.
+func persistRollbackSnapshot(ctx context.Context, cleaner *appsv1alpha1.Cleaner,
+	resources []ResourceResult, logger logr.Logger) error {
+
+	if cleaner.Spec.Rollback == nil || cleaner.Spec.Action == appsv1alpha1.ActionScan {
+		return nil
+	}
+
+	reportSpec := generateReportSpec(resources, cleaner)
+	reportSpec = addRollbackResourceData(reportSpec, resources, cleaner, logger)
+
+	return createReportInstance(ctx, cleaner, reportSpec, logger)
+}
+
+const (
+	// maxRollbackResourceSize caps how large a single resource's captured state
+	// can be before it is stored on the Report instance. This bounds the Report's
+	// total size, since it is persisted in etcd. BlastRadiusLimit already bounds
+	// how many resources a run can affect, so the two together bound the worst case.
+	maxRollbackResourceSize = 256 * 1024
+)
+
+// addRollbackResourceData returns a copy of reportSpec with FullResource populated
+// on each ResourceInfo, capturing the resource's state right before Cleaner acted
+// on it. This is deliberately kept out of generateReportSpec's output: that value
+// is also marshaled into outgoing notification payloads (Slack, Teams, Discord,
+// Telegram, SMTP, Webex), and full resource bodies must never be sent there. It is
+// only meant for the Report instance itself, and only when the Cleaner has
+// Rollback configured.
+func addRollbackResourceData(reportSpec *appsv1alpha1.ReportSpec, resources []ResourceResult,
+	cleaner *appsv1alpha1.Cleaner, logger logr.Logger) *appsv1alpha1.ReportSpec {
+
+	if cleaner.Spec.Rollback == nil || cleaner.Spec.Action == appsv1alpha1.ActionScan {
+		return reportSpec
+	}
+
+	withRollback := *reportSpec
+	withRollback.ResourceInfo = make([]appsv1alpha1.ResourceInfo, len(reportSpec.ResourceInfo))
+	copy(withRollback.ResourceInfo, reportSpec.ResourceInfo)
+
+	for i := range resources {
+		data, err := json.Marshal(resources[i].Resource)
+		if err != nil {
+			logger.V(logs.LogInfo).Info(fmt.Sprintf("failed to marshal resource for rollback: %v", err))
+			continue
+		}
+		if len(data) > maxRollbackResourceSize {
+			withRollback.ResourceInfo[i].Message += fmt.Sprintf(
+				". rollback data not stored: resource size %d exceeds limit %d", len(data), maxRollbackResourceSize)
+			continue
+		}
+		withRollback.ResourceInfo[i].FullResource = data
+	}
+
+	return &withRollback
 }
 
 func createReportInstance(ctx context.Context, cleaner *appsv1alpha1.Cleaner,

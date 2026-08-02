@@ -41,5 +41,11 @@ export const mockReports = [
   { name: 'helm-not-gitops', action: 'Scan', resources: [] },
   { name: 'secrets-non-infisical', action: 'Scan', resources: [] },
   { name: 's3bkp-missing-secrets', action: 'Scan', resources: [] },
-  { name: 'krelay-delete', action: 'Delete', resources: [] },
+  {
+    name: 'krelay-delete',
+    action: 'Delete',
+    resources: [
+      { kind: 'Pod', namespace: 'default', name: 'krelay-agent-abc12', apiVersion: 'v1', message: 'Leftover krelay agent pod' },
+    ],
+  },
 ];

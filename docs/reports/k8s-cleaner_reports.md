@@ -70,3 +70,7 @@ spec:
     name: my-nginx-deployment
     namespace: test
 ```
+
+## Rollback
+
+When the owning Cleaner also has [`rollback`](../getting_started/features/rollback/rollback.md) configured, each entry in the Report additionally carries a `fullResource` field: the resource exactly as it was right before Cleaner deleted or transformed it. This is what allows the most recent execution to be reverted. See the [Rollback](../getting_started/features/rollback/rollback.md) page for details, including how to trigger it.

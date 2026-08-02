@@ -68,6 +68,8 @@ And examples that combine resource state with **live Prometheus metrics**:
 
 7️⃣ [**Metric-based Selection**](https://gianlucam76.github.io/k8s-cleaner/getting_started/examples/metrics/metric_based_selection): Query any Prometheus-compatible endpoint before evaluating each resource. The results are exposed as a global `metrics` table in the Lua script, so you can gate resource matching on live metric values — for example, scale down Deployments only when their HTTP error rate exceeds 5%, or restart Pods only when memory saturation is reported by Prometheus.
 
+8️⃣ [**Rollback**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/rollback/rollback): Capture the state of every resource right before a `Delete` or `Transform` action, so the most recent execution can be reverted with a single API call, no PersistentVolume required.
+
 For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun).
 
 ## Benefits

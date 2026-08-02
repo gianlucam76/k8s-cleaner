@@ -327,6 +327,21 @@ spec:
                 required:
                 - resourceSelectors
                 type: object
+              rollback:
+                description: |-
+                  Rollback, when set, captures the pre-action state of resources affected by
+                  a Delete or Transform action, so the most recent execution can be reverted.
+                  Capturing this state requires a CleanerReport Notification to also be
+                  configured, since captured resources are persisted on the Report instance.
+                properties:
+                  storage:
+                    default: Report
+                    description: Storage indicates where captured resources are persisted
+                      for rollback.
+                    enum:
+                    - Report
+                    type: string
+                type: object
               schedule:
                 description: Schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
                 type: string
@@ -430,8 +445,10 @@ spec:
                   properties:
                     fullResource:
                       description: |-
-                        FullResource contains full resources before
-                        before Cleaner took an action on it
+                        FullResource contains the full resource as it was right before Cleaner
+                        took an action on it. It is only populated when the owning Cleaner has
+                        Rollback configured, and is used to revert the most recent Delete or
+                        Transform action. Never populated for Scan.
                       format: byte
                       type: string
                     message:
