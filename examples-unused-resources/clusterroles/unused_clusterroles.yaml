@@ -4,7 +4,7 @@
 apiVersion: apps.projectsveltos.io/v1alpha1
 kind: Cleaner
 metadata:
-  name: unused-roles
+  name: unused-clusterroles
 spec:
   schedule: "* 0 * * *"
   action: Scan

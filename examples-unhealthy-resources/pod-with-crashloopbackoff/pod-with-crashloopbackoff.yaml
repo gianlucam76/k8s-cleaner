@@ -1,0 +1,37 @@
+# This Cleaner instance finds all Pods, in any namespace, with at least one
+# container currently in CrashLoopBackOff.
+# A container enters CrashLoopBackOff when Kubernetes is waiting to restart it
+# after repeated failures; the Pod is very unlikely to recover on its own.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: crashloopbackoff-pods
+spec:
+  schedule: "*/5 * * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          if obj.status ~= nil and obj.status.containerStatuses ~= nil then
+            for _, containerStatus in ipairs(obj.status.containerStatuses) do
+              if containerStatus.state ~= nil and containerStatus.state.waiting ~= nil and
+                 containerStatus.state.waiting.reason == "CrashLoopBackOff" then
+                hs.matching = true
+                break
+              end
+            end
+          end
+
+          return hs
+        end

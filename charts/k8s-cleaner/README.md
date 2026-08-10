@@ -84,4 +84,4 @@ Major Changes to functions are documented with the version affected. **Before up
 | web.ingress.host | string | `""` | Ingress hostname |
 | web.ingress.tls | list | `[]` | TLS configuration |
 | web.port | int | `9080` | Web dashboard listen port |
-| web.readOnly | bool | `false` | Disable scan triggers from the web UI |
+| web.readOnly | bool | `false` | Disable scan triggers, rollbacks, and creating/updating Cleaners from the library, from the web UI |

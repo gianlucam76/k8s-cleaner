@@ -1,0 +1,55 @@
+# This Cleaner instance finds all Namespaces with no Pods running in them.
+# Kubernetes' own kube-* namespaces are skipped, since being pod-less there
+# is normal.
+# This only looks at Pods: a Namespace holding only ConfigMaps, Secrets, or
+# other non-Pod resources will still be reported as empty.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: empty-namespaces
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Namespace
+      group: ""
+      version: v1
+    - kind: Pod
+      group: ""
+      version: v1
+    aggregatedSelection: |
+      function skipNamespace(name)
+        return string.match(name, '^kube')
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local namespaces = {}
+        local namespacesWithPods = {}
+
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Namespace" then
+            table.insert(namespaces, resource)
+          elseif kind == "Pod" then
+            namespacesWithPods[resource.metadata.namespace] = true
+          end
+        end
+
+        local emptyNamespaces = {}
+
+        for _, namespace in ipairs(namespaces) do
+          local name = namespace.metadata.name
+          if not skipNamespace(name) and namespace.status.phase == "Active" and not namespacesWithPods[name] then
+            table.insert(emptyNamespaces, {resource = namespace})
+          end
+        end
+
+        if #emptyNamespaces > 0 then
+          hs.resources = emptyNamespaces
+        end
+        return hs
+      end

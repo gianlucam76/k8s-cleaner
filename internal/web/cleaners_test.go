@@ -50,9 +50,12 @@ var _ = Describe("Cleaners", func() {
 		Expect(cleaners).To(HaveLen(2))
 	})
 
-	It("should return cleaner detail with Lua script", func() {
+	It("should return cleaner detail with Lua script and notifications", func() {
 		cleaner := newTestCleaner("test-cleaner", "0 * * * *")
 		cleaner.Spec.ResourcePolicySet.ResourceSelectors[0].Evaluate = "function evaluate() return true end"
+		cleaner.Spec.Notifications = []appsv1alpha1.Notification{
+			{Name: defaultNotificationName, Type: appsv1alpha1.NotificationTypeCleanerReport},
+		}
 
 		c := fake.NewClientBuilder().WithScheme(newTestScheme()).
 			WithObjects(cleaner).
@@ -67,6 +70,9 @@ var _ = Describe("Cleaners", func() {
 
 		var resp cleanerResponse
 		Expect(json.NewDecoder(w.Body).Decode(&resp)).To(Succeed())
+		Expect(resp.Notifications).To(Equal([]notificationInfo{
+			{Name: defaultNotificationName, Type: string(appsv1alpha1.NotificationTypeCleanerReport)},
+		}))
 		Expect(resp.Name).To(Equal("test-cleaner"))
 		Expect(resp.LuaScript).ToNot(BeEmpty())
 	})

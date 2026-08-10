@@ -162,7 +162,7 @@ web:
   enabled: false
   # -- Web dashboard listen port
   port: 9080
-  # -- Disable scan triggers from the web UI
+  # -- Disable scan triggers, rollbacks, and creating/updating Cleaners from the library, from the web UI
   readOnly: false
   # -- Ingress configuration for the web dashboard
   ingress:

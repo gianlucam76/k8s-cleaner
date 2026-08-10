@@ -28,15 +28,16 @@ import (
 
 // cleanerResponse is the JSON representation of a Cleaner for the API.
 type cleanerResponse struct {
-	Name             string         `json:"name"`
-	Schedule         string         `json:"schedule"`
-	Action           string         `json:"action"`
-	LastRunTime      *time.Time     `json:"lastRunTime"`
-	NextScheduleTime *time.Time     `json:"nextScheduleTime"`
-	FailureMessage   string         `json:"failureMessage,omitempty"`
-	FlaggedCount     int            `json:"flaggedCount"`
-	Selectors        []selectorInfo `json:"selectors"`
-	LuaScript        string         `json:"luaScript,omitempty"`
+	Name             string             `json:"name"`
+	Schedule         string             `json:"schedule"`
+	Action           string             `json:"action"`
+	LastRunTime      *time.Time         `json:"lastRunTime"`
+	NextScheduleTime *time.Time         `json:"nextScheduleTime"`
+	FailureMessage   string             `json:"failureMessage,omitempty"`
+	FlaggedCount     int                `json:"flaggedCount"`
+	Selectors        []selectorInfo     `json:"selectors"`
+	Notifications    []notificationInfo `json:"notifications"`
+	LuaScript        string             `json:"luaScript,omitempty"`
 }
 
 // selectorInfo is a summary of a ResourceSelector.
@@ -44,6 +45,12 @@ type selectorInfo struct {
 	Group   string `json:"group"`
 	Version string `json:"version"`
 	Kind    string `json:"kind"`
+}
+
+// notificationInfo is a summary of a Notification.
+type notificationInfo struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
 }
 
 // ListCleanersHandler returns all cleaners with their report counts.
@@ -133,6 +140,18 @@ func toCleanerResponse(cleaner *appsv1alpha1.Cleaner, report *appsv1alpha1.Repor
 		resp.FlaggedCount = len(report.Spec.ResourceInfo)
 	}
 
+	resp.Selectors = selectorInfosFromCleaner(cleaner)
+	resp.Notifications = notificationInfosFromCleaner(cleaner)
+
+	if includeDetails {
+		resp.LuaScript = primaryLuaScript(cleaner)
+	}
+
+	return resp
+}
+
+// selectorInfosFromCleaner summarizes a Cleaner's ResourceSelectors for API responses.
+func selectorInfosFromCleaner(cleaner *appsv1alpha1.Cleaner) []selectorInfo {
 	selectors := make([]selectorInfo, 0, len(cleaner.Spec.ResourcePolicySet.ResourceSelectors))
 	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
 		rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
@@ -142,22 +161,34 @@ func toCleanerResponse(cleaner *appsv1alpha1.Cleaner, report *appsv1alpha1.Repor
 			Kind:    rs.Kind,
 		})
 	}
-	resp.Selectors = selectors
+	return selectors
+}
 
-	if includeDetails {
-		// Include the first non-empty Lua evaluate script
-		for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
-			rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
-			if rs.Evaluate != "" {
-				resp.LuaScript = rs.Evaluate
-				break
-			}
-		}
-		// If there's an aggregated selection, prefer that
-		if cleaner.Spec.ResourcePolicySet.AggregatedSelection != "" {
-			resp.LuaScript = cleaner.Spec.ResourcePolicySet.AggregatedSelection
+// notificationInfosFromCleaner summarizes a Cleaner's Notifications for API responses.
+func notificationInfosFromCleaner(cleaner *appsv1alpha1.Cleaner) []notificationInfo {
+	notifications := make([]notificationInfo, 0, len(cleaner.Spec.Notifications))
+	for i := range cleaner.Spec.Notifications {
+		n := &cleaner.Spec.Notifications[i]
+		notifications = append(notifications, notificationInfo{
+			Name: n.Name,
+			Type: string(n.Type),
+		})
+	}
+	return notifications
+}
+
+// primaryLuaScript returns the Lua script most relevant to show a user: the
+// ResourcePolicySet's AggregatedSelection when set, otherwise the first
+// non-empty per-selector Evaluate script.
+func primaryLuaScript(cleaner *appsv1alpha1.Cleaner) string {
+	if cleaner.Spec.ResourcePolicySet.AggregatedSelection != "" {
+		return cleaner.Spec.ResourcePolicySet.AggregatedSelection
+	}
+	for i := range cleaner.Spec.ResourcePolicySet.ResourceSelectors {
+		rs := &cleaner.Spec.ResourcePolicySet.ResourceSelectors[i]
+		if rs.Evaluate != "" {
+			return rs.Evaluate
 		}
 	}
-
-	return resp
+	return ""
 }

@@ -1,0 +1,63 @@
+# This Cleaner instance finds all Pods, in any namespace, that have been
+# stuck in Pending phase for more than 15 minutes (900 seconds).
+# A Pod pending this long is usually unschedulable: insufficient cluster
+# capacity, an unsatisfied node selector/affinity, or an untolerated taint.
+#
+# 900 is a starting point, not a universal threshold - adjust
+# pendingThresholdSeconds below to fit your cluster's normal scheduling
+# latency.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-pending-too-long
+spec:
+  schedule: "*/5 * * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      evaluate: |
+        -- Pods pending longer than this are considered stuck
+        local pendingThresholdSeconds = 900
+
+        -- os.time() always interprets a table's fields as local time, but
+        -- creationTimestamp ("2023-12-12T09:35:56Z") is UTC. localUtcOffsetSeconds
+        -- corrects for that so this works regardless of the host's timezone.
+        function localUtcOffsetSeconds()
+          local now = os.time()
+          return os.difftime(os.time(os.date("*t", now)), os.time(os.date("!*t", now)))
+        end
+
+        function convertTimestampString(timestampStr)
+          local y, mon, d, h, mi, s = string.match(timestampStr, '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)')
+          local asIfLocal = os.time({
+            year = tonumber(y),
+            month = tonumber(mon),
+            day = tonumber(d),
+            hour = tonumber(h),
+            min = tonumber(mi),
+            sec = tonumber(s)
+          })
+          return asIfLocal + localUtcOffsetSeconds()
+        end
+
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          if obj.status ~= nil and obj.status.phase == "Pending" then
+            local created = convertTimestampString(obj.metadata.creationTimestamp)
+            local age = os.difftime(os.time(), tonumber(created))
+            if age > pendingThresholdSeconds then
+              hs.matching = true
+            end
+          end
+
+          return hs
+        end

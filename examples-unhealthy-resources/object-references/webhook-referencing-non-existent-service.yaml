@@ -1,0 +1,79 @@
+# This Cleaner instance finds all Validating/MutatingWebhookConfiguration
+# instances with at least one webhook entry pointing (via clientConfig.service)
+# at a Service that no longer exists.
+# A broken webhook like this can silently block create/update/delete calls for
+# every resource kind it applies to, cluster-wide, until it is fixed.
+#
+# This does not take into account webhooks configured with a URL instead of a
+# Service reference (clientConfig.url).
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: webhooks-referencing-non-existent-service
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: ValidatingWebhookConfiguration
+      group: "admissionregistration.k8s.io"
+      version: v1
+    - kind: MutatingWebhookConfiguration
+      group: "admissionregistration.k8s.io"
+      version: v1
+    - kind: Service
+      group: ""
+      version: v1
+    aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      function hasMissingServiceRef(webhookConfig, existingServices)
+        if webhookConfig.webhooks == nil then
+          return false
+        end
+        for _, webhook in ipairs(webhookConfig.webhooks) do
+          if webhook.clientConfig ~= nil and webhook.clientConfig.service ~= nil then
+            key = getKey(webhook.clientConfig.service.namespace, webhook.clientConfig.service.name)
+            if not existingServices[key] then
+              return true
+            end
+          end
+        end
+        return false
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local webhookConfigs = {}
+        local existingServices = {}
+
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Service" then
+            key = getKey(resource.metadata.namespace, resource.metadata.name)
+            existingServices[key] = true
+          elseif kind == "ValidatingWebhookConfiguration" or kind == "MutatingWebhookConfiguration" then
+            table.insert(webhookConfigs, resource)
+          end
+        end
+
+        local brokenWebhookConfigs = {}
+
+        for _, webhookConfig in ipairs(webhookConfigs) do
+          if hasMissingServiceRef(webhookConfig, existingServices) then
+            table.insert(brokenWebhookConfigs, {resource = webhookConfig})
+          end
+        end
+
+        if #brokenWebhookConfigs > 0 then
+          hs.resources = brokenWebhookConfigs
+        end
+        return hs
+      end

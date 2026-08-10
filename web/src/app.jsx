@@ -10,6 +10,7 @@ import { Footer } from './components/layout/Footer';
 import { ConnectionStatus } from './components/layout/ConnectionStatus';
 import { DashboardPage } from './components/pages/DashboardPage';
 import { ReportsPage } from './components/pages/ReportsPage';
+import { LibraryPage } from './components/pages/LibraryPage';
 import { api } from './utils/fetch';
 import { ENDPOINTS, POLL_INTERVAL_MS, FAST_POLL_INTERVAL_MS, FAST_POLL_DURATION_MS } from './utils/constants';
 
@@ -78,6 +79,7 @@ export function App() {
         <Router>
           <DashboardPage path="/" />
           <ReportsPage path="/reports" />
+          <LibraryPage path="/library" />
           <NotFoundPage default />
         </Router>
       </main>

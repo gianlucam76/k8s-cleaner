@@ -18,4 +18,18 @@ export const ENDPOINTS = {
   cleaner: (name) => `${API_BASE}/cleaners/${encodeURIComponent(name)}`,
   report: (name) => `${API_BASE}/reports/${encodeURIComponent(name)}`,
   rollback: (name) => `${API_BASE}/reports/${encodeURIComponent(name)}/rollback`,
+  library: `${API_BASE}/library`,
+  libraryEntry: (id) => `${API_BASE}/library/${encodeURIComponent(id)}`,
 };
+
+// NotificationType values accepted by the Cleaner CRD (Notification.type).
+export const NOTIFICATION_TYPES = [
+  'CleanerReport',
+  'Slack',
+  'Webex',
+  'Discord',
+  'Teams',
+  'SMTP',
+  'Telegram',
+  'Event',
+];

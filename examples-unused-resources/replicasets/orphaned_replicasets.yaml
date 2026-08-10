@@ -1,0 +1,32 @@
+# This Cleaner instance finds all ReplicaSets, in any namespace, that are
+# scaled to zero (both spec.replicas and status.replicas are 0).
+# These are typically old revisions kept around by a Deployment's
+# revisionHistoryLimit (10 by default) long after they stopped serving
+# traffic, and they accumulate indefinitely if revisionHistoryLimit is unset
+# or set high.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: orphaned-replicasets
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: ReplicaSet
+      group: "apps"
+      version: v1
+      evaluate: |
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          local desired = obj.spec.replicas or 0
+          local current = obj.status.replicas or 0
+
+          if desired == 0 and current == 0 then
+            hs.matching = true
+          end
+
+          return hs
+        end
