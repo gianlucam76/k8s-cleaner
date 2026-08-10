@@ -30,6 +30,10 @@ export function LuaViewer({ code }) {
     } else {
       matchCount.value = 0;
       codeRef.current.textContent = code;
+      // highlight.js refuses to re-highlight a node it already marked as
+      // highlighted, so clear that marker whenever `code` changes under an
+      // already-mounted viewer (e.g. toggling between two scripts).
+      delete codeRef.current.dataset.highlighted;
       hljs.highlightElement(codeRef.current);
     }
   }, [code, search.value]);

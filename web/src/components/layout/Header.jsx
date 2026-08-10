@@ -47,6 +47,7 @@ export function Header() {
           <nav class="flex items-center gap-1 ml-5">
             <a href="/" class={navClass('/')}>Dashboard</a>
             <a href="/reports" class={navClass('/reports')}>Reports</a>
+            <a href="/library" class={navClass('/library')}>Library</a>
           </nav>
         </div>
         <ThemeToggle />

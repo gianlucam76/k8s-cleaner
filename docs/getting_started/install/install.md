@@ -95,7 +95,8 @@ The k8s-cleaner includes an optional **embedded web dashboard** that provides a 
 3. **Lua Script Viewer**: Browse and search your custom Lua logic with syntax highlighting and a copy-to-clipboard feature.
 4. **Report Browser**: Filterable scan reports with status bar charts to track resource improvements over time.
 5. **[Rollback](../features/rollback/rollback.md)**: Revert the most recent `Delete` or `Transform` execution for a Cleaner with one click, when it has `rollback` configured.
-6. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
+6. **Library**: Browse a curated set of ready-made Cleaner recipes, grouped by resource type, preview their selectors and Lua before using them, then set a name/schedule/action/notifications and post them straight to the cluster.
+7. **Flexible Access**: Supports dark/light modes, responsive mobile layouts, and an optional Read-Only mode for production environments.
 
 **⚠️ Important: Data Requirements**
 
@@ -112,6 +113,27 @@ spec:
     - name: report
       type: CleanerReport
 ```
+
+#### Library
+
+The **Library** tab is a curated set of ready-made Cleaner recipes bundled with k8s-cleaner, split into an *Unused Resources* and an *Unhealthy Resources* tab and grouped into labeled sections (RBAC, Workloads, Networking, Storage, and so on) so related recipes sit together.
+
+![Library](../../assets/webui_library.png)
+
+Selecting a recipe opens a preview of its resource selectors and Lua script, followed by a small form limited to:
+
+- **Name** – the Cleaner's name, pre-filled from the recipe.
+- **Schedule** – cron expression, pre-filled from the recipe.
+- **Action** – `Scan` (report only) or `Delete`; always defaults to `Scan` so nothing is removed on first use.
+- **Notifications** – pre-filled with a `CleanerReport` notification, so a recipe posted from the Library shows up in the dashboard immediately (see the Data Requirements note above); add, remove, or change these freely.
+
+The resource selectors and Lua script themselves are never editable here - they always come from the reviewed recipe, not from the form - and clicking **Post Cleaner** creates the Cleaner CR in the cluster.
+
+If a Cleaner with that name already exists, posting shows a comparison of the current Cleaner against what the recipe would set, and an **Update Cleaner** action to resync it from the recipe instead of failing outright.
+
+![Library conflict](../../assets/webui_library_conflict.png)
+
+The Library is subject to the same Read-Only mode as the rest of the dashboard: with `web.readOnly` set, recipes can still be browsed and previewed, but posting and updating are disabled.
 
 #### Enabling the Dashboard via Helm
 

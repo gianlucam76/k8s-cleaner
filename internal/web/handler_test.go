@@ -41,6 +41,7 @@ const (
 	msgOrphaned      = "orphaned"
 	resourceNameOld  = "old"
 	namespaceDefault = "default"
+	unknownLibraryID = "does-not-exist"
 )
 
 // testHandler creates a fully wrapped handler for testing (routes + middleware).

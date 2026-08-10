@@ -9,6 +9,7 @@ const mockLookup = {
   '/api/v1/reports': () => import('../mock/reports.js').then((m) => m.mockReports),
   '/api/v1/config': () => import('../mock/config.js').then((m) => m.mockConfig),
   '/api/v1/health': () => Promise.resolve({ status: 'ok' }),
+  '/api/v1/library': () => import('../mock/library.js').then((m) => m.mockLibrary),
 };
 
 export async function api(url, opts = {}) {
@@ -17,10 +18,27 @@ export async function api(url, opts = {}) {
     const fn = mockLookup[url];
     if (fn) return fn();
 
+    if (url === '/api/v1/cleaners' && opts.method === 'POST') {
+      await new Promise((r) => setTimeout(r, 400));
+      const body = JSON.parse(opts.body);
+      return { name: body.name, schedule: body.schedule, action: 'Scan' };
+    }
+    if (url.startsWith('/api/v1/cleaners/') && opts.method === 'PUT') {
+      await new Promise((r) => setTimeout(r, 400));
+      const name = url.split('/').pop();
+      const body = JSON.parse(opts.body);
+      return { name, schedule: body.schedule, action: 'Scan' };
+    }
     if (url.startsWith('/api/v1/cleaners/') && !url.includes('/trigger')) {
       const name = url.split('/').pop();
       const { mockCleaners } = await import('../mock/cleaners.js');
       return mockCleaners.find((c) => c.name === name) || null;
+    }
+    if (url.startsWith('/api/v1/library/')) {
+      const id = url.split('/').pop();
+      const { mockLibrary, mockLibraryDetail } = await import('../mock/library.js');
+      const summary = mockLibrary.find((e) => e.id === id);
+      return mockLibraryDetail[id] || (summary ? { ...summary, luaScript: '' } : null);
     }
     if (url.startsWith('/api/v1/reports/')) {
       const name = url.split('/').pop();
@@ -52,7 +70,9 @@ export async function api(url, opts = {}) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `HTTP ${res.status}`);
+    const err = new Error(body.error || `HTTP ${res.status}`);
+    err.status = res.status;
+    throw err;
   }
   return res.json();
 }

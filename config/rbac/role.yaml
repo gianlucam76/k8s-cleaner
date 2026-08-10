@@ -25,6 +25,7 @@ rules:
   resources:
   - cleaners
   verbs:
+  - create
   - get
   - list
   - patch

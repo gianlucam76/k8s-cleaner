@@ -1,0 +1,64 @@
+# This Cleaner instance finds all Lease objects (coordination.k8s.io), in any
+# namespace, whose renewTime hasn't been updated in over an hour.
+# Leader-election leases are renewed every ~15s by an active controller; a
+# Lease untouched for an hour almost always means the controller that owned
+# it was uninstalled without releasing its lock.
+#
+# 3600 is a starting point, not a universal threshold - adjust
+# staleThresholdSeconds below if your controllers use a longer lease duration.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: stale-leases
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Lease
+      group: "coordination.k8s.io"
+      version: v1
+      evaluate: |
+        -- Leases not renewed within this window are considered stale
+        local staleThresholdSeconds = 3600
+
+        -- renewTime is a MicroTime ("...T...:...:....123456Z"), unlike the
+        -- second-precision creationTimestamp used elsewhere: fractional
+        -- seconds and the trailing "Z" are simply ignored rather than
+        -- matched exactly.
+        --
+        -- os.time() always interprets a table's fields as local time, but
+        -- renewTime is UTC. localUtcOffsetSeconds corrects for that so this
+        -- works regardless of the host's timezone.
+        function localUtcOffsetSeconds()
+          local now = os.time()
+          return os.difftime(os.time(os.date("*t", now)), os.time(os.date("!*t", now)))
+        end
+
+        function convertTimestampString(timestampStr)
+          local y, mon, d, h, mi, s = string.match(timestampStr, '(%d+)-(%d+)-(%d+)T(%d+):(%d+):(%d+)')
+          local asIfLocal = os.time({
+            year = tonumber(y),
+            month = tonumber(mon),
+            day = tonumber(d),
+            hour = tonumber(h),
+            min = tonumber(mi),
+            sec = tonumber(s),
+          })
+          return asIfLocal + localUtcOffsetSeconds()
+        end
+
+        function evaluate()
+          hs = {}
+          hs.matching = false
+
+          if obj.spec ~= nil and obj.spec.renewTime ~= nil then
+            local renewed = convertTimestampString(obj.spec.renewTime)
+            local age = os.difftime(os.time(), tonumber(renewed))
+            if age > staleThresholdSeconds then
+              hs.matching = true
+            end
+          end
+
+          return hs
+        end

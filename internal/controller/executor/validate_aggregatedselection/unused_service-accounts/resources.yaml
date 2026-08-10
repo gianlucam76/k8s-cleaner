@@ -68,3 +68,9 @@ kind: ServiceAccount
 metadata:
   name: sa-unused
   namespace: baz
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: kube-public

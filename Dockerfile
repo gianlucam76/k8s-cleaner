@@ -28,6 +28,8 @@ COPY api/ api/
 COPY internal/ internal/
 COPY pkg/ pkg/
 COPY web/ web/
+COPY examples-unused-resources/ examples-unused-resources/
+COPY examples-unhealthy-resources/ examples-unhealthy-resources/
 
 # Override web/dist/ with built assets from node stage
 COPY --from=web-builder /web/dist/ web/dist/

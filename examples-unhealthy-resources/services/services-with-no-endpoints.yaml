@@ -1,0 +1,81 @@
+# This Cleaner instance finds all Services, in any namespace, with a selector
+# but no matching ready Endpoints - i.e. no Pod currently backs the Service.
+# This is a common source of forgotten cloud LoadBalancer cost: the workload
+# behind the Service is gone but the Service (and any cloud load balancer it
+# provisioned) is still around.
+#
+# Services without a selector (e.g. ExternalName Services, or Services with
+# manually managed Endpoints) are skipped, since "no matching Pod" does not
+# apply to them.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: services-with-no-endpoints
+spec:
+  schedule: "* 0 * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Service
+      group: ""
+      version: v1
+    - kind: Endpoints
+      group: ""
+      version: v1
+    aggregatedSelection: |
+      function getKey(namespace, name)
+        return namespace .. ":" .. name
+      end
+
+      function endpointsHasReadyAddress(endpoints)
+        if endpoints.subsets == nil then
+          return false
+        end
+        for _, subset in ipairs(endpoints.subsets) do
+          if subset.addresses ~= nil and #subset.addresses > 0 then
+            return true
+          end
+        end
+        return false
+      end
+
+      function evaluate()
+        local hs = {}
+        hs.message = ""
+
+        local services = {}
+        local endpointsByKey = {}
+
+        for _, resource in ipairs(resources) do
+          local kind = resource.kind
+          if kind == "Service" then
+            table.insert(services, resource)
+          elseif kind == "Endpoints" then
+            key = getKey(resource.metadata.namespace, resource.metadata.name)
+            endpointsByKey[key] = resource
+          end
+        end
+
+        local emptyServices = {}
+
+        for _, service in ipairs(services) do
+          -- Skip Services with no selector: their Endpoints are not managed
+          -- by the endpoints controller based on Pod matching
+          local hasSelector = service.spec.selector ~= nil and next(service.spec.selector) ~= nil
+          if hasSelector and service.spec.type ~= "ExternalName" then
+            key = getKey(service.metadata.namespace, service.metadata.name)
+            endpoints = endpointsByKey[key]
+            if endpoints == nil or not endpointsHasReadyAddress(endpoints) then
+              table.insert(emptyServices, {resource = service})
+            end
+          end
+        end
+
+        if #emptyServices > 0 then
+          hs.resources = emptyServices
+        end
+        return hs
+      end
