@@ -109,8 +109,20 @@ func setupScheme() (*runtime.Scheme, error) {
 }
 
 const (
-	kindSecret   = "Secret"
-	apiVersionV1 = "v1"
+	kindSecret         = "Secret"
+	kindServiceAccount = "ServiceAccount"
+	apiVersionV1       = "v1"
+
+	reasonFailedMount = "FailedMount"
+	reasonModernAPI   = "ModernAPIReason"
+)
+
+// timeout/pollingInterval are for Eventually() against envtest (in-process,
+// no kubelet), so they're far shorter than test/fv's equivalents, which poll
+// a real kind cluster.
+const (
+	timeout         = 10 * time.Second
+	pollingInterval = 200 * time.Millisecond
 )
 
 func randomString() string {

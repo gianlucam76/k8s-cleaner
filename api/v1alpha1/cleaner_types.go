@@ -99,6 +99,28 @@ type MetricQuery struct {
 	Query string `json:"query"`
 }
 
+// LogSource configures fetching container log tails for a candidate resource
+// before it is evaluated. Only applies when the ResourceSelector targets Pods;
+// ignored (with a warning logged) for any other Kind.
+type LogSource struct {
+	// Containers restricts which containers' logs are fetched.
+	// Empty means every container in the Pod.
+	// +optional
+	Containers []string `json:"containers,omitempty"`
+
+	// TailLines is the number of most recent log lines fetched per container.
+	// +kubebuilder:default:=50
+	// +optional
+	TailLines *int64 `json:"tailLines,omitempty"`
+
+	// Previous additionally fetches, for every selected container that has
+	// restarted (RestartCount > 0), the log of its previous instance. Useful
+	// to inspect why a container in CrashLoopBackOff last exited.
+	// +kubebuilder:default:=false
+	// +optional
+	Previous bool `json:"previous,omitempty"`
+}
+
 type ResourceSelector struct {
 	// Namespace of the resource deployed in the  Cluster.
 	// Empty for resources scoped at cluster level.
@@ -128,6 +150,8 @@ type ResourceSelector struct {
 	// Must return struct with field "matching" representing whether
 	// object is a match and an optional "message" field.
 	// The global metrics table is available when MetricSource is set.
+	// The global events table is available when IncludeEvents is set.
+	// The global logs (and logsByContainer) table is available when LogSource is set.
 	// +optional
 	Evaluate string `json:"evaluate,omitempty"`
 
@@ -147,6 +171,22 @@ type ResourceSelector struct {
 	// via metrics["<name>"].
 	// +optional
 	MetricQueries []MetricQuery `json:"metricQueries,omitempty"`
+
+	// IncludeEvents, when true, fetches recent Events involving each candidate
+	// resource before it is evaluated. Results are exposed to the Evaluate
+	// script via the global events table: an array of
+	// {reason, message, type, count, lastTimestamp}.
+	// +kubebuilder:default:=false
+	// +optional
+	IncludeEvents bool `json:"includeEvents,omitempty"`
+
+	// LogSource configures fetching container log tails before evaluation.
+	// Applies only when this ResourceSelector's Kind is Pod. Results are exposed
+	// to the Evaluate script via the global logs table (every selected container's tail
+	// concatenated into one string) and logsByContainer table (container name -> tail
+	// string).
+	// +optional
+	LogSource *LogSource `json:"logSource,omitempty"`
 }
 
 type ResourcePolicySet struct {

@@ -54,6 +54,8 @@ nav:
       - More Examples: 'getting_started/examples/unhealthy_resources/more_examples.md'
     - Metric-based Selection:
       - Example - Scale Down on High Error Rate / Restart on Memory Saturation: 'getting_started/examples/metrics/metric_based_selection.md'
+    - Event and Log-based Selection:
+      - Example - Repeated FailedMount Events / OOM in Previous Container Log: 'getting_started/examples/events_logs/events_logs_selection.md'
 - Reports: 'reports/k8s-cleaner_reports.md'
 - Notifications: 'notifications/notifications.md'
 - Blogs and videos: 'resources/blogs.md'

@@ -209,6 +209,8 @@ spec:
                             Must return struct with field "matching" representing whether
                             object is a match and an optional "message" field.
                             The global metrics table is available when MetricSource is set.
+                            The global events table is available when IncludeEvents is set.
+                            The global logs (and logsByContainer) table is available when LogSource is set.
                           type: string
                         excludeDeleted:
                           default: true
@@ -219,6 +221,14 @@ spec:
                         group:
                           description: Group of the resource deployed in the Cluster.
                           type: string
+                        includeEvents:
+                          default: false
+                          description: |-
+                            IncludeEvents, when true, fetches recent Events involving each candidate
+                            resource before it is evaluated. Results are exposed to the Evaluate
+                            script via the global events table: an array of
+                            {reason, message, type, count, lastTimestamp}.
+                          type: boolean
                         kind:
                           description: Kind of the resource deployed in the Cluster.
                           minLength: 1
@@ -247,6 +257,35 @@ spec:
                             - operation
                             type: object
                           type: array
+                        logSource:
+                          description: |-
+                            LogSource configures fetching container log tails before evaluation.
+                            Applies only when this ResourceSelector's Kind is Pod. Results are exposed
+                            to the Evaluate script via the global logs table (every selected container's tail
+                            concatenated into one string) and logsByContainer table (container name -> tail
+                            string).
+                          properties:
+                            containers:
+                              description: |-
+                                Containers restricts which containers' logs are fetched.
+                                Empty means every container in the Pod.
+                              items:
+                                type: string
+                              type: array
+                            previous:
+                              default: false
+                              description: |-
+                                Previous additionally fetches, for every selected container that has
+                                restarted (RestartCount > 0), the log of its previous instance. Useful
+                                to inspect why a container in CrashLoopBackOff last exited.
+                              type: boolean
+                            tailLines:
+                              default: 50
+                              description: TailLines is the number of most recent
+                                log lines fetched per container.
+                              format: int64
+                              type: integer
+                          type: object
                         metricQueries:
                           description: |-
                             MetricQueries is a list of PromQL instant queries to execute against
@@ -535,6 +574,20 @@ rules:
   - get
   - list
   - update
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  verbs:
+  - get
 - apiGroups:
   - '*'
   resources:

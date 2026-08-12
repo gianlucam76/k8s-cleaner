@@ -19,6 +19,7 @@ package executor_test
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/zapr"
@@ -359,5 +360,80 @@ var _ = Describe("Worker", func() {
 		// selector), so it can be larger than 2, but must at least cover secret and secret2.
 		Expect(totalScanned).To(BeNumerically(">=", 2))
 		Expect(resources[0].Resource.GetName()).To(Equal(secret.Name))
+	})
+
+	It("getMatchingResources evaluates using the events global when IncludeEvents is set", func() {
+		sa := &corev1.ServiceAccount{
+			ObjectMeta: metav1.ObjectMeta{Namespace: ns.Name, Name: randomString()},
+		}
+		Expect(k8sClient.Create(context.TODO(), sa)).To(Succeed())
+
+		event := &corev1.Event{
+			ObjectMeta: metav1.ObjectMeta{Namespace: ns.Name, Name: randomString()},
+			InvolvedObject: corev1.ObjectReference{
+				Kind: kindServiceAccount, APIVersion: apiVersionV1,
+				Namespace: sa.Namespace, Name: sa.Name, UID: sa.UID,
+			},
+			Reason:        reasonFailedMount,
+			Type:          corev1.EventTypeWarning,
+			LastTimestamp: metav1.NewTime(time.Now()),
+		}
+		Expect(k8sClient.Create(context.TODO(), event)).To(Succeed())
+
+		matchOnFailedMount := fmt.Sprintf(`function evaluate(obj)
+   local hs = {}
+   hs.matching = false
+   for _, e in ipairs(events) do
+     if e.reason == %q then
+       hs.matching = true
+     end
+   end
+   return hs
+   end
+   `, reasonFailedMount)
+
+		resourceSelector := &appsv1alpha1.ResourceSelector{
+			Kind:          kindServiceAccount,
+			Group:         "",
+			Version:       apiVersionV1,
+			Namespace:     ns.Name,
+			IncludeEvents: true,
+			Evaluate:      matchOnFailedMount,
+		}
+
+		var resources []executor.ResourceResult
+		Eventually(func() bool {
+			var err error
+			resources, _, err = executor.GetMatchingResources(context.TODO(), resourceSelector, logr.Logger{})
+			return err == nil && len(resources) == 1
+		}, timeout, pollingInterval).Should(BeTrue())
+		Expect(resources[0].Resource.GetName()).To(Equal(sa.Name))
+	})
+
+	It("getMatchingResources ignores LogSource when the ResourceSelector does not target Pods", func() {
+		sa := &corev1.ServiceAccount{
+			ObjectMeta: metav1.ObjectMeta{Namespace: ns.Name, Name: randomString()},
+		}
+		Expect(k8sClient.Create(context.TODO(), sa)).To(Succeed())
+
+		matchAlways := `function evaluate(obj)
+   return {matching = true}
+   end`
+
+		resourceSelector := &appsv1alpha1.ResourceSelector{
+			Kind:      kindServiceAccount,
+			Group:     "",
+			Version:   apiVersionV1,
+			Namespace: ns.Name,
+			LogSource: &appsv1alpha1.LogSource{},
+			Evaluate:  matchAlways,
+		}
+
+		// LogSource is meaningless for a ServiceAccount selector; this must not
+		// error, just proceed as if LogSource were unset.
+		resources, _, err := executor.GetMatchingResources(context.TODO(), resourceSelector, logr.Logger{})
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resources).To(HaveLen(1))
+		Expect(resources[0].Resource.GetName()).To(Equal(sa.Name))
 	})
 })

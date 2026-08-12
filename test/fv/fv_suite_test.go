@@ -53,6 +53,7 @@ const (
 	kindSecret         = "Secret"
 	kindServiceAccount = "ServiceAccount"
 	kindService        = "Service"
+	kindPod            = "Pod"
 	apiVersionV1       = "v1"
 	labelApp           = "app"
 	volumeMountConf    = "conf"

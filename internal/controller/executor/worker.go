@@ -36,6 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -83,11 +84,16 @@ var (
 	k8sClient client.Client
 	config    *rest.Config
 	scheme    *runtime.Scheme
+	// clientset is a typed Kubernetes clientset, needed alongside k8sClient
+	// (controller-runtime's client.Client) because fetching container logs
+	// hits the pods/log subresource, which client.Client does not expose.
+	clientset *kubernetes.Clientset
 )
 
 const (
 	luaTableError = "lua script output is not a lua table"
 	luaBoolError  = "lua script output is not a lua bool"
+	apiVersionV1  = "v1"
 )
 
 type evaluateStatus struct {
@@ -277,6 +283,14 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 		return nil, 0, err
 	}
 
+	// LogSource only makes sense for Pods; decided once here (rather than per
+	// resource in the loop below) so a misconfigured non-Pod ResourceSelector
+	// logs a single warning instead of one per matched resource.
+	targetsPods := sr.Group == "" && sr.Version == apiVersionV1 && sr.Kind == "Pod"
+	if sr.LogSource != nil && !targetsPods {
+		logger.Info("logSource is set but this ResourceSelector does not target Pods; ignoring")
+	}
+
 	results := make([]ResourceResult, 0)
 	for i := range resources {
 		resource := &resources[i]
@@ -287,7 +301,35 @@ func getMatchingResources(ctx context.Context, sr *appsv1alpha1.ResourceSelector
 			resource.GetKind(), resource.GetNamespace(), resource.GetName()))
 		l.V(logs.LogDebug).Info("considering resource for deletion")
 
-		isMatch, message, err := isMatch(resource, sr.Evaluate, metricsData, l)
+		// events and logs are best-effort: a fetch failure for one candidate
+		// resource should not abort evaluation of every other candidate in
+		// this ResourceSelector, so failures are logged and treated as "no
+		// data available" rather than propagated.
+		var resourceEvents []corev1.Event
+		if sr.IncludeEvents {
+			resourceEvents, err = fetchEvents(ctx, resource)
+			if err != nil {
+				l.Info(fmt.Sprintf("failed to fetch events, evaluating without them: %v", err))
+				resourceEvents = nil
+			}
+		}
+
+		var currentLogs, previousLogs *containerLogTails
+		if sr.LogSource != nil && targetsPods {
+			pod := &corev1.Pod{}
+			if convErr := runtime.DefaultUnstructuredConverter.FromUnstructured(
+				resource.UnstructuredContent(), pod); convErr != nil {
+				l.Info(fmt.Sprintf("failed to convert resource to Pod, evaluating without logs: %v", convErr))
+			} else {
+				currentLogs, previousLogs, err = fetchPodLogs(ctx, pod, sr.LogSource, l)
+				if err != nil {
+					l.Info(fmt.Sprintf("failed to fetch logs, evaluating without them: %v", err))
+					currentLogs, previousLogs = nil, nil
+				}
+			}
+		}
+
+		isMatch, message, err := isMatch(resource, sr.Evaluate, metricsData, resourceEvents, currentLogs, previousLogs, l)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -568,7 +610,41 @@ func getNamespaces(ctx context.Context, resourceSelector *appsv1alpha1.ResourceS
 	return matchingNamespaces, nil
 }
 
-func isMatch(resource *unstructured.Unstructured, script string, metricsData map[string]float64, logger logr.Logger,
+// setEvaluateGlobals sets every global an Evaluate script may reference besides
+// obj: metrics (MetricSource/MetricQueries), events (IncludeEvents), and
+// logs/logsByContainer/logsPrevious/logsPreviousByContainer (LogSource). Each
+// is always defined, empty when its corresponding ResourceSelector option is
+// unset, so a script can reference them without a nil check.
+func setEvaluateGlobals(l *lua.LState, metricsData map[string]float64, events []corev1.Event,
+	currentLogs, previousLogs *containerLogTails) {
+
+	metricsTable := l.NewTable()
+	for k, v := range metricsData {
+		metricsTable.RawSetString(k, lua.LNumber(v))
+	}
+	l.SetGlobal("metrics", metricsTable)
+
+	eventsTable := l.NewTable()
+	for i := range events {
+		ev := &events[i]
+		entry := l.NewTable()
+		entry.RawSetString("reason", lua.LString(ev.Reason))
+		entry.RawSetString("message", lua.LString(ev.Message))
+		entry.RawSetString("type", lua.LString(ev.Type))
+		entry.RawSetString("count", lua.LNumber(ev.Count))
+		entry.RawSetString("lastTimestamp", lua.LString(eventTimestamp(ev).Format(time.RFC3339)))
+		eventsTable.Append(entry)
+	}
+	l.SetGlobal("events", eventsTable)
+
+	l.SetGlobal("logs", lua.LString(combinedLogs(currentLogs)))
+	l.SetGlobal("logsByContainer", logsByContainerTable(l, currentLogs))
+	l.SetGlobal("logsPrevious", lua.LString(combinedLogs(previousLogs)))
+	l.SetGlobal("logsPreviousByContainer", logsByContainerTable(l, previousLogs))
+}
+
+func isMatch(resource *unstructured.Unstructured, script string, metricsData map[string]float64,
+	events []corev1.Event, currentLogs, previousLogs *containerLogTails, logger logr.Logger,
 ) (matching bool, message string, err error) {
 
 	if script == "" {
@@ -578,11 +654,7 @@ func isMatch(resource *unstructured.Unstructured, script string, metricsData map
 	l := lua.NewState()
 	defer l.Close()
 
-	metricsTable := l.NewTable()
-	for k, v := range metricsData {
-		metricsTable.RawSetString(k, lua.LNumber(v))
-	}
-	l.SetGlobal("metrics", metricsTable)
+	setEvaluateGlobals(l, metricsData, events, currentLogs, previousLogs)
 
 	obj := mapToTable(resource.UnstructuredContent())
 
@@ -860,6 +932,29 @@ func getRequestStatus(cleanerName string) (*responseParams, error) {
 func removeFromSlice(s []string, i int) []string {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
+}
+
+// combinedLogs returns tails.Combined, or "" when tails is nil (LogSource
+// unset, or the resource wasn't a Pod, or logsPrevious with no restarts).
+func combinedLogs(tails *containerLogTails) string {
+	if tails == nil {
+		return ""
+	}
+	return tails.Combined
+}
+
+// logsByContainerTable converts tails.ByContainer to a lua table, or an
+// empty table when tails is nil, so the Evaluate script can always index it
+// without a nil check.
+func logsByContainerTable(l *lua.LState, tails *containerLogTails) *lua.LTable {
+	tbl := l.NewTable()
+	if tails == nil {
+		return tbl
+	}
+	for name, tail := range tails.ByContainer {
+		tbl.RawSetString(name, lua.LString(tail))
+	}
+	return tbl
 }
 
 // mapToTable converts a Go map to a lua table
