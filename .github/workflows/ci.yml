@@ -26,7 +26,7 @@ jobs:
       with:
         python-version: 3.x
     - name: Install Zensical
-      run: pip install zensical==0.0.32
+      run: pip install zensical==0.0.53
     - name: Build documentation site
       run: zensical build --clean
     - name: Upload Pages artifact
