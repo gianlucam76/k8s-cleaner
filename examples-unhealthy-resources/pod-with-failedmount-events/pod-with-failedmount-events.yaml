@@ -1,0 +1,36 @@
+# This Cleaner instance finds all Pods, in any namespace, that have
+# accumulated more than 5 FailedMount Events. A Pod repeatedly failing to
+# mount a volume (missing ConfigMap/Secret, unavailable PersistentVolume,
+# wrong permissions, ...) is very unlikely to recover on its own.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-with-failedmount-events
+spec:
+  schedule: "*/10 * * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      includeEvents: true
+      evaluate: |
+        function evaluate(obj)
+          hs = {}
+          hs.matching = false
+
+          for _, e in ipairs(events) do
+            if e.reason == "FailedMount" and e.count > 5 then
+              hs.matching = true
+              hs.message = "repeated FailedMount events: " .. e.count
+              break
+            end
+          end
+
+          return hs
+        end

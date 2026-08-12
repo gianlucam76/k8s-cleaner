@@ -633,7 +633,7 @@ func getSecret(ctx context.Context, notification *appsv1alpha1.Notification) (*c
 		return nil, fmt.Errorf("notification must reference secret containing slack token/channel id")
 	}
 
-	if notification.NotificationRef.APIVersion != "v1" {
+	if notification.NotificationRef.APIVersion != apiVersionV1 {
 		return nil, fmt.Errorf("notification must reference secret containing slack token/channel id")
 	}
 

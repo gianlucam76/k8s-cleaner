@@ -27,6 +27,12 @@ var (
 	AggregatedSelection     = aggregatedSelection
 	GetNamespaces           = getNamespaces
 
+	FetchEvents            = fetchEvents
+	FetchPodLogs           = fetchPodLogs
+	SelectedContainerNames = selectedContainerNames
+	HasRestarted           = hasRestarted
+	CombineContainerLogs   = combineContainerLogs
+
 	GetResourceKey             = getResourceKey
 	GetThrottledResources      = getThrottledResources
 	FilterResourcesByThreshold = filterResourcesByThreshold
@@ -34,6 +40,10 @@ var (
 
 	CheckBlastRadiusLimit = checkBlastRadiusLimit
 )
+
+// ContainerLogTails is an alias for the unexported containerLogTails, so
+// tests in package executor_test can build one directly.
+type ContainerLogTails = containerLogTails
 
 var (
 	GenerateReportSpec      = generateReportSpec

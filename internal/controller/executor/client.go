@@ -25,6 +25,7 @@ import (
 	"github.com/go-logr/zapr"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/events"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -132,6 +133,15 @@ func (m *Manager) startWorkloadWorkers(ctx context.Context, numOfWorker int, log
 	k8sClient = m.Client
 	config = m.config
 	scheme = m.scheme
+
+	cs, err := kubernetes.NewForConfig(m.config)
+	if err != nil {
+		// LogSource fetches will fail for individual resources; nothing else
+		// in the executor depends on clientset, so this is not fatal.
+		logger.Error(err, "failed to build Kubernetes clientset; LogSource evaluation will be unavailable")
+	} else {
+		clientset = cs
+	}
 
 	for i := 0; i < numOfWorker; i++ {
 		go processRequests(ctx, i, logger.WithValues("worker", fmt.Sprintf("%d", i)))

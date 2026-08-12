@@ -44,6 +44,8 @@ There are also examples to identify unhealthy resources:
 
   - [Pods Mounting Secrets with Old Content](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-outdated-secrets): Detect pods that are not utilizing the most recent Secret data.
   - [Pods Using Expired Certificates](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-expired-certificates): Pinpoint pods that are operating with expired security certificates.
+  - [Pods with Repeated FailedMount Events](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-failedmount-events): Identify pods stuck unable to mount a volume.
+  - [Pods with an OOM in Their Previous Log](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unhealthy-resources/pod-with-oom-in-logs): Identify crash-looping pods whose last exit was an out-of-memory kill.
 
 And examples that combine resource state with **live Prometheus metrics**:
 
@@ -69,6 +71,8 @@ And examples that combine resource state with **live Prometheus metrics**:
 7️⃣ [**Metric-based Selection**](https://gianlucam76.github.io/k8s-cleaner/getting_started/examples/metrics/metric_based_selection): Query any Prometheus-compatible endpoint before evaluating each resource. The results are exposed as a global `metrics` table in the Lua script, so you can gate resource matching on live metric values — for example, scale down Deployments only when their HTTP error rate exceeds 5%, or restart Pods only when memory saturation is reported by Prometheus.
 
 8️⃣ [**Rollback**](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/rollback/rollback): Capture the state of every resource right before a `Delete` or `Transform` action, so the most recent execution can be reverted with a single API call, no PersistentVolume required.
+
+9️⃣ [**Event and Log-based Selection**](https://gianlucam76.github.io/k8s-cleaner/getting_started/examples/events_logs/events_logs_selection): Fetch recent Events and, for Pods, container log tails before evaluating each resource. Exposed as `events` and `logs`/`logsByContainer` globals in the Lua script — for example, delete Pods that accumulated repeated `FailedMount` events, or ones whose previous crashed instance logged an out-of-memory error.
 
 For a complete list of **features** with **examples**, have a look at the [link](https://gianlucam76.github.io/k8s-cleaner/getting_started/features/dryrun/dryrun).
 

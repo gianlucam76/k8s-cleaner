@@ -1,0 +1,34 @@
+# This Cleaner instance finds all Pods, in any namespace, whose "app"
+# container has restarted (RestartCount > 0) and whose *previous* instance's
+# log - the one that actually crashed - mentions an out-of-memory error. The
+# current instance's log, right after a fresh restart, would not show it yet.
+apiVersion: apps.projectsveltos.io/v1alpha1
+kind: Cleaner
+metadata:
+  name: pods-with-oom-in-logs
+spec:
+  schedule: "*/5 * * * *"
+  action: Scan
+  notifications:
+  - name: report
+    type: CleanerReport
+  resourcePolicySet:
+    resourceSelectors:
+    - kind: Pod
+      group: ""
+      version: v1
+      excludeDeleted: false
+      logSource:
+        containers: ["app"]
+        tailLines: 100
+        previous: true
+      evaluate: |
+        function evaluate(obj)
+          hs = {}
+          hs.matching = logsPrevious ~= nil and
+            string.find(logsPrevious, "OutOfMemoryError") ~= nil
+          if hs.matching then
+            hs.message = "previous instance's log mentions an out-of-memory error"
+          end
+          return hs
+        end
