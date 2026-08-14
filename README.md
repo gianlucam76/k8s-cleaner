@@ -92,7 +92,7 @@ By combining the **flexibility** of **scheduling**, the **accuracy** of **label 
 - 👉 To get updates [⭐️ star](https://github.com/gianlucam76/k8s-cleaner/stargazers) this repository.
 - 👉 Working examples can be found in the [examples](https://github.com/gianlucam76/k8s-cleaner/tree/main/examples-unused-resources) section.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=gianlucam76/k8s-cleaner&type=Date)](https://www.star-history.com/#gianlucam76/k8s-cleaner&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=gianlucam76/k8s-cleaner&type=Date)](https://star-history.dera.page/#gianlucam76/k8s-cleaner&Date)
 
 ## Getting Started Guide
 
