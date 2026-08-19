@@ -9,7 +9,7 @@ COPY web/ .
 RUN if [ -f package.json ]; then npm run build; else mkdir -p dist; fi
 
 # Stage 2: Build the manager binary
-FROM golang:1.26.6 AS builder
+FROM golang:1.27.0 AS builder
 
 ARG BUILDOS
 ARG TARGETARCH
