@@ -10,7 +10,7 @@ require (
 	golang.org/x/tools v0.49.0
 	k8s.io/client-go v0.36.3
 	sigs.k8s.io/controller-tools v0.21.0
-	sigs.k8s.io/kind v0.32.0
+	sigs.k8s.io/kind v0.33.0
 )
 
 require (
