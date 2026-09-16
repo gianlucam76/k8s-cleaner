@@ -54,9 +54,9 @@ spec:
         {{- end }}
         {{- range $key, $value := .Values.controller.args }}
              {{- if not (kindIs "invalid" $value) }}
-          - -{{ $key | mustRegexFind "^[^_]+" }}={{ include "k8s-cleaner.template" (dict "tpl" $value "ctx" $.ctx) }}
+          - {{ printf "%s=%s" (include "k8s-cleaner.argFlag" $key) (include "k8s-cleaner.template" (dict "tpl" $value "ctx" $)) | quote }}
             {{- else }}
-          - -{{ $key | mustRegexFind "^[^_]+" }}
+          - {{ include "k8s-cleaner.argFlag" $key | quote }}
             {{- end }}
         {{- end }}
           env:

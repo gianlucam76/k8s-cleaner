@@ -1,0 +1,13 @@
+# Installs the chart with every shape of controller.args, so a regression in
+# the argument rendering fails the chart-testing install instead of reaching
+# users. Every flag here is a real manager flag, so the controller must start.
+controller:
+  args:
+    # A plain key: --worker-number=5
+    worker-number: 5
+    # A null value renders the flag alone: --disable-telemetry
+    disable-telemetry: null
+    # A templated value: --concurrent-reconciles=10
+    concurrent-reconciles: "{{ .Values.replicaCount | mul 10 }}"
+    # A key that already carries its dashes: --jitter-window=15
+    "-jitter-window=15": null

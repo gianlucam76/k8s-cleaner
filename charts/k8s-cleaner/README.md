@@ -23,12 +23,37 @@ Major Changes to functions are documented with the version affected. **Before up
 | :--------- | :---------------- | :-------------- | :-------------- |
 |||||
 
+# Controller arguments
+
+`controller.args` is a map of flag name to flag value:
+
+```yaml
+controller:
+  args:
+    # Renders --worker-number=10
+    worker-number: 10
+    # A single character flag takes a single dash: -v=5
+    v: 5
+    # A null value renders the flag alone: --dry-run
+    dry-run: null
+    # Values are rendered as templates
+    cluster-name: "{{ .Release.Name }}"
+    # A _<suffix> is stripped from the flag name, so the same flag can be
+    # passed twice: --label=a and --label=b
+    label_1: a
+    label_2: b
+    # A key that already starts with a dash gets two dashes whatever its
+    # length: --v and --worker-number=1
+    "-v": null
+    "-worker-number=1": null
+```
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity |
-| controller.args | object | `{}` | Controller ARguments |
+| controller.args | object | `{}` | Controller arguments, as a map of flag name to flag value. See the Controller arguments section of the README for the rules and an example. |
 | controller.image.pullPolicy | string | `"IfNotPresent"` | Controller Image pull policy |
 | controller.image.registry | string | `"docker.io"` | Controller Image Registry |
 | controller.image.repository | string | `"projectsveltos/k8s-cleaner"` | Controller Image Repository |

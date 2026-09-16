@@ -75,12 +75,30 @@ Resolve a controller port by name, falling back to a default value when absent.
 {{- printf "%v" $port -}}
 {{- end }}
 
+{{/*
+Render a value through the template engine. Expects a dict with "tpl" (the
+value) and "ctx" (the root context).
+*/}}
 {{- define "k8s-cleaner.template" -}}
-  {{- if $.ctx }}
-    {{- if typeIs "string" $.tpl }}
-      {{- tpl  $.tpl $.ctx  | replace "+|" "\n" }}
-    {{- else }}
-      {{- tpl ($.tpl | toYaml) $.ctx | replace "+|" "\n" }}
-    {{- end }}
+  {{- if typeIs "string" $.tpl }}
+    {{- tpl $.tpl $.ctx | replace "+|" "\n" }}
+  {{- else }}
+    {{- tpl ($.tpl | toYaml) $.ctx | replace "+|" "\n" }}
   {{- end }}
+{{- end -}}
+
+{{/*
+Render the flag name of a controller argument. The chart README documents the
+naming rules. Leading dashes are normalised rather than kept, so the workaround
+of writing the whole flag in the key keeps rendering as it did before the
+values were rendered correctly.
+*/}}
+{{- define "k8s-cleaner.argFlag" -}}
+{{- $flag := . | mustRegexFind "^[^_]+" -}}
+{{- $name := regexReplaceAll "^-+" $flag "" -}}
+{{- if or (hasPrefix "-" $flag) (gt (len $name) 1) -}}
+{{- printf "--%s" $name -}}
+{{- else -}}
+{{- printf "-%s" $name -}}
+{{- end -}}
 {{- end -}}
