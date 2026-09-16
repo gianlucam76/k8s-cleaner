@@ -29,7 +29,7 @@ controller:
     tag: "v0.23.0"
     # -- Controller Image pull policy
     pullPolicy: IfNotPresent
-  # -- Controller ARguments
+  # -- Controller arguments, as a map of flag name to flag value. See the Controller arguments section of the README for the rules and an example.
   args: {}
   ports:
   - containerPort: 8443
