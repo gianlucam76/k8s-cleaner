@@ -57,7 +57,7 @@ controller:
 | controller.image.pullPolicy | string | `"IfNotPresent"` | Controller Image pull policy |
 | controller.image.registry | string | `"docker.io"` | Controller Image Registry |
 | controller.image.repository | string | `"projectsveltos/k8s-cleaner"` | Controller Image Repository |
-| controller.image.tag | string | `"v0.23.0"` | ControllerImage Tag |
+| controller.image.tag | string | `"v0.24.0"` | ControllerImage Tag |
 | controller.livenessProbe | object | `{"enabled":true,"httpGet":{"path":"/healthz","port":"healthz","scheme":"HTTP"},"initialDelaySeconds":15,"periodSeconds":20}` | Controller LivenessProbe |
 | controller.ports[0].containerPort | int | `8443` |  |
 | controller.ports[0].name | string | `"metrics"` |  |
