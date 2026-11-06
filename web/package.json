@@ -12,7 +12,7 @@
   "dependencies": {
     "@preact/signals": "^2.0.0",
     "highlight.js": "^11.11.0",
-    "preact": "^10.25.0",
+    "preact": "^11.0.0",
     "preact-router": "^4.1.2"
   },
   "devDependencies": {
